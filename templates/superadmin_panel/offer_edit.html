@@ -1,0 +1,342 @@
+{% extends "core/base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+  {% if offer %}Editar Oferta{% else %}Crear Oferta{% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-6">
+  <div class="column is-half is-offset-one-quarter">
+    <div class="box">
+
+      {# TÍTULO #}
+      <h1 class="title has-text-centered mb-5">
+        🔥
+        {% if hide_product_field and product_from_url %}
+          Oferta para <span class="has-text-info">{{ product_from_url.title }}</span>
+        {% elif offer %}
+          Oferta para <span class="has-text-info">{{ offer.product.title }}</span>
+        {% else %}
+          {% if offer %}Editar oferta{% else %}Crear oferta{% endif %}
+        {% endif %}
+      </h1>
+
+      {# ERRORES GENERALES #}
+      {% if form.non_field_errors %}
+        <div class="notification is-danger is-light">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      {# INFO DEL PRODUCTO (precio normal y oferta actual) SI TENEMOS PRODUCTO DEFINIDO #}
+      {% if hide_product_field and product_from_url %}
+        {% with product_obj=product_from_url %}
+          <div class="notification is-light">
+            <strong>Producto:</strong> {{ product_obj.title }}<br>
+            <strong>Vendedor:</strong> {{ product_obj.vendor.name }}<br>
+            <strong>Precio normal:</strong> ${{ product_obj.price }} <br>
+
+            {% if product_obj.active_offer %}
+              <strong>Precio actual con oferta:</strong>
+              <span class="has-text-danger has-text-weight-bold">
+                ${{ product_obj.final_price }}
+              </span>
+              <span class="tag is-success is-light ml-2">Oferta activa</span>
+            {% else %}
+              <span class="tag is-light">Sin oferta activa</span>
+            {% endif %}
+          </div>
+        {% endwith %}
+      {% elif offer %}
+        {% with product_obj=offer.product %}
+          <div class="notification is-light">
+            <strong>Producto:</strong> {{ product_obj.title }}<br>
+            <strong>Vendedor:</strong> {{ product_obj.vendor.name }}<br>
+            <strong>Precio normal:</strong> ${{ product_obj.price }} <br>
+
+            {% if product_obj.active_offer %}
+              <strong>Precio actual con oferta:</strong>
+              <span class="has-text-danger has-text-weight-bold">
+                ${{ product_obj.final_price }}
+              </span>
+              <span class="tag is-success is-light ml-2">Oferta activa</span>
+            {% else %}
+              <span class="tag is-light">Sin oferta activa</span>
+            {% endif %}
+          </div>
+        {% endwith %}
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        {# PRODUCTO: fijado o seleccionable #}
+        {% if hide_product_field and product_from_url %}
+          <div class="field">
+            <label class="label">Producto</label>
+            <p><strong>{{ product_from_url.title }}</strong></p>
+            <p class="help">Vendedor: {{ product_from_url.vendor.name }}</p>
+            {{ form.product.as_hidden }}
+          </div>
+        {% else %}
+          <div class="field">
+            <label class="label">Producto</label>
+            <div class="control">
+              {{ form.product|add_class:"input" }}
+            </div>
+            {% if form.product.errors %}
+              <p class="help is-danger">{{ form.product.errors }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {# Campos del formulario #}
+        {% for field in form %}
+          {% if field.name != "product" %}
+
+            <div class="field mt-4">
+
+              {% if field.name == "discount_percentage" %}
+                <label class="label">% de descuento</label>
+                <div class="control">
+                  {{ field|add_class:"input" }}
+                </div>
+                <p class="help">Ej: 20 para un 20%.</p>
+
+              {% elif field.name == "discount_price" %}
+                <label class="label">Precio con descuento</label>
+                <div class="control">
+                  {{ field|add_class:"input" }}
+                </div>
+                <p class="help">Si se usa este valor, tiene prioridad sobre el %.</p>
+
+              {% elif field.name == "is_2x1" %}
+                <label class="checkbox">
+                  {{ field }} Oferta 2x1
+                </label>
+
+              {% elif field.name == "start_date" %}
+                  <label class="label">Fecha/hora inicio</label>
+                  <div class="control">
+                      {{ field|add_class:"input"|attr:"type:datetime-local" }}
+                  </div>
+
+              {% elif field.name == "end_date" %}
+                  <label class="label">Fecha/hora término</label>
+                  <div class="control">
+                      {{ field|add_class:"input"|attr:"type:datetime-local" }}
+                  </div>
+
+              {% elif field.name == "is_active" %}
+                <label class="checkbox">
+                  {{ field }} Activa
+                </label>
+
+              {% else %}
+                <label class="label">{{ field.label }}</label>
+                <div class="control">
+                  {{ field|add_class:"input" }}
+                </div>
+              {% endif %}
+
+              {% if field.errors %}
+                <p class="help is-danger">{{ field.errors }}</p>
+              {% endif %}
+
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {# PREVIEW: solo si tenemos un producto (vía product_from_url o offer) #}
+        {% if hide_product_field and product_from_url %}
+          {% with product_obj=product_from_url %}
+            <div class="box mt-5 has-background-info-light">
+              <h2 class="subtitle mb-2">💰 Vista previa del precio final</h2>
+
+              <p><strong>Precio normal:</strong> ${{ product_obj.price }}</p>
+
+              <p><strong>Precio final estimado:</strong>
+                <span id="preview-final" class="has-text-weight-bold">$—</span>
+              </p>
+            </div>
+          {% endwith %}
+        {% elif offer %}
+          {% with product_obj=offer.product %}
+            <div class="box mt-5 has-background-info-light">
+              <h2 class="subtitle mb-2">💰 Vista previa del precio final</h2>
+
+              <p><strong>Precio normal:</strong> ${{ product_obj.price }}</p>
+
+              <p><strong>Precio final estimado:</strong>
+                <span id="preview-final" class="has-text-weight-bold">$—</span>
+              </p>
+            </div>
+          {% endwith %}
+        {% endif %}
+
+        <!-- Botones -->
+        <div class="field mt-6">
+          <button class="button is-primary is-medium is-fullwidth">
+            Guardar oferta
+          </button>
+        </div>
+
+        <a href="{{ back_url }}" class="button is-light is-fullwidth mt-2">
+          ← Volver
+        </a>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if hide_product_field and product_from_url or offer %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const discountPercentage = document.getElementById("id_discount_percentage");
+  const discountPrice = document.getElementById("id_discount_price");
+  const is2x1 = document.getElementById("id_is_2x1");
+  const preview = document.getElementById("preview-final");
+  const startInput = document.getElementById("id_start_date");
+  const endInput = document.getElementById("id_end_date");
+
+  const basePrice = parseInt(
+    "{% if hide_product_field and product_from_url %}{{ product_from_url.price }}{% elif offer %}{{ offer.product.price }}{% endif %}"
+  );
+
+  function todayMinDatetime() {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now.toISOString().slice(0, 16);
+  }
+
+  const todayMin = todayMinDatetime();
+  if (startInput) startInput.min = todayMin;
+  if (endInput) endInput.min = todayMin;
+
+  function updateEndDateMin() {
+    if (!startInput || !endInput || !startInput.value) return;
+
+    const d = new Date(startInput.value);
+    const minEnd = new Date(d.getTime() + 60000);
+    endInput.min = minEnd.toISOString().slice(0, 16);
+  }
+
+  if (startInput) {
+    startInput.addEventListener("change", updateEndDateMin);
+    updateEndDateMin();
+  }
+
+  function updatePreview() {
+    if (!preview) return;
+
+    let final = basePrice;
+
+    if (discountPrice && discountPrice.value) {
+      final = parseInt(discountPrice.value);
+    } else if (discountPercentage && discountPercentage.value) {
+      final = basePrice - Math.round(basePrice * (discountPercentage.value / 100));
+    }
+
+    preview.textContent = isNaN(final)
+      ? "$—"
+      : "$" + final.toLocaleString();
+  }
+
+  function disableDiscounts() {
+    if (discountPercentage) {
+      discountPercentage.value = "";
+      discountPercentage.disabled = true;
+    }
+    if (discountPrice) {
+      discountPrice.value = "";
+      discountPrice.disabled = true;
+    }
+  }
+
+  function enableDiscounts() {
+    if (discountPercentage) discountPercentage.disabled = false;
+    if (discountPrice) discountPrice.disabled = false;
+  }
+
+  if (is2x1 && is2x1.checked) disableDiscounts();
+
+  if (is2x1) {
+    is2x1.addEventListener("change", () => {
+      is2x1.checked ? disableDiscounts() : enableDiscounts();
+      updatePreview();
+    });
+  }
+
+  if (discountPercentage) {
+    discountPercentage.setAttribute("maxlength", "2");
+
+    discountPercentage.addEventListener("input", () => {
+      const v = discountPercentage.value.replace(/\D/g, "").slice(0, 2);
+      discountPercentage.value = v;
+
+      discountPercentage.style.border =
+        (v < 1 || v > 90) ? "2px solid red" : "";
+
+      if (v) {
+        if (is2x1) is2x1.checked = false;
+        if (discountPrice) discountPrice.value = "";
+      }
+
+      updatePreview();
+    });
+  }
+
+  if (discountPrice) {
+    discountPrice.setAttribute("maxlength", "6");
+
+    discountPrice.addEventListener("input", () => {
+      const v = discountPrice.value.replace(/\D/g, "").slice(0, 6);
+      discountPrice.value = v;
+
+      discountPrice.style.border =
+        (!v || v < 1 || v >= basePrice) ? "2px solid red" : "";
+
+      if (v) {
+        if (is2x1) is2x1.checked = false;
+        if (discountPercentage) discountPercentage.value = "";
+      }
+
+      updatePreview();
+    });
+
+    // Botón "calcular porcentaje automáticamente"
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Calcular porcentaje automáticamente";
+    btn.className = "button is-info is-fullwidth mt-2";
+
+    discountPrice.parentNode.parentNode.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+      const newPrice = parseInt(discountPrice.value);
+
+      if (!newPrice || newPrice < 1 || newPrice >= basePrice) {
+        alert("Ingresa un precio rebajado válido.");
+        return;
+      }
+
+      let pct = Math.round(100 - (newPrice / basePrice * 100));
+      pct = Math.max(1, Math.min(90, pct));
+
+      if (discountPercentage) discountPercentage.value = pct;
+      if (is2x1) is2x1.checked = false;
+
+      updatePreview();
+    });
+  }
+
+  updatePreview();
+});
+</script>
+{% endif %}
+{% endblock %}

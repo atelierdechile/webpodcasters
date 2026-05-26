@@ -1,0 +1,191 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ product.title }}{% endblock title %}
+
+{% block content %}
+
+<div class="columns is-centered">
+  <div class="column is-8">
+
+    <!-- 📸 Imagen -->
+    {% if product.image %}
+      <figure class="image mb-5" style="max-width: 420px;">
+        <img src="{{ product.image.url }}" alt="{{ product.title }}" style="border-radius: 12px;">
+      </figure>
+    {% endif %}
+
+    <!-- 🧀 Título -->
+    <h1 class="title mb-2">{{ product.title }}</h1>
+
+    <!-- 🔥 PRECIO -->
+    <p class="is-size-5 has-text-weight-semibold mb-3">
+
+      {% if product.active_offer %}
+
+        {% if product.active_offer.is_2x1 %}
+          <!-- 💥 OFERTA 2×1 -->
+          <span class="has-text-grey-light" style="text-decoration: line-through;">
+            {{ currency_symbol }}{{ product.price }}
+          </span>
+
+          <span class="has-text-danger ml-2">
+            {{ currency_symbol }}{{ product.get_final_price }} c/u
+          </span>
+
+          <span class="is-size-6 has-text-grey ml-1">{{ currency_code }}</span>
+
+          <span class="tag is-danger is-light ml-2">
+            🔥 2×1 activo
+          </span>
+
+          <p class="is-size-6 has-text-success mt-1">Llévate 2, paga 1 🍕</p>
+
+        {% else %}
+          <!-- 💸 OFERTA NORMAL -->
+          <span class="has-text-grey-light" style="text-decoration: line-through;">
+            {{ currency_symbol }}{{ product.price }}
+          </span>
+
+          <span class="has-text-danger ml-2">
+            {{ currency_symbol }}{{ product.get_final_price }}
+          </span>
+
+          <span class="is-size-6 has-text-grey ml-1">{{ currency_code }}</span>
+
+          <span class="tag is-danger is-light ml-2">
+            🔥 Oferta activa -{{ product.get_offer_percentage }}%
+          </span>
+        {% endif %}
+
+      {% else %}
+        <!-- Precio normal -->
+        {{ currency_symbol }}{{ product.price }}
+        <span class="is-size-6 has-text-grey ml-1">{{ currency_code }}</span>
+      {% endif %}
+
+    </p>
+
+    <!-- 🏷 Vendedor + preferencias -->
+    <p class="mb-3">
+      <span class="tag is-dark">{{ product.vendor.name }}</span>
+
+      {% for pref in product.preferences.all %}
+        <span class="tag is-success is-light ml-1">
+          {% if pref.name|lower == "vegana" %}
+            🌱 {{ pref.name }}
+          {% elif pref.name|lower == "sin gluten" %}
+            🌾 {{ pref.name }}
+          {% else %}
+            🍕 {{ pref.name }}
+          {% endif %}
+        </span>
+      {% endfor %}
+    </p>
+
+    <p class="mb-5">{{ product.description }}</p>
+
+    <hr>
+
+    {# ⚠️ BLOQUE DE ALERTA DE ALERGIA EN LA MISMA PÁGINA #}
+    {% if allergy_warning %}
+      <div class="notification is-danger is-light" style="border-radius: 12px; padding: 20px;">
+        <h3 class="title is-5 mb-2">⚠️ Posible alergia detectada</h3>
+
+        <p class="mb-3">
+          La pizza <strong>{{ product.title }}</strong> contiene ingredientes asociados
+          a tus alergias registradas:
+        </p>
+
+        <ul class="mb-4" style="margin-left: 1rem;">
+          {% for c in conflicts %}
+            <li>
+              <strong>{{ c.allergy.name }}</strong>:
+              {% for ing in c.ingredients %}
+                {{ ing.name }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </li>
+          {% endfor %}
+        </ul>
+
+        <p class="mb-4">
+          Si no estás seguro, te recomendamos <strong>no continuar</strong> con esta pizza.
+        </p>
+
+        <form method="post" class="mt-2">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" value="{{ quantity|default:1 }}">
+          <input type="hidden" name="ignore_allergy_warning" value="1">
+
+          <div class="buttons">
+            <a href="" class="button">
+              Cancelar
+            </a>
+            <button class="button is-danger">
+              Agregar igual 🛒
+            </button>
+          </div>
+        </form>
+      </div>
+      <hr>
+    {% endif %}
+
+    <!-- 🛒 Agregar al carrito -->
+    <form method="post">
+      {% csrf_token %}
+      <div class="field has-addons">
+        <div class="control">
+          <input 
+            type="number" 
+            name="quantity" 
+            value="{{ quantity|default:1 }}" 
+            class="input" 
+            min="1">
+        </div>
+        <div class="control">
+          <button class="button is-dark is-uppercase">
+            Agregar al carrito 🛒
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <hr>
+
+    <!-- 🧩 Productos Similares -->
+    {% if similar_products %}
+      <div class="mt-6">
+        <h2 class="subtitle mb-4">Productos Similares 🍕</h2>
+        <div class="columns is-multiline">
+          {% for product in similar_products %}
+            {% include 'product/parts/list_item.html' %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- 💚 Recomendaciones -->
+    {% if recommended_products %}
+      <div class="mt-6">
+        <h2 class="subtitle mb-4">Recomendaciones para ti 💚</h2>
+        <div class="columns is-multiline">
+          {% for rec in recommended_products %}
+            {% include 'product/parts/list_item.html' with product=rec %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<style>
+  .tag.is-success.is-light {
+    font-size: .9rem;
+    border-radius: 10px;
+  }
+  .button.is-dark:hover {
+    background-color: #222;
+  }
+</style>
+
+{% endblock content %}

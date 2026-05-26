@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+
+{% block title %}Editar Preferencias{% endblock %}
+
+{% block content %}
+<style>
+.pref-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+.pref-chip {
+  padding: 0.7rem 1.4rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  background: #e5e7eb;
+  color: #111;
+  transition: 0.25s;
+  user-select: none;
+  border: 2px solid transparent;
+}
+
+.pref-chip.selected {
+  background: #0d9488;
+  color: white;
+  border-color: #0b7669;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.pref-checkbox {
+  display: none;
+}
+</style>
+
+<div class="container mt-5">
+  <h1 class="title has-text-centered">Editar Preferencias 🍕</h1>
+  <p class="has-text-centered mb-4">
+    Selecciona tus preferencias alimentarias. Esto nos ayudará a mostrarte las pizzas adecuadas.
+  </p>
+
+  <form method="POST" class="has-text-centered">
+    {% csrf_token %}
+    <div class="pref-container">
+      {% for pref in preferences %}
+        <label class="pref-chip {% if pref in selected %}selected{% endif %}">
+          <input type="checkbox" class="pref-checkbox" name="preferences" value="{{ pref.id }}"
+                 {% if pref in selected %}checked{% endif %}>
+          {% if pref.name|lower == "vegana" %}
+            🌱 {{ pref.name }}
+          {% elif pref.name|lower == "sin gluten" %}
+            🌾 {{ pref.name }}
+          {% else %}
+            🍕 {{ pref.name }}
+          {% endif %}
+        </label>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="button is-link is-medium mt-5">
+      Guardar Cambios
+    </button>
+  </form>
+</div>
+
+<script>
+document.querySelectorAll(".pref-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const checkbox = chip.querySelector(".pref-checkbox");
+    checkbox.checked = !checkbox.checked;
+    chip.classList.toggle("selected");
+  });
+});
+</script>
+{% endblock %}

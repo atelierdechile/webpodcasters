@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ category.title }}{% endblock title %}
+
+{% block content %}
+
+<div class="columns is-multiline mb-6">
+
+  <!-- TÍTULO DE LA CATEGORÍA -->
+  <div class="column is-12 has-text-centered mt-6 mb-4">
+    <h2 class="is-size-3">{{ category.title }}</h2>
+  </div>
+
+  <!-- 🌱 FILTRO DE PREFERENCIAS -->
+  {% if user.is_authenticated and user.profile.preferences.count > 0 %}
+    <div class="column is-12 has-text-centered mb-5">
+
+      {% if solo_pref %}
+        <a href="?" class="button is-light is-rounded">
+          👀 Ver todas las pizzas
+        </a>
+        <p class="has-text-grey mt-2">
+          Mostrando solo pizzas según tus preferencias 🍃
+        </p>
+      {% else %}
+        <a href="?solo_pref=1" class="button is-success is-light is-rounded">
+          🌱 Ver solo mis preferencias
+        </a>
+      {% endif %}
+
+    </div>
+  {% endif %}
+
+  <!-- LISTADO DE PRODUCTOS -->
+  {% for product in products %}
+    {% include 'product/parts/list_item.html' %}
+  {% empty %}
+    <div class="column is-12 has-text-centered">
+      <p class="has-text-grey">
+        🚫 No hay productos disponibles. Inicia sesión o selecciona un país en la página principal.
+      </p>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock content %}

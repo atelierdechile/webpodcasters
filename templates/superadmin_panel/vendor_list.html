@@ -1,0 +1,208 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="level mb-5">
+      <div class="level-left">
+        <div>
+          <div class="mb-3">
+            <h1 class="title is-4">Gestión de vendedores</h1>
+            <p class="subtitle is-6 has-text-grey">
+              Revisa la información de cada vendedor y accede a sus productos, ofertas y menú semanal.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="level-right">
+        <a href="{% url 'core:admin_landing' %}" class="button is-light">
+          ← Volver al panel admin
+        </a>
+      </div>
+    </div>
+
+    <!-- Resumen: total vendedores -->
+    <div class="columns is-multiline mb-4">
+      <div class="column is-12-mobile is-4-tablet is-3-desktop">
+        <div class="box" style="box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+          <p class="has-text-grey is-uppercase is-size-7 has-text-weight-semibold">
+            Total vendedores
+          </p>
+          <p class="title is-3 mb-0">
+            {{ vendors|length }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card principal -->
+    <div class="card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+      <header class="card-header">
+        <p class="card-header-title">
+          Listado de vendedores
+        </p>
+      </header>
+
+      <div class="card-content">
+
+        <!-- Buscador -->
+        <div class="field mb-4">
+          <label class="label is-size-7 has-text-grey">Buscar vendedor</label>
+          <div class="control has-icons-left">
+            <input 
+              class="input" 
+              type="text" 
+              id="vendorSearch" 
+              placeholder="Buscar por nombre o usuario…">
+            <span class="icon is-small is-left">
+              <i class="fas fa-search"></i>
+            </span>
+          </div>
+          <p class="help is-size-7">
+            Escribe parte del nombre o del usuario para filtrar rápidamente.
+          </p>
+        </div>
+
+        <!-- VISTA DESKTOP / TABLET: tabla -->
+        <div class="table-container is-hidden-mobile">
+          <table class="table is-fullwidth is-striped is-hoverable" id="vendorTable">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Usuario</th>
+                <th>País</th>
+                <th>Creado</th>
+                <th class="has-text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for v in vendors %}
+                <tr>
+                  <td class="has-text-weight-semibold">
+                    {{ v.name }}
+                  </td>
+                  <td class="has-text-grey">
+                    @{{ v.created_by.username }}
+                  </td>
+                  <td>
+                    {{ v.country.name|default:"-" }}
+                  </td>
+                  <td class="has-text-grey is-size-7">
+                    {{ v.created_at|date:"d/m/Y H:i" }}
+                  </td>
+                  <td class="has-text-right">
+                    <div class="buttons are-small is-right">
+                      <a href="{% url 'superadmin_panel:vendor_products' v.id %}" class="button is-primary is-light">
+                        Ver detalle
+                      </a>
+                      <a href="{% url 'superadmin_panel:vendor_edit' v.id %}" class="button is-info is-light">
+                        Editar
+                      </a>
+
+                      {# Eliminar por POST, con confirm, sin salir de la página #}
+                      <form method="post"
+                            action="{% url 'superadmin_panel:vendor_delete' v.id %}"
+                            style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="button is-danger is-light"
+                                onclick="return confirm('¿Seguro que quieres eliminar este vendedor? Esta acción no se puede deshacer.');">
+                          Eliminar
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="has-text-centered has-text-grey py-5">
+                    No hay vendedores registrados por el momento.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- VISTA MOBILE: tarjetas -->
+        <div class="is-hidden-tablet" id="vendorCards">
+          {% for v in vendors %}
+            <div 
+              class="box vendor-card" 
+              data-name="{{ v.name|lower }}" 
+              data-user="{{ v.created_by.username|lower }}"
+            >
+              <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+                <div>
+                  <p class="has-text-weight-semibold">{{ v.name }}</p>
+                  <p class="has-text-grey is-size-7">@{{ v.created_by.username }}</p>
+                </div>
+              </div>
+              <div class="is-size-7 has-text-grey mb-3">
+                <span><strong>País:</strong> {{ v.country.name|default:"-" }}</span><br>
+                <span><strong>Creado:</strong> {{ v.created_at|date:"d/m/Y H:i" }}</span>
+              </div>
+              <div class="buttons are-small is-flex is-flex-direction-column">
+                <a href="{% url 'superadmin_panel:vendor_products' v.id %}" class="button is-primary is-fullwidth">
+                  Ver detalle
+                </a>
+                <a href="{% url 'superadmin_panel:vendor_edit' v.id %}" class="button is-info is-fullwidth">
+                  Editar
+                </a>
+
+                <form method="post"
+                      action="{% url 'superadmin_panel:vendor_delete' v.id %}">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="button is-danger is-fullwidth"
+                          onclick="return confirm('¿Seguro que quieres eliminar este vendedor? Esta acción no se puede deshacer.');">
+                    Eliminar
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% empty %}
+            <p class="has-text-centered has-text-grey py-5">
+              No hay vendedores registrados por el momento.
+            </p>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("vendorSearch");
+    const table = document.getElementById("vendorTable");
+    const rows = table ? table.querySelectorAll("tbody tr") : [];
+    const cards = document.querySelectorAll(".vendor-card");
+
+    input.addEventListener("keyup", function () {
+      const q = this.value.toLowerCase().trim();
+
+      // Filtrar filas de la tabla (desktop/tablet)
+      rows.forEach(row => {
+        if (row.querySelector("td[colspan]")) return; // fila de "empty"
+        const name = row.children[0].innerText.toLowerCase();
+        const user = row.children[1].innerText.toLowerCase();
+        const match = name.includes(q) || user.includes(q);
+        row.style.display = match ? "" : "none";
+      });
+
+      // Filtrar tarjetas (mobile)
+      cards.forEach(card => {
+        const name = card.dataset.name || "";
+        const user = card.dataset.user || "";
+        const match = name.includes(q) || user.includes(q);
+        card.style.display = match ? "" : "none";
+      });
+    });
+  });
+</script>
+{% endblock %}

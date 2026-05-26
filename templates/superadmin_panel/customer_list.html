@@ -1,0 +1,69 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <nav class="breadcrumb mb-4" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
+        <li><a href="{% url 'superadmin_panel:customer_list' %}">Compradores</a></li>
+        <li class="is-active"><a aria-current="page">Listado de Compradores</a></li>
+      </ul>
+    </nav>
+
+    <h1 class="title is-4 mb-4">🧑‍🤝‍🧑 Listado de Compradores</h1>
+
+    <div class="box">
+      <table class="table is-fullwidth is-striped is-hoverable">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Correo electrónico</th>
+            <th style="width: 200px;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customers %}
+            <tr>
+              <td>{{ customer.username }}</td>
+              <td>{{ customer.email|default:"—" }}</td>
+              <td>
+                <div class="buttons are-small">
+                  <!-- Editar -->
+                  <a
+                    href="{% url 'superadmin_panel:customer_edit' customer.id %}"
+                    class="button is-info is-light"
+                  >
+                    ✏️ Editar
+                  </a>
+
+                  <!-- Eliminar -->
+                  <form
+                    method="post"
+                    action="{% url 'superadmin_panel:customer_delete' customer.id %}"
+                    style="display:inline;"
+                    onsubmit="return confirm('⚠️ ¿Estás seguro de que deseas eliminar este comprador?\n\nEsta acción no se puede deshacer.');"
+                  >
+                    {% csrf_token %}
+                    <button type="submit" class="button is-danger is-light">
+                      🗑️ Eliminar
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="3" class="has-text-centered has-text-grey">
+                No hay compradores registrados.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

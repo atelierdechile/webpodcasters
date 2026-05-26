@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmación de tu orden #{{ order.id }}</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 640px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    .header {
+      text-align: center;
+      background: linear-gradient(135deg, #4CAF50, #81C784);
+      color: white;
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .order-info {
+      margin-top: 20px;
+    }
+    .order-info p {
+      margin: 6px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #fafafa;
+    }
+    .total {
+      text-align: right;
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #777;
+      font-size: 13px;
+    }
+    .footer a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+    .old-price {
+      text-decoration: line-through;
+      color: #888;
+      font-size: 13px;
+    }
+    .discount-badge {
+      background: #ff5252;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>✅ ¡Gracias por tu pedido!</h1>
+      <p>Orden #{{ order.id }}</p>
+    </div>
+
+    <div class="order-info">
+      <p>Hola <strong>{{ order.first_name }}</strong>,</p>
+      <p>Tu orden ha sido recibida con éxito y ya está siendo procesada por nuestras tiendas 🍕.</p>
+
+      <h3>🧾 Detalles del pedido:</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+        {% for item in order.items.all %}
+          <tr>
+            <td>
+              <strong>{{ item.product.title }}</strong><br>
+
+              {% if item.discount_percentage > 0 %}
+                <span class="old-price">
+                  {{ item.original_price }} CLP
+                </span>
+                <span class="discount-badge">
+                  -{{ item.discount_percentage }}%
+                </span><br>
+                <span>{{ item.price }} CLP c/u</span>
+              
+              {% elif item.original_price > item.price %}
+                <span class="old-price">{{ item.original_price }} CLP</span><br>
+                <span>{{ item.price }} CLP c/u</span>
+
+              {% else %}
+                <span>{{ item.price }} CLP c/u</span>
+              {% endif %}
+            </td>
+
+            <td>{{ item.quantity }}</td>
+
+            <td>{{ item.get_total_price }} CLP</td>
+          </tr>
+        {% endfor %}
+
+        </tbody>
+      </table>
+
+      <p class="total">
+        💰 Total pagado: <strong>{{ order.paid_amount|floatformat:0 }} CLP</strong>
+      </p>
+
+      <h3>📍 Dirección de entrega:</h3>
+      <p>{{ order.address }}, {{ order.place }} ({{ order.zipcode }})</p>
+
+      <p><strong>Teléfono de contacto:</strong> {{ order.phone }}</p>
+    </div>
+
+  </div>
+</body>
+</html>

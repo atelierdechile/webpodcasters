@@ -1,0 +1,92 @@
+{% extends "core/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width: 700px;">
+
+    <nav class="breadcrumb mb-4" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
+        <li><a href="{% url 'superadmin_panel:customer_list' %}">Compradores</a></li>
+        <li class="is-active"><a aria-current="page">Editar {{ customer.username }}</a></li>
+      </ul>
+    </nav>
+
+    <div class="box">
+      <h1 class="title is-4 mb-4">✏️ Editar Comprador</h1>
+
+      <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="notification is-danger is-light">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="field">
+          <label class="label">Nombre de usuario</label>
+          <div class="control">
+            {{ form.username|add_class:"input" }}
+          </div>
+          {% if form.username.errors %}
+            <p class="help is-danger">{{ form.username.errors }}</p>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label class="label">Correo electrónico</label>
+          <div class="control">
+            {{ form.email|add_class:"input" }}
+          </div>
+          {% if form.email.errors %}
+            <p class="help is-danger">{{ form.email.errors }}</p>
+          {% endif %}
+        </div>
+
+        <hr>
+
+        <p class="is-size-7 has-text-grey mb-2">
+          Si no quieres cambiar la contraseña, deja estos campos en blanco.
+        </p>
+
+        <div class="field">
+          <label class="label">Nueva contraseña</label>
+          <div class="control">
+            {{ form.new_password1|add_class:"input" }}
+          </div>
+          {% if form.new_password1.errors %}
+            <p class="help is-danger">{{ form.new_password1.errors }}</p>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label class="label">Repetir nueva contraseña</label>
+          <div class="control">
+            {{ form.new_password2|add_class:"input" }}
+          </div>
+          {% if form.new_password2.errors %}
+            <p class="help is-danger">{{ form.new_password2.errors }}</p>
+          {% endif %}
+        </div>
+
+        <div class="field is-grouped is-justify-content-space-between mt-5">
+          <div class="control">
+            <a href="{% url 'superadmin_panel:customer_list' %}" class="button is-light">
+              ← Volver
+            </a>
+          </div>
+          <div class="control">
+            <button type="submit" class="button is-primary">
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

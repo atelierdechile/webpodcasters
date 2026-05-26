@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Buscar: {{ query }}{% endblock title %}
+
+{% block content %}
+
+<div class="columns is-multiline mb-6">
+
+    <!-- 🔍 TÍTULO -->
+    <div class="column is-12 has-text-centered mt-6 mb-4">
+        <h2 class="is-size-3">Resultados para "{{ query }}"</h2>
+    </div>
+
+    <!-- 🌱 FILTRO SOLO MIS PREFERENCIAS -->
+    {% if user.is_authenticated and user.profile.preferences.count > 0 %}
+        <div class="column is-12 has-text-centered mb-5">
+
+            {% if solo_pref %}
+                <a href="?query={{ query }}" class="button is-light is-rounded">
+                    👀 Ver todos los resultados
+                </a>
+                <p class="has-text-grey mt-2">
+                    Mostrando resultados según tus preferencias 🍃
+                </p>
+            {% else %}
+                <a href="?query={{ query }}&solo_pref=1" class="button is-success is-light is-rounded">
+                    🌱 Ver solo mis preferencias
+                </a>
+            {% endif %}
+
+        </div>
+    {% endif %}
+
+    <!-- 🔎 RESULTADOS -->
+    {% for product in products %}
+        {% include 'product/parts/list_item.html' %}
+    {% empty %}
+        <div class="column is-12 has-text-centered">
+            <p class="has-text-grey">
+                No se encontraron resultados para "{{ query }}".
+            </p>
+        </div>
+    {% endfor %}
+
+</div>
+
+{% endblock content %}

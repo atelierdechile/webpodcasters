@@ -1,0 +1,582 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<style>
+  body {
+    background: #f5f5f7;
+  }
+
+  .weekly-menu-page {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .weekly-menu-header {
+    margin-bottom: 18px;
+  }
+
+  .weekly-menu-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .weekly-menu-wrapper {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 992px) {
+    .weekly-menu-wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* -------- PANEL GENÉRICO -------- */
+
+  .panel-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #e3e3e7;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid #ececf1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #f7f9ff, #fdfdff);
+  }
+
+  .panel-title {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+  }
+
+  .panel-tag {
+    font-size: 0.78rem;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3730a3;
+    font-weight: 500;
+  }
+
+  .panel-body {
+    padding: 12px 14px 14px 14px;
+  }
+
+  /* -------- LISTA DE PRODUCTOS (IZQUIERDA) -------- */
+
+  .products-list {
+    max-height: 540px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .products-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .products-list::-webkit-scrollbar-thumb {
+    background: #d0d0dd;
+    border-radius: 999px;
+  }
+
+  .product-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e1e1ea;
+    border-radius: 12px;
+    background: #fff;
+    cursor: grab;
+    transition: box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  }
+
+  .product-item:hover {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+    border-color: #c7d2fe;
+  }
+
+  .product-thumb {
+    width: 100%;
+    height: 90px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #f3f3f3;
+  }
+
+  .product-thumb-placeholder {
+    width: 100%;
+    height: 90px;
+    border-radius: 10px;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #aaa;
+  }
+
+  .product-title {
+    font-weight: 600;
+    margin: 0;
+    font-size: 0.84rem;
+  }
+
+  .product-price {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #777;
+  }
+
+  /* -------- PANEL SEMANA (DERECHA) -------- */
+
+  .week-panel-body {
+    padding: 14px 16px 18px 16px;
+  }
+
+  .week-legend {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 10px;
+  }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(210px, 1fr));
+    gap: 14px;
+  }
+
+  @media (max-width: 992px) {
+    .week-grid {
+      grid-template-columns: repeat(2, minmax(190px, 1fr));
+    }
+  }
+
+  @media (max-width: 576px) {
+    .week-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .day-box {
+    border: 1px solid #dedee8;
+    border-radius: 16px;
+    padding: 10px;
+    min-height: 210px;
+    background: #fafafa;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+
+  .day-box:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+  }
+
+  .day-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 0.86rem;
+    color: #4b5563;
+  }
+
+  .day-label {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .day-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .day-badge {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #f4f4f5;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .day-badge-assigned {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .day-clear-btn {
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    padding: 0;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .day-clear-btn:hover {
+    color: #ef4444;
+  }
+
+  .day-box--active {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    background: #f5f7ff;
+  }
+
+  .assigned-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .assigned-image {
+    width: 100%;
+    height: 120px;
+    border-radius: 11px;
+    object-fit: cover;
+    background: #f0f0f0;
+  }
+
+  .assigned-image-placeholder {
+    width: 100%;
+    height: 120px;
+    border-radius: 11px;
+    background: #f3f4f6;
+    border: 1px dashed #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    color: #9ca3af;
+  }
+
+  .assigned-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .assigned-price {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .empty-day-text {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin-top: 8px;
+  }
+</style>
+
+<div class="weekly-menu-page">
+
+  <div class="weekly-menu-header">
+
+    <div class="level mb-4">
+    <div class="level-left">
+        <h2 class="title is-4 mb-0">📆 Menú semanal</h2>
+    </div>
+    <div class="level-right">
+        <div class="buttons">
+            <a href="{% url 'vendor:weekly_menu_history' %}" class="button is-link is-light">
+                📚 Ver menu histórico
+            </a>
+        </div>
+    </div>
+</div>
+    <div class="weekly-menu-subtitle">
+      Próximos 7 días ({{ monday }} - {{ sunday }}). <br>
+      Arrastra una pizza desde el panel izquierdo hacia el día que quieras destacar.
+    </div>
+  </div>
+
+  <div class="weekly-menu-wrapper">
+
+    <!-- PANEL DE PRODUCTOS -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h5 class="panel-title mb-0">1. Elige tu pizza</h5>
+        <span class="panel-tag">Productos del vendedor</span>
+      </div>
+
+      <div class="panel-body">
+        {% if products %}
+          <div class="products-list">
+            {% for product in products %}
+              <div class="product-item"
+                   draggable="true"
+                   data-product-id="{{ product.id }}">
+
+                {% if product.thumbnail %}
+                  <img src="{{ product.thumbnail.url }}"
+                       alt="{{ product.title }}"
+                       class="product-thumb">
+                {% elif product.image %}
+                  <img src="{{ product.image.url }}"
+                       alt="{{ product.title }}"
+                       class="product-thumb">
+                {% else %}
+                  <div class="product-thumb-placeholder">
+                    Sin imagen
+                  </div>
+                {% endif %}
+
+                <p class="product-title">{{ product.title }}</p>
+                <p class="product-price">
+                  {% if product.price %}
+                    ${{ product.price|floatformat:0 }}
+                  {% else %}
+                    Precio no definido
+                  {% endif %}
+                </p>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No tienes productos disponibles.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- PANEL DE SEMANA -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h5 class="panel-title mb-0">2. Asigna el menú diario</h5>
+        <span class="panel-tag">Semana</span>
+      </div>
+
+      <div class="week-panel-body">
+
+        <div class="week-grid">
+          {% for day in days %}
+            <div class="day-box"
+                 data-date="{{ day.date|date:'Y-m-d' }}"
+                 ondragover="allowDrop(event)"
+                 ondrop="dropProduct(event)">
+
+              <div class="day-box-header">
+                <span class="day-label">
+                  {{ day.weekday_label }} {{ day.date|date:"d/m" }}
+                </span>
+                <div class="day-header-actions">
+                  {% if day.menu %}
+                    <button type="button"
+                            class="day-clear-btn"
+                            title="Quitar pizza de este día"
+                            onclick="clearDay(this)">
+                      ✕
+                    </button>
+                  {% endif %}
+                  <span class="day-badge {% if day.menu %}day-badge-assigned{% endif %}">
+                    {% if day.menu %}Pizza asignada{% else %}Libre{% endif %}
+                  </span>
+                </div>
+              </div>
+
+              <div class="assigned-product">
+                {% if day.menu %}
+                  <div class="assigned-card">
+                    {% if day.menu.product.thumbnail %}
+                      <img src="{{ day.menu.product.thumbnail.url }}"
+                           alt="{{ day.menu.product.title }}"
+                           class="assigned-image">
+                    {% elif day.menu.product.image %}
+                      <img src="{{ day.menu.product.image.url }}"
+                           alt="{{ day.menu.product.title }}"
+                           class="assigned-image">
+                    {% else %}
+                      <div class="assigned-image-placeholder">
+                        Sin imagen
+                      </div>
+                    {% endif %}
+
+                    <p class="assigned-title">{{ day.menu.product.title }}</p>
+                    <p class="assigned-price">
+                      {% if day.menu.product.price %}
+                        ${{ day.menu.product.price|floatformat:0 }}
+                      {% else %}
+                        Precio no definido
+                      {% endif %}
+                    </p>
+                  </div>
+                {% else %}
+                  <div class="assigned-card">
+                    <div class="assigned-image-placeholder">
+                      Arrastra una pizza aquí
+                    </div>
+                    <p class="assigned-title" style="color:#9ca3af;">Sin pizza asignada</p>
+                    <p class="assigned-price empty-day-text">
+                      Arrastra una desde el panel izquierdo.
+                    </p>
+                  </div>
+                {% endif %}
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let draggedProductId = null;
+
+  document.addEventListener("dragstart", function (e) {
+    const item = e.target.closest(".product-item");
+    if (item) {
+      draggedProductId = item.dataset.productId;
+    }
+  });
+
+  function allowDrop(e) {
+    e.preventDefault();
+    const box = e.currentTarget;
+    box.classList.add("day-box--active");
+  }
+
+  function dropProduct(e) {
+    e.preventDefault();
+
+    const box = e.currentTarget;
+    box.classList.remove("day-box--active");
+
+    const date = box.dataset.date;  // formato YYYY-MM-DD
+    if (!draggedProductId) return;
+
+    fetch("{% url 'vendor:weekly_menu_assign' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        product_id: draggedProductId,
+        date: date,
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.ok) {
+        const assignedDiv = box.querySelector(".assigned-product");
+        if (assignedDiv) {
+          const imagePart = data.image_url
+            ? `<img src="${data.image_url}" alt="${data.product_title}" class="assigned-image">`
+            : `<div class="assigned-image-placeholder">Sin imagen</div>`;
+
+          const pricePart = data.product_price || "Precio no definido";
+
+          assignedDiv.innerHTML = `
+            <div class="assigned-card">
+              ${imagePart}
+              <p class="assigned-title">${data.product_title}</p>
+              <p class="assigned-price">${pricePart}</p>
+            </div>
+          `;
+        }
+        const badge = box.querySelector(".day-badge");
+        if (badge) {
+          badge.textContent = "Pizza asignada";
+          badge.classList.add("day-badge-assigned");
+        }
+
+        // Aseguramos que aparezca el botón de quitar si no estaba
+        const headerActions = box.querySelector(".day-header-actions");
+        if (headerActions && !headerActions.querySelector(".day-clear-btn")) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "day-clear-btn";
+          btn.title = "Quitar pizza de este día";
+          btn.textContent = "✕";
+          btn.onclick = function () { clearDay(btn); };
+          headerActions.insertBefore(btn, headerActions.firstChild);
+        }
+      } else {
+        alert(data.error || "No se pudo guardar");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error de conexión");
+    });
+  }
+
+  function clearDay(button) {
+    const box = button.closest(".day-box");
+    if (!box) return;
+
+    const date = box.dataset.date;
+
+    fetch("{% url 'vendor:weekly_menu_clear' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ date: date }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.ok) {
+        const assignedDiv = box.querySelector(".assigned-product");
+        if (assignedDiv) {
+          assignedDiv.innerHTML = `
+            <div class="assigned-card">
+              <div class="assigned-image-placeholder">
+                Arrastra una pizza aquí
+              </div>
+              <p class="assigned-title" style="color:#9ca3af;">Sin pizza asignada</p>
+              <p class="assigned-price empty-day-text">
+                Arrastra una desde el panel izquierdo.
+              </p>
+            </div>
+          `;
+        }
+
+        const badge = box.querySelector(".day-badge");
+        if (badge) {
+          badge.textContent = "Libre";
+          badge.classList.remove("day-badge-assigned");
+        }
+
+        // Quitamos el botón de eliminar
+        button.remove();
+      } else {
+        alert(data.error || "No se pudo eliminar");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error de conexión");
+    });
+  }
+
+  document.addEventListener("dragend", function () {
+    document.querySelectorAll(".day-box--active").forEach(function (box) {
+      box.classList.remove("day-box--active");
+    });
+  });
+</script>
+
+{% endblock %}

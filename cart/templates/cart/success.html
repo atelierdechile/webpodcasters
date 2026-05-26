@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Pedido confirmado{% endblock title %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin: 2rem auto; background: #fff; border-radius: 10px; padding: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; color: #4CAF50;">✅ ¡Gracias por tu pedido!</h1>
+        <p style="font-size: 1.1rem; color: #555;">Tu compra ha sido procesada exitosamente.</p>
+        <p style="font-size: 1rem; color: #777;">Número de orden: <strong>#{{ order.id }}</strong></p>
+    </div>
+
+    {% if order %}
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.3rem; color: #333; margin-bottom: .8rem;">🧾 Resumen del pedido</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f8f8; border-bottom: 1px solid #ddd;">
+                    <th style="text-align: left; padding: 10px;">Producto</th>
+                    <th style="text-align: center; padding: 10px;">Cantidad</th>
+                    <th style="text-align: right; padding: 10px;">Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">{{ item.product.title }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ item.quantity }}</td>
+                    <td style="padding: 10px; text-align: right;">{{ item.get_total_price|floatformat:0 }} CLP</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="text-align: right; margin-top: 1rem;">
+            <p style="font-size: 1.2rem; font-weight: bold;">💰 Total pagado: {{ order.paid_amount|floatformat:0 }} CLP</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <h3 style="font-size: 1.1rem; color: #333; margin-bottom: .5rem;">📦 Datos de envío</h3>
+        <p style="margin: 0;">{{ order.first_name }} {{ order.last_name }}</p>
+        <p style="margin: 0;">{{ order.address }}, {{ order.place }}</p>
+        <p style="margin: 0;">{{ order.zipcode }}</p>
+        <p style="margin: 0;">Tel: {{ order.phone }}</p>
+        <p style="margin: 0;">Correo: {{ order.email }}</p>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'core:home' %}"
+ 
+           style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">
+            🏠 Volver al inicio
+        </a>
+    </div>
+</div>
+{% endblock content %}

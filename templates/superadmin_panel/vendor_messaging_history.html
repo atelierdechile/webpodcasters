@@ -1,0 +1,291 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<style>
+.admin-history {
+  padding-top: 6rem;
+}
+
+.admin-history h1 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0d9488;
+  margin-bottom: .4rem;
+}
+
+.admin-history .subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.history-card {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.6rem 1.8rem;
+  box-shadow: 0 10px 25px rgba(15,23,42,.12);
+}
+
+.history-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.history-topbar a {
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  padding: .55rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: .92rem;
+  border: 1px solid transparent;
+  transition: all .2s ease;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #0d9488;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(13,148,136,.18);
+}
+.btn-primary:hover { background: #0b7669; transform: translateY(-1px); }
+
+.btn-ghost {
+  background: #fff;
+  color: #0f172a;
+  border-color: #e5e7eb;
+}
+.btn-ghost:hover { background: #f9fafb; transform: translateY(-1px); }
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px;
+}
+
+thead th {
+  text-align: left;
+  font-size: .85rem;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #6b7280;
+  background: #f9fafb;
+  padding: .85rem .9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tbody td {
+  padding: .85rem .9rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
+  color: #0f172a;
+  font-size: .94rem;
+}
+
+tbody tr:hover {
+  background: rgba(13,148,136,.04);
+}
+
+.badge {
+  display: inline-block;
+  padding: .18rem .6rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+
+.badge-all {
+  background: rgba(59,130,246,.10);
+  color: #1d4ed8;
+  border-color: rgba(59,130,246,.18);
+}
+
+.badge-comuna {
+  background: rgba(16,185,129,.10);
+  color: #047857;
+  border-color: rgba(16,185,129,.18);
+}
+
+.badge-vendor {
+  background: rgba(245,158,11,.12);
+  color: #92400e;
+  border-color: rgba(245,158,11,.20);
+}
+
+.muted {
+  color: #6b7280;
+  font-size: .9rem;
+}
+
+.link {
+  color: #0d9488;
+  font-weight: 800;
+  text-decoration: none;
+}
+.link:hover { text-decoration: underline; }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 1.3rem;
+  flex-wrap: wrap;
+}
+
+.page-pill {
+  padding: .45rem .75rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-weight: 800;
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.page-pill:hover {
+  background: #f9fafb;
+}
+
+.page-current {
+  background: rgba(13,148,136,.10);
+  border-color: rgba(13,148,136,.25);
+  color: #0d9488;
+}
+
+@media (max-width: 768px) {
+  .history-card { padding: 1.2rem; }
+}
+</style>
+
+<main class="admin-history">
+  <div class="container">
+
+    <h1>🗂 Historial de Mensajería</h1>
+    <p class="subtitle">Registro de correos enviados a vendedores (fecha, filtro, asunto, adjuntos y cantidad).</p>
+
+    <div class="history-card">
+      <div class="history-topbar">
+        <a href="{% url 'core:admin_landing' %}" class="btn btn-ghost">← Volver al panel</a>
+        <a href="{% url 'superadmin_panel:vendor_messaging' %}" class="btn btn-primary">+ Nuevo mensaje</a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Destino</th>
+              <th>Asunto</th>
+              <th>Adjunto</th>
+              <th>Enviados</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in page.object_list %}
+              <tr>
+                <td>
+                  <div><strong>{{ log.created_at|date:"d-m-Y" }}</strong></div>
+                  <div class="muted">{{ log.created_at|time:"H:i" }}</div>
+                </td>
+
+                <td>
+                  {% if log.target_type == "all" %}
+                    <span class="badge badge-all">Todos</span>
+                  {% elif log.target_type == "comuna" %}
+                    <span class="badge badge-comuna">Por comuna</span>
+                  {% elif log.target_type == "vendor" %}
+                    <span class="badge badge-vendor">Vendedor</span>
+                  {% else %}
+                    <span class="badge">{{ log.target_type }}</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if log.target_type == "all" %}
+                    <span class="muted">Todos los vendedores</span>
+                  {% elif log.target_type == "comuna" %}
+                    <strong>{{ log.comuna|default:"-" }}</strong>
+                  {% elif log.target_type == "vendor" %}
+                    <span class="muted">Vendor ID:</span> <strong>{{ log.vendor_id|default:"-" }}</strong>
+                  {% else %}
+                    <span class="muted">-</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  <strong>{{ log.subject }}</strong>
+                  <div class="muted" style="margin-top:.25rem;">
+                    {{ log.body|truncatechars:90 }}
+                  </div>
+                </td>
+
+                <td>
+                  {% if log.attachment %}
+                    <a class="link" href="{{ log.attachment.url }}" target="_blank" rel="noopener">
+                      Descargar
+                    </a>
+                  {% else %}
+                    <span class="muted">—</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  <strong>{{ log.recipients_count }}</strong>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="muted" style="padding: 1.2rem;">
+                  No hay envíos registrados todavía.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      {% if page.paginator.num_pages > 1 %}
+        <div class="pagination">
+          {% if page.has_previous %}
+            <a class="page-pill" href="?page={{ page.previous_page_number }}">← Anterior</a>
+          {% endif %}
+
+          <span class="page-pill page-current">
+            Página {{ page.number }} de {{ page.paginator.num_pages }}
+          </span>
+
+          {% if page.has_next %}
+            <a class="page-pill" href="?page={{ page.next_page_number }}">Siguiente →</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</main>
+
+{% endblock %}

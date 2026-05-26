@@ -1,0 +1,271 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Selecciona tus preferencias{% endblock %}
+
+{% block content %}
+
+<div class="container" style="max-width: 700px; margin-top: 60px; margin-bottom: 50px;">
+    
+    <div class="card" style="
+        padding: 35px;
+        border-radius: 14px;
+        box-shadow: 0px 6px 16px rgba(0,0,0,0.08);
+    ">
+        
+        <h2 class="has-text-centered mb-2" style="font-size: 1.8rem; font-weight: 700;">
+            🍕 Personaliza tu experiencia
+        </h2>
+
+        <p class="has-text-centered mb-5" style="font-size: 1.15rem; color: #555;">
+            Cuéntanos tus preferencias y posibles alergias para recomendarte pizzas más seguras y a tu gusto.
+        </p>
+
+        <!-- 🔥 ESTILOS DE LOS CHIPS -->
+        <style>
+            .pref-grid,
+            .alg-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-top: 1.5rem;
+                justify-content: center;
+            }
+
+            .pref-chip,
+            .alg-chip {
+                position: relative;
+                padding: .8rem 1.3rem .8rem 2.3rem;
+                border-radius: 9999px;
+                cursor: pointer;
+                font-size: 1.05rem;
+                background: #eef2f7;
+                color: #111;
+                border: 2px solid transparent;
+
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+
+                transition: transform .12s ease, box-shadow .12s ease, 
+                            background .12s ease, border-color .12s ease;
+                user-select: none;
+                outline: none;
+            }
+
+            .pref-chip[data-selected="true"],
+            .alg-chip[data-selected="true"] {
+                transform: translateY(-1px) scale(1.03);
+                box-shadow: 0 6px 12px rgba(0,0,0,.15);
+            }
+
+            .pref-chip[data-selected="true"] {
+                background: #0d9488;
+                color: #fff;
+                border-color: #0b7669;
+            }
+
+            .alg-chip[data-selected="true"] {
+                background: #f97316;
+                color: #fff;
+                border-color: #ea580c;
+            }
+
+            .pref-chip .check,
+            .alg-chip .check {
+                position: absolute;
+                left: .7rem;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 1.3rem;
+                height: 1.3rem;
+                border-radius: 9999px;
+                background: #cbd5e1;
+                color: #111;
+                font-size: .85rem;
+                display: grid;
+                place-items: center;
+                transition: background .12s ease, color .12s ease;
+            }
+
+            .pref-chip[data-selected="true"] .check {
+                background: #0b7669;
+                color: #fff;
+            }
+
+            .alg-chip[data-selected="true"] .check {
+                background: #ea580c;
+                color: #fff;
+            }
+
+            .pref-hidden,
+            .alg-hidden {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+                margin-top: 1.5rem;
+                text-align: center;
+            }
+
+            .section-subtitle {
+                font-size: .95rem;
+                color: #666;
+                text-align: center;
+                margin-top: .25rem;
+            }
+
+            hr.section-divider {
+                margin: 2rem auto 1.5rem;
+                max-width: 60%;
+                border: none;
+                border-top: 1px solid #e5e7eb;
+            }
+        </style>
+
+        <form method="POST" id="prefForm">
+            {% csrf_token %}
+
+            <!-- ========================= -->
+            <!-- PREFERENCIAS ALIMENTARIAS -->
+            <!-- ========================= -->
+            <h3 class="section-title">Preferencias alimentarias</h3>
+            <p class="section-subtitle">
+                Elige estilos de alimentación que te gusten (por ejemplo, sin gluten, vegana).
+            </p>
+
+            <div class="pref-grid">
+                {% with selected_prefs=selected_preferences_ids %}
+                    {% for pref in preferences %}
+                        {% with pref_id=pref.id|stringformat:"s" %}
+                        <label class="pref-chip"
+                            tabindex="0"
+                            data-selected="{% if selected_prefs and pref_id in selected_prefs %}true{% else %}false{% endif %}"
+                            aria-pressed="{% if selected_prefs and pref_id in selected_prefs %}true{% else %}false{% endif %}">
+                            
+                            <span class="check">✓</span>
+
+                            {% if pref.name|lower == "vegana" %}
+                                🌱 {{ pref.name }}
+                            {% elif pref.name|lower == "sin gluten" %}
+                                🌾 {{ pref.name }}
+                            {% else %}
+                                🍕 {{ pref.name }}
+                            {% endif %}
+
+                            <input 
+                                type="checkbox"
+                                class="pref-hidden"
+                                name="preferences"
+                                value="{{ pref.id }}"
+                                {% if selected_prefs and pref_id in selected_prefs %}checked{% endif %}
+                            >
+                        </label>
+                        {% endwith %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <!-- ========================= -->
+            <!-- ALERGIAS ALIMENTARIAS     -->
+            <!-- ========================= -->
+            <hr class="section-divider">
+
+            <h3 class="section-title">¿Tienes alguna alergia?</h3>
+            <p class="section-subtitle">
+                Si marcas alguna alergia, te avisaremos cuando un producto tenga ingredientes que puedan afectarte.
+            </p>
+
+            <div class="alg-grid">
+                {% with selected_algs=selected_allergies_ids %}
+                    {% for alg in allergies %}
+                        {% with alg_id=alg.id|stringformat:"s" %}
+                        <label class="alg-chip"
+                            tabindex="0"
+                            data-selected="{% if selected_algs and alg_id in selected_algs %}true{% else %}false{% endif %}"
+                            aria-pressed="{% if selected_algs and alg_id in selected_algs %}true{% else %}false{% endif %}">
+                            
+                            <span class="check">!</span>
+
+                            {% if "gluten" in alg.name|lower %}
+                                🌾 {{ alg.name }}
+                            {% elif "lácteos" in alg.name|lower or "lacteos" in alg.name|lower %}
+                                🧀 {{ alg.name }}
+                            {% elif "cerdo" in alg.name|lower %}
+                                🐖 {{ alg.name }}
+                            {% elif "vacuno" in alg.name|lower %}
+                                🐮 {{ alg.name }}
+                            {% elif "pollo" in alg.name|lower %}
+                                🍗 {{ alg.name }}
+                            {% elif "hongos" in alg.name|lower %}
+                                🍄 {{ alg.name }}
+                            {% elif "frutos secos" in alg.name|lower %}
+                                🥜 {{ alg.name }}
+                            {% elif "piña" in alg.name|lower %}
+                                🍍 {{ alg.name }}
+                            {% else %}
+                                ⚠️ {{ alg.name }}
+                            {% endif %}
+
+                            <input 
+                                type="checkbox"
+                                class="alg-hidden"
+                                name="allergies"
+                                value="{{ alg.id }}"
+                                {% if selected_algs and alg_id in selected_algs %}checked{% endif %}
+                            >
+                        </label>
+                        {% endwith %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <div class="has-text-centered mt-5" style="display:flex; flex-direction:column; gap:10px;">
+                <button class="button is-primary is-medium" style="width: 70%; margin: 0 auto;" type="submit">
+                    Guardar configuración
+                </button>
+
+                <a href="{% url 'core:home' %}" class="button is-light" style="width:60%; margin:0 auto;">
+                    Saltar por ahora
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+(function() {
+    function setupChipToggle(selector, inputClass) {
+        const chips = [...document.querySelectorAll(selector)];
+
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => toggleChip(chip, inputClass));
+            chip.addEventListener('keydown', e => {
+                if (e.key === " " || e.key === "Enter") {
+                    e.preventDefault();
+                    toggleChip(chip, inputClass);
+                }
+            });
+        });
+
+        function toggleChip(chip, inputClass) {
+            const input = chip.querySelector('input.' + inputClass);
+            if (!input) return;
+
+            const selected = input.checked = !input.checked;
+
+            chip.dataset.selected = String(selected);
+            chip.setAttribute('aria-pressed', String(selected));
+        }
+    }
+
+    setupChipToggle('.pref-chip', 'pref-hidden');
+    setupChipToggle('.alg-chip', 'alg-hidden');
+})();
+</script>
+
+{% endblock %}

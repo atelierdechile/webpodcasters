@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Nueva orden #{{ order.id }}</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 640px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    .header {
+      text-align: center;
+      background: linear-gradient(135deg, #ff4d4d, #ff944d);
+      color: white;
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .order-info {
+      margin-top: 20px;
+    }
+    .order-info p {
+      margin: 6px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #fafafa;
+    }
+
+    .old-price {
+      text-decoration: line-through;
+      color: #888;
+      font-size: 13px;
+    }
+    .discount-badge {
+      background: #ff5252;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    .total {
+      text-align: right;
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🍕 Nueva orden #{{ order.id }}</h1>
+      <p>¡Hola {{ vendor.name }}!</p>
+    </div>
+
+    <div class="order-info">
+      <p>Tienes una nueva orden en tu tienda dentro de <strong>Pizza Marketplace</strong>.</p>
+
+      <h3>🧾 Detalles del pedido:</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for item in order.items.all %}
+            {% if item.vendor == vendor %}
+
+            <tr>
+              <td>
+                <strong>{{ item.product.title }}</strong><br>
+
+                {% if item.discount_percentage > 0 %}
+                  <span class="old-price">{{ item.original_price }} CLP</span>
+                  <span class="discount-badge">-{{ item.discount_percentage }}%</span><br>
+                  <span>{{ item.price }} CLP c/u</span>
+
+                {% elif item.original_price > item.price %}
+                  <span class="old-price">{{ item.original_price }} CLP</span><br>
+                  <span>{{ item.price }} CLP c/u</span>
+
+                {% else %}
+                  <span>{{ item.price }} CLP c/u</span>
+                {% endif %}
+              </td>
+
+              <td>{{ item.quantity }}</td>
+
+              <td>{{ item.get_total_price }} CLP</td>
+            </tr>
+
+            {% endif %}
+          {% endfor %}
+
+        </tbody>
+      </table>
+
+      <p class="total">
+        💰 Total pagado por el cliente: <strong>{{ order.paid_amount|floatformat:0 }} CLP</strong>
+      </p>
+
+      <h3>👤 Datos del cliente:</h3>
+      <p><strong>Nombre:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+      <p><strong>Email:</strong> {{ order.email }}</p>
+      <p><strong>Teléfono:</strong> {{ order.phone }}</p>
+      <p><strong>Dirección:</strong> {{ order.address }}, {{ order.place }}</p>
+      <p><strong>Código postal:</strong> {{ order.zipcode }}</p>
+    </div>
+
+  </div>
+</body>
+</html>

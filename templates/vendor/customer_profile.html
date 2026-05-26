@@ -1,0 +1,308 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block content %}
+<h1 class="title">Mi Perfil 👤</h1>
+
+<div class="box">
+
+    <!-- DATOS BÁSICOS -->
+    <p><strong>Usuario:</strong> {{ username }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+    <p><strong>País:</strong> {{ profile.country }}</p>
+    <p><strong>Comuna:</strong> {{ profile.comuna }}</p>
+
+    <hr>
+
+    <!-- 🥦 PREFERENCIAS -->
+    <h2 class="subtitle mb-2">Preferencias Alimentarias 🍽️</h2>
+
+    {% if profile.preferences.count > 0 %}
+        <div class="tags mb-3">
+            {% for pref in profile.preferences.all %}
+                <span class="tag is-success is-light" style="font-size: .95rem; padding: .6rem 1rem; border-radius: 12px; display:inline-flex; align-items:center; gap:.4rem;">
+                    {% if pref.name|lower == "vegana" %}
+                        🌱
+                    {% elif pref.name|lower == "sin gluten" %}
+                        🌾
+                    {% else %}
+                        🍕
+                    {% endif %}
+                    {{ pref.name }}
+                </span>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="has-text-grey mb-3">No has seleccionado preferencias aún.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- ⚠️ ALERGIAS -->
+    <h2 class="subtitle mb-2">Alergias Alimentarias ⚠️</h2>
+
+    {% if profile.allergies.count > 0 %}
+        <div class="tags mb-3">
+            {% for alg in profile.allergies.all %}
+                <span class="tag is-warning is-light" style="font-size: .95rem; padding: .6rem 1rem; border-radius: 12px; display:inline-flex; align-items:center; gap:.4rem;">
+                    {% if "gluten" in alg.name|lower %}
+                        🌾
+                    {% elif "lácteos" in alg.name|lower or "lacteos" in alg.name|lower %}
+                        🧀
+                    {% elif "cerdo" in alg.name|lower %}
+                        🐖
+                    {% elif "vacuno" in alg.name|lower %}
+                        🐮
+                    {% elif "pollo" in alg.name|lower %}
+                        🍗
+                    {% elif "hongos" in alg.name|lower %}
+                        🍄
+                    {% elif "frutos secos" in alg.name|lower %}
+                        🥜
+                    {% elif "piña" in alg.name|lower %}
+                        🍍
+                    {% else %}
+                        ⚠️
+                    {% endif %}
+                    {{ alg.name }}
+                </span>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="has-text-grey mb-3">No has registrado alergias aún.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- 🔧 FORMULARIO INLINE PARA EDITAR PREFERENCIAS Y ALERGIAS -->
+    <h2 class="subtitle mt-4">Editar Preferencias y Alergias</h2>
+
+    <form method="POST" id="prefForm">
+        {% csrf_token %}
+
+        <style>
+            .pref-grid, .alg-grid {
+                display: flex; 
+                flex-wrap: wrap; 
+                gap: .8rem;
+                margin-bottom: 1rem;
+            }
+            .pref-chip, .alg-chip {
+                position: relative;
+                padding: .7rem 1.2rem .7rem 2.2rem;
+                border-radius: 9999px;
+                cursor: pointer;
+                font-size: 1rem;
+                background: #eef2f7;
+                color: #111;
+                border: 2px solid transparent;
+                transition: transform .12s ease, box-shadow .12s ease, 
+                            background .12s ease, border-color .12s ease;
+                user-select: none;
+                outline: none;
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+            }
+            .pref-chip.selected {
+                background: #0d9488;
+                color: #fff;
+                border-color: #0b7669;
+                transform: translateY(-1px) scale(1.02);
+                box-shadow: 0 6px 12px rgba(0,0,0,.12);
+            }
+            .alg-chip.selected {
+                background: #f97316;
+                color: #fff;
+                border-color: #ea580c;
+                transform: translateY(-1px) scale(1.02);
+                box-shadow: 0 6px 12px rgba(0,0,0,.12);
+            }
+            .pref-chip .check, .alg-chip .check {
+                position: absolute; 
+                left: .6rem; 
+                top: 50%; 
+                transform: translateY(-50%);
+                width: 1.2rem; 
+                height: 1.2rem; 
+                border-radius: 9999px;
+                display: grid; 
+                place-items: center;
+                background: #cbd5e1; 
+                color: #111; 
+                font-size: .85rem;
+                transition: background .12s ease, color .12s ease;
+            }
+            .pref-chip.selected .check { 
+                background: #0b7669; 
+                color: #fff; 
+            }
+            .alg-chip.selected .check { 
+                background: #ea580c; 
+                color: #fff; 
+            }
+            .pref-hidden, .alg-hidden { 
+                display: none; 
+            }
+        </style>
+
+        <!-- PREFERENCIAS -->
+        <p class="has-text-weight-semibold mb-2">Preferencias alimentarias</p>
+        <div class="pref-grid">
+            {% for pref in preferences %}
+                <label
+                    class="pref-chip {% if pref.id in selected_ids %}selected{% endif %}"
+                    tabindex="0"
+                    data-selected="{% if pref.id in selected_ids %}true{% else %}false{% endif %}"
+                    aria-pressed="{% if pref.id in selected_ids %}true{% else %}false{% endif %}"
+                >
+                    <span class="check">✓</span>
+
+                    {% if pref.name|lower == "vegana" %}
+                        🌱 {{ pref.name }}
+                    {% elif pref.name|lower == "sin gluten" %}
+                        🌾 {{ pref.name }}
+                    {% else %}
+                        🍕 {{ pref.name }}
+                    {% endif %}
+
+                    <input 
+                        type="checkbox" 
+                        class="pref-hidden" 
+                        name="preferences" 
+                        value="{{ pref.id }}"
+                        {% if pref.id in selected_ids %}checked{% endif %}>
+                </label>
+            {% endfor %}
+        </div>
+
+        <!-- ALERGIAS -->
+        <p class="has-text-weight-semibold mt-4 mb-2">Alergias alimentarias</p>
+        <div class="alg-grid">
+            {% for alg in allergies %}
+                <label
+                    class="alg-chip {% if alg.id in selected_allergies_ids %}selected{% endif %}"
+                    tabindex="0"
+                    data-selected="{% if alg.id in selected_allergies_ids %}true{% else %}false{% endif %}"
+                    aria-pressed="{% if alg.id in selected_allergies_ids %}true{% else %}false{% endif %}"
+                >
+                    <span class="check">!</span>
+
+                    {% if "gluten" in alg.name|lower %}
+                        🌾 {{ alg.name }}
+                    {% elif "lácteos" in alg.name|lower or "lacteos" in alg.name|lower %}
+                        🧀 {{ alg.name }}
+                    {% elif "cerdo" in alg.name|lower %}
+                        🐖 {{ alg.name }}
+                    {% elif "vacuno" in alg.name|lower %}
+                        🐮 {{ alg.name }}
+                    {% elif "pollo" in alg.name|lower %}
+                        🍗 {{ alg.name }}
+                    {% elif "hongos" in alg.name|lower %}
+                        🍄 {{ alg.name }}
+                    {% elif "frutos secos" in alg.name|lower %}
+                        🥜 {{ alg.name }}
+                    {% elif "piña" in alg.name|lower %}
+                        🍍 {{ alg.name }}
+                    {% else %}
+                        ⚠️ {{ alg.name }}
+                    {% endif %}
+
+                    <input 
+                        type="checkbox" 
+                        class="alg-hidden" 
+                        name="allergies" 
+                        value="{{ alg.id }}"
+                        {% if alg.id in selected_allergies_ids %}checked{% endif %}>
+                </label>
+            {% endfor %}
+        </div>
+
+        <div class="is-flex is-justify-content-flex-end mt-4" style="gap:.5rem;">
+            <button type="reset" id="prefReset" class="button is-light">Restablecer</button>
+            <button type="submit" id="prefSave" class="button is-link" disabled>Guardar Cambios</button>
+        </div>
+
+        <p id="prefHint" class="has-text-grey is-size-7 mt-2" style="display:none;">
+            Tienes cambios sin guardar.
+        </p>
+
+    </form>
+
+</div>
+
+<!-- SCRIPT INTERACTIVO -->
+<script>
+(function () {
+  const prefChips = [...document.querySelectorAll('.pref-chip')];
+  const algChips  = [...document.querySelectorAll('.alg-chip')];
+  const saveBtn   = document.getElementById('prefSave');
+  const resetBtn  = document.getElementById('prefReset');
+  const hint      = document.getElementById('prefHint');
+
+  const chips = [...prefChips, ...algChips];
+
+  // Guardamos el estado inicial de TODOS los checkboxes (prefs + alergias)
+  const initial = new Map();
+  chips.forEach(chip => {
+    const input = chip.querySelector('input.pref-hidden, input.alg-hidden');
+    if (!input) return;
+    const key = input.name + ':' + input.value;
+    initial.set(key, input.checked);
+  });
+
+  const setDirty = (dirty) => {
+    saveBtn.disabled = !dirty;
+    hint.style.display = dirty ? 'block' : 'none';
+  };
+
+  const isDirty = () => chips.some(chip => {
+    const input = chip.querySelector('input.pref-hidden, input.alg-hidden');
+    if (!input) return false;
+    const key = input.name + ':' + input.value;
+    return initial.get(key) !== input.checked;
+  });
+
+  function toggleChip(chip) {
+    const input = chip.querySelector('input.pref-hidden, input.alg-hidden');
+    if (!input) return;
+
+    const nowChecked = !input.checked;
+    input.checked = nowChecked;
+    chip.dataset.selected = String(nowChecked);
+    chip.setAttribute('aria-pressed', String(nowChecked));
+    chip.classList.toggle('selected', nowChecked);
+
+    setDirty(isDirty());
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => toggleChip(chip));
+    chip.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        toggleChip(chip);
+      }
+    });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    chips.forEach(chip => {
+      const input = chip.querySelector('input.pref-hidden, input.alg-hidden');
+      if (!input) return;
+      const key = input.name + ':' + input.value;
+      const start = initial.get(key);
+      input.checked = start;
+      chip.dataset.selected = String(start);
+      chip.setAttribute('aria-pressed', String(start));
+      chip.classList.toggle('selected', !!start);
+    });
+    setDirty(false);
+  });
+
+  setDirty(false);
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+{
+  "version": "v2",
+  "metadata": {
+    "name": "🍕 PizzaBot (Local Mode)",
+    "description": "Flujo completo de integración Django + ManyChat (modo local)."
+  },
+  "nodes": [
+    {
+      "id": "start",
+      "type": "message",
+      "text": "👋 ¡Hola {{first_name}}! Bienvenido a *PizzaBot*. 🍕\n\nAquí puedes elegir tus pizzas favoritas y pagar directamente en nuestra web.",
+      "actions": [
+        {
+          "action": "request",
+          "method": "POST",
+          "url": "http://127.0.0.1:8000/api/cart/create/",
+          "save_to": "cart_token",
+          "on_success": {
+            "action": "goto",
+            "target": "menu"
+          }
+        }
+      ]
+    },
+    {
+      "id": "menu",
+      "type": "message",
+      "text": "¿Qué te gustaría hacer?",
+      "buttons": [
+        {"text": "🍕 Ver pizzas", "action": "goto", "target": "ver_pizzas"},
+        {"text": "🛒 Ver carrito", "action": "goto", "target": "ver_carrito"},
+        {"text": "💬 Hablar con soporte", "action": "text", "value": "Te conectamos con soporte 👨‍🍳"}
+      ]
+    },
+    {
+      "id": "ver_pizzas",
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/products/",
+      "save_to": "pizzas",
+      "on_success": {
+        "action": "gallery",
+        "title_field": "title",
+        "subtitle_field": "description",
+        "image_field": "image",
+        "items": "{{pizzas}}",
+        "buttons": [
+          {
+            "text": "Agregar al carrito 🍕",
+            "action": "request",
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/api/cart/add/",
+            "body": {
+              "token": "{{cart_token}}",
+              "product_id": "{{item.id}}",
+              "quantity": 1
+            },
+            "on_success": {
+              "action": "text",
+              "value": "✅ Agregaste {{item.title}} al carrito.\n¿Querés seguir eligiendo o ver tu carrito?",
+              "buttons": [
+                {"text": "🛒 Ver carrito", "action": "goto", "target": "ver_carrito"},
+                {"text": "🍕 Ver más pizzas", "action": "goto", "target": "ver_pizzas"}
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ver_carrito",
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/cart/{{cart_token}}/",
+      "save_to": "carrito",
+      "on_success": {
+        "action": "text",
+        "value": "🧾 Tu pedido:\n{{#each carrito.items}}\n- {{product}} × {{quantity}}\n{{/each}}\n\n💰 *Total:* {{carrito.total}} CLP",
+        "buttons": [
+          {
+            "text": "💳 Pagar ahora",
+            "action": "open_url",
+            "url": "http://127.0.0.1:8000/cart/checkout/start/?cart_token={{cart_token}}"
+          },
+          {"text": "🍕 Seguir eligiendo", "action": "goto", "target": "ver_pizzas"}
+        ]
+      }
+    }
+  ],
+  "start_node": "start"
+}

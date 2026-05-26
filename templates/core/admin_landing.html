@@ -1,0 +1,208 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<style>
+/* Encapsulamos todo en .admin-landing para no romper otras vistas */
+.admin-landing {
+  width: 100%;
+  padding-top: 6rem; /* por el navbar fijo */
+}
+
+/* Títulos */
+.admin-landing h1.admin-title {
+  color: #0d9488;
+  margin-bottom: 1.2rem;
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.admin-landing p.admin-subtitle {
+  color: #555;
+  font-size: 1.05rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Secciones */
+.admin-landing .section-title {
+  margin-top: 1rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+}
+
+.admin-landing .section-subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* Cards */
+.admin-landing .cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.8rem;
+  margin-top: 1.5rem;
+}
+
+.admin-landing .admin-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.8rem 1.6rem 1.6rem;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(15,23,42,.08);
+  transition: all .20s ease;
+}
+
+.admin-landing .admin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 18px rgba(15,23,42,.14);
+}
+
+.admin-landing .admin-card h3 {
+  color: #0d9488;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: .6rem;
+}
+
+.admin-landing .admin-card p {
+  color: #555;
+  font-size: .95rem;
+  margin-bottom: 1rem;
+}
+
+/* Botón dentro de cada card */
+.admin-landing .admin-card-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  margin-top: .4rem;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  background: #0d9488;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all .2s ease;
+}
+
+.admin-landing .admin-card-cta:hover {
+  background: #0b7669;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-landing {
+    padding-top: 5.5rem;
+  }
+}
+</style>
+
+<main class="admin-landing">
+  <div class="container">
+
+    <!-- Título principal -->
+    <h1 class="admin-title">👋 Bienvenido Admin</h1>
+    <p class="admin-subtitle">Panel de control administrativo</p>
+
+    <!-- Herramientas generales -->
+    <div class="section-title">Herramientas generales</div>
+    <p class="section-subtitle">Accesos rápidos del sistema.</p>
+
+    <div class="cards">
+      <div class="admin-card">
+        <h3>Gestión de Usuarios</h3>
+        <p>Maneja usuarios y permisos desde Django Admin.</p>
+        <a href="/admin/" class="admin-card-cta">Ir a gestión de usuarios →</a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Registro de Actividad</h3>
+        <p>Consulta logs del sistema y del bot.</p>
+        <a href="/analytics/dashboard/" class="admin-card-cta">Ver registros de actividad →</a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Métricas del Sistema</h3>
+        <p>Revisa gráficos de actividad, errores y rendimiento.</p>
+        <a href="/analytics/graficos/" class="admin-card-cta">Ver métricas →</a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Preguntas de Usuarios</h3>
+        <p>Revisa las dudas almacenadas que la IA resumió.</p>
+        <a href="/assistant/questions/" class="admin-card-cta">Ver preguntas de usuarios →</a>
+      </div>
+    </div>
+
+    {% if request.user.is_superuser %}
+    <!-- Panel de súper admin -->
+    <div class="section-title">Panel de Súper Admin</div>
+    <p class="section-subtitle">
+      Gestión avanzada de vendedores, compradores, ingredientes, menú y comunicación.
+    </p>
+
+    <div class="cards">
+      <div class="admin-card">
+        <h3>Vendedores & Productos</h3>
+        <p>Maneja vendedores y sus productos desde un panel centralizado.</p>
+        <a href="{% url 'superadmin_panel:vendor_list' %}" class="admin-card-cta">
+          Ir a vendedores →
+        </a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Compradores</h3>
+        <p>Administra los compradores registrados en la plataforma.</p>
+        <a href="{% url 'superadmin_panel:customer_list' %}" class="admin-card-cta">
+          Ir a compradores →
+        </a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Mensajería a vendedores</h3>
+        <p>Envía correos a todos, por comuna o a un vendedor específico, con adjunto e historial.</p>
+        <a href="{% url 'superadmin_panel:vendor_messaging' %}" class="admin-card-cta">
+          Ir a mensajería →
+        </a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Historial de mensajes</h3>
+        <p>Revisa el registro de correos enviados a vendedores.</p>
+        <a href="/super-admin/vendor/history/" class="admin-card-cta">
+          Ver historial →
+        </a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Ingredientes de pizzas</h3>
+        <p>Administra categorías e ingredientes globales del sistema.</p>
+        <a href="{% url 'superadmin_panel:ingredient_manage' %}" class="admin-card-cta">
+          Gestionar ingredientes →
+        </a>
+      </div>
+
+      <div class="admin-card">
+        <h3>Menú semanal</h3>
+        <p>Define qué pizza se muestra cada día por vendedor en el menú semanal.</p>
+        <a href="{% url 'superadmin_panel:weekly_menu_list' %}" class="admin-card-cta">
+          Gestionar menú semanal →
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</main>
+
+{% endblock %}

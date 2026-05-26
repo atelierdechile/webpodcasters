@@ -1,0 +1,477 @@
+{% extends "core/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<section class="section ingredients-admin">
+  <div class="container" style="max-width: 1120px;">
+
+    <style>
+      .ingredients-admin {
+        padding-top: 4rem;
+      }
+
+      .ingredients-admin .page-header {
+        margin-bottom: 1.5rem;
+      }
+
+      .ingredients-admin .page-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+      }
+
+      .ingredients-admin .page-title span.icon {
+        background: #ecfeff;
+        color: #0d9488;
+        border-radius: 999px;
+        padding: .35rem;
+      }
+
+      .ingredients-admin .page-subtitle {
+        font-size: .95rem;
+        color: #6b7280;
+      }
+
+      .ingredients-admin .stat-card {
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        background: #ffffff;
+        box-shadow: 0 6px 18px rgba(15,23,42,.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .ingredients-admin .stat-label {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6b7280;
+        font-weight: 600;
+      }
+
+      .ingredients-admin .stat-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .ingredients-admin .stat-pill {
+        font-size: .75rem;
+        padding: .25rem .65rem;
+        border-radius: 999px;
+        background: #ecfeff;
+        color: #0d9488;
+        font-weight: 600;
+      }
+
+      .ingredients-admin .box-elevated {
+        border-radius: 16px;
+        box-shadow: 0 10px 28px rgba(15,23,42,.06);
+        border: 1px solid #e5e7eb;
+      }
+
+      .ingredients-admin .box-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: .75rem;
+      }
+
+      .ingredients-admin .box-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+      }
+
+      .ingredients-admin .box-title .tag {
+        font-size: .75rem;
+      }
+
+      .ingredients-admin .hint-text {
+        font-size: .8rem;
+        color: #9ca3af;
+        margin-bottom: .75rem;
+      }
+
+      .ingredients-admin .category-list {
+        max-height: 260px;
+        overflow-y: auto;
+        padding-right: .3rem;
+      }
+
+      .ingredients-admin .category-list::-webkit-scrollbar {
+        width: 5px;
+      }
+      .ingredients-admin .category-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+      }
+
+      .ingredients-admin .category-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .45rem .6rem;
+        border-radius: 999px;
+        background: #f3f4f6;
+        font-size: .85rem;
+        margin-bottom: .4rem;
+      }
+
+      .ingredients-admin .category-row .category-name-input {
+        flex: 1;
+      }
+
+      .ingredients-admin .category-row .category-count {
+        font-size: .75rem;
+        background: #0d9488;
+        color: #fff;
+        border-radius: 999px;
+        padding: .15rem .55rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .ingredients-admin .group-card {
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        margin-bottom: .75rem;
+        overflow: hidden;
+      }
+
+      .ingredients-admin .group-header {
+        padding: .6rem .9rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(90deg,#f9fafb,#f3f4f6);
+      }
+
+      .ingredients-admin .group-name {
+        font-size: .9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #4b5563;
+      }
+
+      .ingredients-admin .group-header .tag {
+        font-size: .7rem;
+      }
+
+      .ingredients-admin .group-body {
+        padding: .6rem .9rem .7rem;
+      }
+
+      .ingredients-admin .ingredient-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .4rem;
+      }
+
+      .ingredients-admin .ingredient-row-name {
+        flex: 1;
+      }
+
+      .ingredients-admin .ingredient-row-name input {
+        font-size: .8rem;
+        height: 2rem;
+        padding: .25rem .5rem;
+      }
+
+      @media (max-width: 768px) {
+        .ingredients-admin {
+          padding-top: 3.5rem;
+        }
+      }
+    </style>
+
+    <!-- BREADCRUMB -->
+    <nav class="breadcrumb mb-4" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
+        <li class="is-active"><a aria-current="page">Gestor de ingredientes</a></li>
+      </ul>
+    </nav>
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="level">
+        <div class="level-left">
+          <div>
+            <h1 class="page-title">
+              <span class="icon">
+                <i class="fas fa-carrot"></i>
+              </span>
+              Gestor de ingredientes
+            </h1>
+            <p class="page-subtitle">
+              Mantén actualizada la biblioteca de categorías e ingredientes que los vendedores usan en sus pizzas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="columns is-multiline mb-4">
+      <div class="column is-12-mobile is-4-tablet is-3-desktop">
+        <div class="stat-card">
+          <div>
+            <p class="stat-label">Categorías</p>
+            <p class="stat-value">{{ categories|length }}</p>
+          </div>
+          <span class="stat-pill">
+            <i class="fas fa-layer-group"></i>&nbsp; Agrupadores
+          </span>
+        </div>
+      </div>
+      <div class="column is-12-mobile is-4-tablet is-3-desktop">
+        <div class="stat-card">
+          <div>
+            <p class="stat-label">Ingredientes</p>
+            <p class="stat-value">{{ ingredients|length }}</p>
+          </div>
+          <span class="stat-pill">
+            <i class="fas fa-pizza-slice"></i>&nbsp; Disponibles
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="notification is-{{ message.tags }} is-light">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- MAIN FORMS -->
+    <div class="columns is-variable is-5">
+      <!-- COL 1: CATEGORÍA -->
+      <div class="column is-5">
+        <div class="box box-elevated">
+          <div class="box-header">
+            <div class="box-title">
+              📂 Nueva categoría
+              <span class="tag is-info is-light">Para agrupar ingredientes</span>
+            </div>
+          </div>
+
+          <p class="hint-text">
+            Usa categorías amplias como <strong>Carnes</strong>, <strong>Quesos</strong>, <strong>Salsas</strong>, <strong>Vegetales</strong>, etc.
+          </p>
+
+          <form method="post" class="mb-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_category">
+            {{ cat_form.non_field_errors }}
+
+            <div class="field">
+              <label class="label is-size-7 has-text-grey">Nombre de la categoría</label>
+              <div class="control">
+                {% render_field cat_form.name class+="input" %}
+              </div>
+              {% if cat_form.name.errors %}
+                <p class="help is-danger">{{ cat_form.name.errors|join:", " }}</p>
+              {% endif %}
+            </div>
+
+            <div class="field">
+              <label class="label is-size-7 has-text-grey">
+                Posición en la lista
+                <span class="tag is-light is-info is-rounded is-size-7">
+                  1 = aparece arriba
+                </span>
+              </label>
+              <div class="control">
+                {% render_field cat_form.ordering class+="input" %}
+              </div>
+              <p class="help is-size-7">
+                Deja el valor sugerido si no quieres ordenar nada: se colocará al final automáticamente.
+              </p>
+              {% if cat_form.ordering.errors %}
+                <p class="help is-danger">{{ cat_form.ordering.errors|join:", " }}</p>
+              {% endif %}
+            </div>
+
+            <div class="field mt-3">
+              <button type="submit" class="button is-link is-fullwidth">
+                ➕ Agregar categoría
+              </button>
+            </div>
+          </form>
+
+          <h3 class="subtitle is-6 has-text-grey">Categorías existentes</h3>
+          <div class="category-list">
+            {% for c in categories %}
+              {% with count=c.ingredients.count %}
+              <form method="post" class="category-row">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="category_modify">
+                <input type="hidden" name="category_id" value="{{ c.id }}">
+
+                <div class="category-name-input">
+                  <input 
+                    type="text"
+                    name="name"
+                    value="{{ c.name }}"
+                    class="input is-small"
+                    placeholder="Nombre de la categoría">
+                </div>
+
+                <span class="category-count">
+                  {{ count }} ing.
+                </span>
+
+                <div class="buttons are-small">
+                  <button 
+                    type="submit"
+                    name="submit_type"
+                    value="update"
+                    class="button is-link is-light">
+                    Guardar
+                  </button>
+                  <button 
+                    type="submit"
+                    name="submit_type"
+                    value="delete"
+                    class="button is-danger is-light"
+                    onclick="return confirm('¿Seguro que quieres eliminar esta categoría? Los ingredientes quedarán sin categoría.');">
+                    Eliminar
+                  </button>
+                </div>
+              </form>
+              {% endwith %}
+            {% empty %}
+              <p class="has-text-grey is-size-7">
+                Aún no hay categorías creadas.
+              </p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- COL 2: INGREDIENTE -->
+      <div class="column is-7">
+        <div class="box box-elevated">
+          <div class="box-header">
+            <div class="box-title">
+              🧀 Nuevo ingrediente
+              <span class="tag is-primary is-light">Usado en las pizzas</span>
+            </div>
+          </div>
+
+          <p class="hint-text">
+            Primero elige la categoría y luego escribe el nombre del ingrediente.
+          </p>
+
+          <form method="post" class="mb-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_ingredient">
+            {{ ing_form.non_field_errors }}
+
+            <div class="field">
+              <label class="label is-size-7 has-text-grey">Categoría</label>
+              <div class="control">
+                {% render_field ing_form.category class+="select" %}
+              </div>
+              {% if ing_form.category.errors %}
+                <p class="help is-danger">{{ ing_form.category.errors|join:", " }}</p>
+              {% endif %}
+            </div>
+
+            <div class="field">
+              <label class="label is-size-7 has-text-grey">Nombre del ingrediente</label>
+              <div class="control">
+                {% render_field ing_form.name class+="input" %}
+              </div>
+              {% if ing_form.name.errors %}
+                <p class="help is-danger">{{ ing_form.name.errors|join:", " }}</p>
+              {% endif %}
+            </div>
+
+            <div class="field mt-3">
+              <button type="submit" class="button is-primary is-fullwidth">
+                ➕ Agregar ingrediente
+              </button>
+            </div>
+          </form>
+
+          <h3 class="subtitle is-6 has-text-grey mb-2">Ingredientes por categoría</h3>
+
+          {% regroup ingredients by category as ingredient_groups %}
+
+          {% if ingredient_groups %}
+            {% for group in ingredient_groups %}
+              <div class="group-card">
+                <div class="group-header">
+                  <div class="group-name">
+                    {% if group.grouper %}
+                      {{ group.grouper.name }}
+                    {% else %}
+                      Sin categoría
+                    {% endif %}
+                  </div>
+                  <span class="tag is-light">
+                    {{ group.list|length }} ingrediente{{ group.list|length|pluralize:"s" }}
+                  </span>
+                </div>
+                <div class="group-body">
+                  {% for ing in group.list %}
+                    <form method="post" class="ingredient-row">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="ingredient_modify">
+                      <input type="hidden" name="ingredient_id" value="{{ ing.id }}">
+
+                      <div class="ingredient-row-name">
+                        <input 
+                          type="text"
+                          name="name"
+                          value="{{ ing.name }}"
+                          class="input is-small"
+                          placeholder="Nombre del ingrediente">
+                      </div>
+
+                      <div class="buttons are-small">
+                        <button
+                          type="submit"
+                          name="submit_type"
+                          value="update"
+                          class="button is-link is-light">
+                          Guardar
+                        </button>
+                        <button
+                          type="submit"
+                          name="submit_type"
+                          value="delete"
+                          class="button is-danger is-light"
+                          onclick="return confirm('¿Seguro que quieres eliminar este ingrediente?');">
+                          Eliminar
+                        </button>
+                      </div>
+                    </form>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="has-text-grey is-size-7">
+              Aún no hay ingredientes registrados.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

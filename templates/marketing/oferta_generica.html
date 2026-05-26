@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Pizzas disponibles</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body style="margin:0; padding:0; background:#f5f5f5; font-family: Arial, Helvetica, sans-serif;">
+
+    <table align="center" cellpadding="0" cellspacing="0" width="100%"
+           style="max-width:520px; margin:auto; background:#ffffff; border-radius:12px; overflow:hidden;">
+
+        <!-- Header -->
+        <tr>
+            <td style="background:#1d3557; padding:18px; text-align:center;">
+                <h1 style="color:#ffffff; margin:0; font-size:24px;">
+                    🍕 Descubre tus próximas pizzas favoritas
+                </h1>
+            </td>
+        </tr>
+
+        <!-- Contenido -->
+        <tr>
+            <td style="padding:20px;">
+
+                <p style="font-size:16px; color:#333; margin-bottom:14px;">
+                    Hola <strong>{{ user.first_name|default:user.username }}</strong>,
+                </p>
+
+                <p style="font-size:15px; color:#555; line-height:1.5; margin-bottom:18px;">
+                    Hoy no tenemos ofertas activas en tu comuna,  
+                    pero puedes explorar nuestro catálogo completo y descubrir nuevas pizzas que te encantarán.
+                </p>
+
+                <!-- CTA -->
+                <div style="text-align:center; margin:28px 0;">
+                    <a href="{{ site_url }}"
+                       style="background:#457b9d; color:white; padding:14px 26px;
+                              text-decoration:none; font-size:16px; border-radius:8px;
+                              display:inline-block; font-weight:bold;">
+                        🔎 Ver catálogo completo
+                    </a>
+                </div>
+
+                <p style="font-size:14px; color:#555; margin-top:20px; line-height:1.4;">
+                    Revisa todas las pizzas disponibles en tu zona y disfruta  
+                    de preparaciones artesanales y frescas, listas para sorprenderte.
+                </p>
+
+            </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+            <td style="padding:20px; text-align:center; font-size:13px; color:#888;">
+                Gracias por ser parte de nuestra comunidad de Marketplace Pizzas 🍕.
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+</html>

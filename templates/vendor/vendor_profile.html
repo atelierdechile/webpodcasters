@@ -1,0 +1,249 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Panel del Vendedor{% endblock %}
+
+{% block content %}
+
+<h1 class="title has-text-centered">
+    🍕 Panel del Vendedor – <span class="is-capitalized">{{ vendor.name }}</span>
+</h1>
+
+<!-- SALDOS -->
+<div class="box has-background-light">
+    <div class="columns is-multiline has-text-centered">
+        <div class="column is-6">
+            <p class="is-size-4"><strong>💵 Mi Saldo</strong></p>
+            <p class="is-size-3 has-text-success">${{ vendor.get_balance }}</p>
+        </div>
+        <div class="column is-6">
+            <p class="is-size-4"><strong>📬 Pagado</strong></p>
+            <p class="is-size-3 has-text-info">${{ vendor.get_paid_amount }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- MENÚ SEMANAL / HISTÓRICO -->
+<div class="box">
+    <div class="level is-mobile">
+        <div class="level-left">
+            <p class="title is-5 mb-0">🍽️ Menú destacado del vendedor</p>
+        </div>
+        <div class="level-right">
+            <div class="buttons">
+                <a href="{% url 'vendor:weekly_menu_edit' %}"
+                   class="button is-primary is-light">
+                    📆 Configurar menú próximos 7 días
+                </a>
+                <a href="{% url 'vendor:weekly_menu_history' %}"
+                   class="button is-link is-light">
+                    📚 Ver histórico de menú
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MIS PRODUCTOS -->
+<div class="box">
+    <div class="level">
+        <h2 class="title is-4">🛒 Mis Productos</h2>
+        <a href="{% url 'vendor:add-product' %}" class="button is-primary">➕ Agregar Producto</a>
+    </div>
+
+    {% if products %}
+        <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Precio</th>
+                    <th>Oferta</th>
+                    <th style="width: 160px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        <a href="{% url 'product:product' product.category.slug product.slug %}">
+                            {{ product.title }}
+                        </a>
+                    </td>
+
+                    <!-- PRECIO NORMAL + PRECIO FINAL -->
+                    <td>
+                        {% if product.get_final_price != product.price %}
+                            <span style="text-decoration: line-through; color:#888;">
+                                ${{ product.price }}
+                            </span><br>
+                            <span class="has-text-danger has-text-weight-bold">
+                                ${{ product.get_final_price }}
+                            </span>
+                        {% else %}
+                            ${{ product.price }}
+                        {% endif %}
+                    </td>
+
+                    <!-- BADGE DE OFERTA -->
+                    <td>
+                        {% if product.active_offer %}
+                            <span class="tag is-success is-light">🔥 Oferta activa</span>
+                        {% else %}
+                            <span class="tag is-light">Sin oferta</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- ACCIONES -->
+                    <td class="is-flex is-flex-direction-column is-align-items-flex-start" style="gap: 6px;">
+                        <a href="{% url 'vendor:edit-offer' product.id %}"
+                           class="button is-info is-small">
+                           Editar Oferta
+                        </a>
+
+                        <a href="{% url 'vendor:delete-product' product.pk %}"
+                           class="button is-danger is-small"
+                           onclick="return confirm('¿Eliminar este producto?');">
+                           Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="has-text-grey">Aún no has agregado productos.</p>
+    {% endif %}
+</div>
+
+<!-- ========================================================= -->
+<!-- 🚀 DASHBOARD DE VENTAS DEL VENDEDOR + FILTROS            -->
+<!-- ========================================================= -->
+
+<div class="box">
+    <h2 class="title is-3 has-text-centered">📊 Mis Estadísticas de Venta</h2>
+
+    <!-- FILTROS -->
+    <div class="buttons has-addons is-centered" style="margin-bottom: 20px;">
+        <button class="button is-link" onclick="loadDashboard('today')">Hoy</button>
+        <button class="button is-info" onclick="loadDashboard('7days')">Últimos 7 días</button>
+        <button class="button is-primary" onclick="loadDashboard('30days')">Últimos 30 días</button>
+    </div>
+
+    <!-- Ventas por día -->
+    <div class="box">
+        <h3 class="title is-4">📅 Ventas por día</h3>
+        <canvas id="salesChart" style="max-height: 260px;"></canvas>
+    </div>
+
+    <!-- Top productos -->
+    <div class="box" id="top-products-box">
+        <h3 class="title is-4">🔥 Pizzas más vendidas</h3>
+        <canvas id="topProductsChart" style="max-height: 260px;"></canvas>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let salesChartInstance = null;
+let topProductsChartInstance = null;
+
+// ==================================================
+// 🔥 CARGAR AMBOS GRÁFICOS
+// ==================================================
+function loadDashboard(range) {
+    loadSalesData(range);
+    loadTopProducts(range);
+}
+
+// ==================================================
+// 📌 1) GRÁFICO: VENTAS POR DÍA
+// ==================================================
+function loadSalesData(range) {
+    fetch(`/analytics/vendor/sales-data/?range=${range}`)
+        .then(r => r.json())
+        .then(data => renderSalesChart(data));
+}
+
+function renderSalesChart(data) {
+    const ctx = document.getElementById("salesChart").getContext("2d");
+
+    if (salesChartInstance) salesChartInstance.destroy();
+
+    salesChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: data.map(d => d.day),
+            datasets: [{
+                label: "Ventas por día",
+                data: data.map(d => d.total),
+                backgroundColor: "rgba(54, 162, 235, 0.6)",
+                borderColor: "rgba(54, 162, 235, 1)",
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+// ==================================================
+// 🔥 2) GRÁFICO: TOP PRODUCTOS (HORIZONTAL)
+// ==================================================
+function loadTopProducts(range) {
+    fetch(`/analytics/vendor/top-products/?range=${range}`)
+        .then(r => r.json())
+        .then(data => renderTopProductsChart(data));
+}
+
+function renderTopProductsChart(data) {
+    // 🔥 RECREAR CANVAS
+    const box = document.getElementById("top-products-box");
+    const oldCanvas = document.getElementById("topProductsChart");
+    oldCanvas.remove();
+
+    const canvas = document.createElement("canvas");
+    canvas.id = "topProductsChart";
+    canvas.style.maxHeight = "260px";
+    box.appendChild(canvas);
+
+    const ctx = canvas.getContext("2d");
+
+    topProductsChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: data.map(d => d.product),
+            datasets: [{
+                label: "Unidades vendidas",
+                data: data.map(d => d.total),
+                backgroundColor: "rgba(255, 159, 64, 0.6)",
+                borderColor: "rgba(255, 159, 64, 1)",
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            indexAxis: "y",
+            scales: {
+                x: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+// ==================================================
+// ✔ Cargar por defecto
+// ==================================================
+document.addEventListener("DOMContentLoaded", () => loadDashboard("7days"));
+</script>
+
+{% endblock %}

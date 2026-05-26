@@ -1,0 +1,396 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="container text-center mt-5" style="max-width: 1100px;">
+  <h1>📊 Panel Global de Actividad & Ventas</h1>
+  <p class="text-muted mb-4">Estadísticas globales de la plataforma</p>
+
+  <!-- ======================================================= -->
+  <!-- 🗺️ MAPA – VENDEDORES (CÍRCULOS) + VENTAS HISTÓRICAS (LIVE) -->
+  <!-- ======================================================= -->
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="color:#0d9488; font-weight:600;">Mapa de vendedores (ventas históricas)</h2>
+      <small id="mapStatus" style="opacity:.7;"></small>
+    </div>
+
+    <div id="vendorsMap" style="height:420px; margin-top:1rem; border-radius:12px; overflow:hidden;"></div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- 📈 GLOBAL – VENTAS POR DÍA -->
+  <!-- ======================================================= -->
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="color:#0d9488; font-weight:600;">Ventas por día (global)</h2>
+
+      <select id="ventasRango" style="padding:8px; border-radius:5px; border:1px solid #ccc;">
+        <option value="today">Hoy</option>
+        <option value="7days" selected>Últimos 7 días</option>
+        <option value="30days">Últimos 30 días</option>
+      </select>
+    </div>
+
+    <div style="height:280px; margin-top:1rem;">
+      <canvas id="ventasChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- 🍕 GLOBAL – PIZZAS MÁS VENDIDAS -->
+  <!-- ======================================================= -->
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="color:#0d9488; font-weight:600;">Pizzas más vendidas (global)</h2>
+
+      <select id="productosRango" style="padding:8px; border-radius:5px; border:1px solid #ccc;">
+        <option value="today">Hoy</option>
+        <option value="7days" selected>Últimos 7 días</option>
+        <option value="30days">Últimos 30 días</option>
+      </select>
+    </div>
+
+    <div style="height:260px; margin-top:1rem;">
+      <canvas id="productosChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- 📈 Usuarios por día -->
+  <!-- ======================================================= -->
+  <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h2 style="color:#0d9488; font-weight:600;">Usuarios conectados por día</h2>
+      <div>
+        <label for="rango" style="font-weight:bold; margin-right:8px;">Rango:</label>
+        <select id="rango" style="padding:8px; border-radius:5px; border:1px solid #ddd;">
+          <option value="7" selected>📅 Últimos 7 días</option>
+          <option value="14">🗓️ Últimos 14 días</option>
+        </select>
+      </div>
+    </div>
+    <div style="height:280px;">
+      <canvas id="usuariosChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- ⏰ Actividad por hora -->
+  <!-- ======================================================= -->
+  <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h2 style="color:#0d9488; font-weight:600;">Actividad por hora del día</h2>
+      <div>
+        <label for="periodo" style="font-weight:bold; margin-right:8px;">Periodo:</label>
+        <select id="periodo" style="padding:8px; border-radius:5px; border:1px solid #ddd;">
+          <option value="historico" selected>📜 Histórico</option>
+          <option value="mensual">🗓️ Último mes</option>
+          <option value="semanal">📅 Últimos 7 días</option>
+          <option value="diario">☀️ Hoy</option>
+        </select>
+      </div>
+    </div>
+    <div style="height:250px;">
+      <canvas id="horasChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- 🥧 Errores -->
+  <!-- ======================================================= -->
+  <div class="card" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2rem; align-items:center; background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="flex:1 1 45%; min-width:350px; height:260px;">
+      <canvas id="erroresChart"></canvas>
+    </div>
+
+    <div id="erroresInfo" style="flex:1 1 35%; min-width:260px; text-align:left; background:#f9fafb; padding:1.5rem 2rem; border-radius:10px; box-shadow:inset 0 0 5px rgba(0,0,0,0.05);">
+      <h3 style="color:#0d9488; font-weight:700; margin-bottom:1rem;">Resumen de eventos</h3>
+      <p><strong style="color:#ef4444;">❌ Errores:</strong> <span id="erroresTotal">0</span></p>
+      <p><strong style="color:#10b981;">✅ Correctos:</strong> <span id="correctosTotal">0</span></p>
+      <hr style="margin:1rem 0; border:none; border-top:1px solid #ddd;">
+      <p><strong>Porcentaje de errores:</strong> <span id="porcentajeErrores">0%</span></p>
+      <p><strong>Porcentaje de eventos correctos:</strong> <span id="porcentajeCorrectos">0%</span></p>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- 🌿 KPI Preferencias -->
+  <!-- ======================================================= -->
+  <div class="kpi-section mt-5">
+    <h2 style="color:#0d9488; font-weight:700;">Preferencias Alimentarias</h2>
+
+    <div class="kpi-grid" style="display:flex; gap:2rem; justify-content:center; margin-bottom:2rem;">
+      <div class="kpi-card" style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:250px;">
+        <h3 style="font-size:1.1rem; font-weight:600;">Usuarios veganos este mes</h3>
+        <p id="kpi-veganos" class="kpi-value" style="font-size:2rem; margin-top:10px;">Cargando...</p>
+      </div>
+
+      <div class="kpi-card" style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:250px;">
+        <h3 style="font-size:1.1rem; font-weight:600;">Cambios de preferencias este mes</h3>
+        <p id="kpi-cambios" class="kpi-value" style="font-size:2rem; margin-top:10px;">Cargando...</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.3rem; font-weight:600; margin-bottom:1rem;">Preferencias más activadas</h3>
+
+    <div style="height:300px; margin-bottom:2rem;">
+      <canvas id="chartTopPreferencias"></canvas>
+    </div>
+  </div>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+  <!-- Chart.js (Leaflet ya lo tienes en base.html) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    console.log("✅ graficos.html scripts cargaron");
+
+    Chart.defaults.responsive = true;
+    Chart.defaults.maintainAspectRatio = false;
+    const animOpts = { duration: 600, easing: "easeInOutQuad" };
+
+    ///////////////////////////////////////////////////////////////
+    // 🗺️ MAPA (CÍRCULOS + TAMAÑO POR VENTAS HISTÓRICAS)
+    ///////////////////////////////////////////////////////////////
+let map = null;
+let vendorCircles = new Map();
+let mapInitialized = false;
+
+function formatCLP(n){
+  return new Intl.NumberFormat('es-CL', {
+    style:'currency',
+    currency:'CLP',
+    maximumFractionDigits:0
+  }).format(n || 0);
+}
+
+// 🎯 tamaño por tramos (centenas claras)
+function salesToRadius(total){
+  if (total < 300000) return 6;
+  if (total < 500000) return 8;
+  if (total < 700000) return 10;
+  if (total < 900000) return 12;
+  if (total < 1100000) return 14;
+  if (total < 1500000) return 17;
+  return 20;
+}
+
+// 🎨 color por nivel de ventas
+function salesToColor(total){
+  if (total < 500000) return "#22c55e";   // verde
+  if (total < 1000000) return "#eab308";  // amarillo
+  if (total < 1500000) return "#f97316";  // naranja
+  return "#ef4444";                       // rojo
+}
+
+function initMapOnce(){
+  if (mapInitialized) return;
+  mapInitialized = true;
+
+  map = L.map("vendorsMap").setView([-33.05, -71.55], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap"
+  }).addTo(map);
+
+  setTimeout(() => map.invalidateSize(), 300);
+}
+
+async function loadVendorsMap(){
+  initMapOnce();
+  if (!map) return;
+
+  const statusEl = document.getElementById("mapStatus");
+
+  try {
+    const res = await fetch("/analytics/api/map/vendors-sales-total/");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+
+    const data = await res.json();
+
+    data.forEach(v => {
+      if (v.lat == null || v.lng == null) return;
+
+      const total = Number(v.sales_total || 0);
+      const radius = salesToRadius(total);
+      const color = salesToColor(total);
+
+      const popupHtml = `
+        <b>${v.name}</b><br/>
+        ${v.comuna ? v.comuna + "<br/>" : ""}
+        Ventas históricas: <b>${formatCLP(total)}</b>
+      `;
+
+      if (vendorCircles.has(v.id)) {
+        const c = vendorCircles.get(v.id);
+        c.setLatLng([v.lat, v.lng]);
+        c.setRadius(radius);
+        c.setStyle({ color, fillColor: color });
+        c.setPopupContent(popupHtml);
+      } else {
+        const c = L.circleMarker([v.lat, v.lng], {
+          radius,
+          color,
+          fillColor: color,
+          weight: total >= 1000000 ? 3 : 1.5, // borde más fuerte desde 1M
+          fillOpacity: 0.45
+        }).addTo(map);
+
+        c.bindPopup(popupHtml);
+        vendorCircles.set(v.id, c);
+      }
+    });
+
+    if (statusEl) {
+      statusEl.textContent = `Actualizado: ${new Date().toLocaleTimeString()}`;
+    }
+
+  } catch (err) {
+    console.error("❌ Error mapa:", err);
+    if (statusEl) statusEl.textContent = "Error cargando mapa";
+  }
+}
+
+    ///////////////////////////////////////////////////////////////
+    // 🔥 CHARTS: ventas + top productos (global)
+    ///////////////////////////////////////////////////////////////
+    const ventasChart = new Chart(document.getElementById("ventasChart"), {
+      type: "bar",
+      data: { labels: [], datasets: [{ label: "Pedidos", data: [], backgroundColor:"#0d9488" }] },
+      options: { scales: { y: { beginAtZero: true } } }
+    });
+
+    const productosChart = new Chart(document.getElementById("productosChart"), {
+      type: "bar",
+      data: { labels: [], datasets: [{ label: "Ventas", data: [], backgroundColor:"#f97316" }] },
+      options: { indexAxis: "y", scales: { x: { beginAtZero: true } } }
+    });
+
+    async function loadVentas() {
+      const rango = document.getElementById("ventasRango").value;
+      const res = await fetch(`/analytics/admin/sales-data/?range=${rango}`);
+      const data = await res.json();
+      ventasChart.data.labels = data.map(d => d.day);
+      ventasChart.data.datasets[0].data = data.map(d => d.total);
+      ventasChart.update();
+    }
+
+    async function loadProductos() {
+      const rango = document.getElementById("productosRango").value;
+      const res = await fetch(`/analytics/admin/top-products/?range=${rango}`);
+      const data = await res.json();
+      productosChart.data.labels = data.map(d => d.product);
+      productosChart.data.datasets[0].data = data.map(d => d.total);
+      productosChart.update();
+    }
+
+    document.getElementById("ventasRango").addEventListener("change", loadVentas);
+    document.getElementById("productosRango").addEventListener("change", loadProductos);
+
+    ///////////////////////////////////////////////////////////////
+    // 🔥 TUS GRÁFICOS ORIGINALES (logs)
+    ///////////////////////////////////////////////////////////////
+    const usuariosChart = new Chart(document.getElementById('usuariosChart'), {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Usuarios por día', data: [], backgroundColor: '#0d9488', borderRadius: 6 }] },
+      options: { animation: animOpts, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+    });
+
+    const horasChart = new Chart(document.getElementById('horasChart'), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Eventos por hora', data: [], borderColor: '#0d9488', backgroundColor: 'rgba(13,148,136,0.25)', fill: true, tension: 0.3 }] },
+      options: { animation: animOpts, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+    });
+
+    const erroresChart = new Chart(document.getElementById('erroresChart'), {
+      type: 'pie',
+      data: { labels: ['Errores', 'Correctos'], datasets: [{ data: [0, 0], backgroundColor: ['#ef4444', '#10b981'] }] },
+      options: { animation: animOpts, plugins: { legend: { display: true, position: 'bottom' } } }
+    });
+
+    async function actualizarDatos() {
+      const rango = document.getElementById('rango').value;
+      const periodo = document.getElementById('periodo').value;
+
+      const [resDias, resHoras] = await Promise.all([
+        fetch(`/analytics/api/data/?rango=${rango}`),
+        fetch(`/analytics/api/horas/?periodo=${periodo}`)
+      ]);
+
+      const dataDias = await resDias.json();
+      const dataHoras = await resHoras.json();
+
+      usuariosChart.data.labels = dataDias.usuarios.map(e => e.fecha);
+      usuariosChart.data.datasets[0].data = dataDias.usuarios.map(e => e.total);
+      usuariosChart.update();
+
+      horasChart.data.labels = dataHoras.labels;
+      horasChart.data.datasets[0].data = dataHoras.values;
+      horasChart.update();
+
+      const errores = dataDias.errores;
+      const correctos = dataDias.total - errores;
+      erroresChart.data.datasets[0].data = [errores, correctos];
+      erroresChart.update();
+
+      const total = errores + correctos;
+      document.getElementById('erroresTotal').textContent = errores;
+      document.getElementById('correctosTotal').textContent = correctos;
+      document.getElementById('porcentajeErrores').textContent = total ? ((errores / total) * 100).toFixed(1) + "%" : "0%";
+      document.getElementById('porcentajeCorrectos').textContent = total ? ((correctos / total) * 100).toFixed(1) + "%" : "0%";
+    }
+
+    ///////////////////////////////////////////////////////////////
+    // 🌿 KPI preferencias
+    ///////////////////////////////////////////////////////////////
+    let chartPreferencias = null;
+
+    async function loadPreferenciasKpis(){
+      const r = await fetch("/analytics/preferences_kpis/");
+      const data = await r.json();
+
+      document.getElementById("kpi-veganos").innerText = data.veganos_mes;
+      document.getElementById("kpi-cambios").innerText = data.cambios_mes;
+
+      const nombres = (data.ranking || []).map(item => item.preference__name);
+      const totales = (data.ranking || []).map(item => item.total);
+
+      const ctx = document.getElementById("chartTopPreferencias").getContext("2d");
+
+      if (chartPreferencias) chartPreferencias.destroy();
+
+      chartPreferencias = new Chart(ctx, {
+        type: "bar",
+        data: { labels: nombres, datasets: [{ label: "Activaciones", data: totales, backgroundColor: "#0d9488", borderRadius: 6 }] },
+        options: { maintainAspectRatio: false, responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    ///////////////////////////////////////////////////////////////
+    // 🚀 init
+    ///////////////////////////////////////////////////////////////
+    document.addEventListener("DOMContentLoaded", () => {
+      // mapa (polling)
+      loadVendorsMap();
+      setInterval(loadVendorsMap, 5000);
+
+      // ventas globales
+      loadVentas();
+      loadProductos();
+
+      // logs
+      actualizarDatos();
+      document.getElementById('rango').addEventListener('change', actualizarDatos);
+      document.getElementById('periodo').addEventListener('change', actualizarDatos);
+      setInterval(actualizarDatos, 30000);
+
+      // kpis
+      loadPreferenciasKpis();
+    });
+  </script>
+{% endblock %}

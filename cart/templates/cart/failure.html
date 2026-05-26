@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Pago Fallido{% endblock %}
+
+{% block content %}
+<div class="box has-text-centered">
+    <div class="icon is-large has-text-danger mb-4">
+        <i class="fas fa-exclamation-circle fa-3x"></i>
+    </div>
+    <h1 class="title">Pago Fallido</h1>
+    <p class="subtitle">El pago no pudo ser procesado.</p>
+    
+    <p class="mb-6">Puedes intentarlo nuevamente o contactarnos si el problema persiste.</p>
+    
+    <div class="buttons is-centered">
+        <a href="{% url 'cart:cart' %}" class="button is-primary">Volver al carrito</a>
+        <a href="{% url 'core:frontpage' %}" class="button is-light">Ir al inicio</a>
+    </div>
+</div>
+{% endblock %}

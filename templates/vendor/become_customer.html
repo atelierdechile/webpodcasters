@@ -1,0 +1,220 @@
+{% extends 'core/base.html' %}
+{% block title %}Registrarse como cliente{% endblock title %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 900px;">
+  <h1 class="title has-text-centered mb-5">Crear cuenta de cliente</h1>
+  <p class="has-text-centered mb-4">Completa tu registro para comenzar a comprar en nuestro marketplace 🛍️</p>
+
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="columns is-multiline">
+
+      <!--  Datos de usuario -->
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.username.id_for_label }}" class="label">Nombre de usuario</label>
+          <div class="control">{{ form.username }}</div>
+          {{ form.username.errors }}
+        </div>
+      </div>
+
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.email.id_for_label }}" class="label">Correo electrónico</label>
+          <div class="control">{{ form.email }}</div>
+          {{ form.email.errors }}
+        </div>
+      </div>
+
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.first_name.id_for_label }}" class="label">Nombre</label>
+          <div class="control">{{ form.first_name }}</div>
+          {{ form.first_name.errors }}
+        </div>
+      </div>
+
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.last_name.id_for_label }}" class="label">Apellido</label>
+          <div class="control">{{ form.last_name }}</div>
+          {{ form.last_name.errors }}
+        </div>
+      </div>
+
+      <!--  País -->
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.country.id_for_label }}" class="label">País</label>
+          <div class="control">
+            <div class="select is-fullwidth">{{ form.country }}</div>
+          </div>
+          {{ form.country.errors }}
+        </div>
+      </div>
+
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.phone.id_for_label }}" class="label">Teléfono</label>
+          <div class="control">{{ form.phone }}</div>
+          {{ form.phone.errors }}
+        </div>
+      </div>
+
+      <!--  Región, Provincia, Comuna -->
+      <div class="column is-one-third">
+        <div class="field">
+          <label for="{{ form.region.id_for_label }}" class="label">Región</label>
+          <div class="control">
+            <div class="select is-fullwidth">{{ form.region }}</div>
+          </div>
+          {{ form.region.errors }}
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="field">
+          <label for="{{ form.provincia.id_for_label }}" class="label">Provincia</label>
+          <div class="control">
+            <div class="select is-fullwidth">{{ form.provincia }}</div>
+          </div>
+          {{ form.provincia.errors }}
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="field">
+          <label for="{{ form.comuna.id_for_label }}" class="label">Comuna</label>
+          <div class="control">
+            <div class="select is-fullwidth">{{ form.comuna }}</div>
+          </div>
+          {{ form.comuna.errors }}
+        </div>
+      </div>
+
+            <!--  Dirección -->
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.address.id_for_label }}" class="label">Dirección</label>
+          <div class="control">{{ form.address }}</div>
+          {{ form.address.errors }}
+        </div>
+      </div>
+
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.zipcode.id_for_label }}" class="label">Código postal</label>
+          <div class="control">{{ form.zipcode }}</div>
+          {{ form.zipcode.errors }}
+        </div>
+      </div>
+
+      <!--  Contraseñas -->
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.password1.id_for_label }}" class="label">Contraseña</label>
+          <div class="control">{{ form.password1 }}</div>
+          {{ form.password1.errors }}
+        </div>
+      </div>
+
+      <div class="column is-half">
+        <div class="field">
+          <label for="{{ form.password2.id_for_label }}" class="label">Confirmar contraseña</label>
+          <div class="control">{{ form.password2 }}</div>
+          {{ form.password2.errors }}
+        </div>
+      </div>
+
+    </div>
+
+    <!--  Botón -->
+    <div class="control mt-5">
+      <button type="submit" class="button is-primary is-fullwidth">
+        Crear cuenta de cliente
+      </button>
+    </div>
+  </form>
+</div>
+
+<!--  Prefijo telefónico según país -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const countrySelect = document.getElementById('id_country');
+    const phoneInput = document.getElementById('id_phone');
+
+    async function applyCode() {
+      const id = countrySelect.value;
+      if (!id) return;
+      const res = await fetch(`/api/countries/${id}/`);
+      const data = await res.json();
+      const code = data.phone_code;
+
+      phoneInput.placeholder = `${code} ...`;
+      if (!phoneInput.value.startsWith(code)) {
+        phoneInput.value = code + ' ';
+      }
+
+      phoneInput.addEventListener('keydown', (e) => {
+        const prefix = code + ' ';
+        const selStart = phoneInput.selectionStart;
+        if ((e.key === 'Backspace' && selStart <= prefix.length) ||
+            (e.key === 'Delete' && selStart < prefix.length)) {
+          e.preventDefault();
+          phoneInput.setSelectionRange(prefix.length, prefix.length);
+        }
+      });
+    }
+
+    if (countrySelect) {
+      countrySelect.addEventListener('change', applyCode);
+      if (countrySelect.value) applyCode();
+    }
+  });
+</script>
+
+<!--  AJAX Región → Provincia → Comuna -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const regionSelect = document.getElementById('id_region');
+    const provinciaSelect = document.getElementById('id_provincia');
+    const comunaSelect = document.getElementById('id_comuna');
+
+    if (!regionSelect || !provinciaSelect || !comunaSelect) return;
+
+    regionSelect.addEventListener('change', function() {
+      const regionId = this.value;
+      if (!regionId) return;
+      fetch(`/location/ajax/cargar-provincias/?region_id=${regionId}`)
+        .then(response => response.json())
+        .then(data => {
+          provinciaSelect.innerHTML = '<option value="">Seleccione provincia</option>';
+          comunaSelect.innerHTML = '<option value="">Seleccione comuna</option>';
+          data.forEach(prov => {
+            const opt = document.createElement('option');
+            opt.value = prov.id;
+            opt.textContent = prov.nombre;
+            provinciaSelect.appendChild(opt);
+          });
+        });
+    });
+
+    provinciaSelect.addEventListener('change', function() {
+      const provinciaId = this.value;
+      if (!provinciaId) return;
+      fetch(`/location/ajax/cargar-comunas/?provincia_id=${provinciaId}`)
+        .then(response => response.json())
+        .then(data => {
+          comunaSelect.innerHTML = '<option value="">Seleccione comuna</option>';
+          data.forEach(com => {
+            const opt = document.createElement('option');
+            opt.value = com.id;
+            opt.textContent = com.nombre;
+            comunaSelect.appendChild(opt);
+          });
+        });
+    });
+  });
+</script>
+{% endblock content %}

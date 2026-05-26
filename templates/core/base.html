@@ -1,0 +1,384 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pizza Marketplace{% endblock title %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+    <style>
+        .navbar { overflow: visible !important; }
+
+        html, body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body { margin: 0; }
+        section.section { flex: 1; }
+        footer.footer { margin-top: auto; }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+
+        <!-- LOGO -->
+        <a class="navbar-item" href="{% url 'core:home' %}">
+            <img src="https://cdn-icons-png.flaticon.com/512/1404/1404945.png"
+                 alt="Pizza Marketplace Logo"
+                 style="height: 40px; width: auto; object-fit: contain;">
+        </a>
+
+
+        <a role="button" class="navbar-burger" aria-label="menu"
+           aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+
+        <div class="navbar-start">
+            <a class="navbar-item" href="{% url 'core:home' %}">Inicio</a>
+
+            {% for category in categories %}
+                <a class="navbar-item" href="{% url 'product:category' category.slug %}">
+                    {{ category.title }}
+                </a>
+            {% endfor %}
+
+            <!-- Buscador -->
+            <div class="navbar-item">
+                <form method="get" action="{% url 'product:search' %}">
+                    <div class="field has-addons">
+                        <div class="control">
+                            <input type="search" name="query" class="input" placeholder="Buscar...">
+                        </div>
+                        <div class="control">
+                            <button class="button is-dark is-uppercase">Buscar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
+        <div class="navbar-end">
+
+        {% if request.user.is_authenticated %}
+
+            {% if not user.vendor %}
+            <!-- 📍 UBICACIÓN SOLO PARA CLIENTES -->
+            <div class="navbar-item">
+                <button class="button is-info" onclick="openLocationModal()">
+                    📍 {% if comuna_activa %}{{ comuna_activa }}{% else %}Usar ubicación{% endif %}
+                </button>
+            </div>
+            {% endif %}
+
+
+            <!--CARRITO SOLO SI ESTÁ LOGUEADO -->
+            <div class="navbar-item">
+                <a href="{% url 'cart:cart' %}" class="button is-warning">
+                    Carrito {% if cart %}({{ cart|length }}){% endif %}
+                </a>
+            </div>
+
+            <!-- Usuario logueado -->
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link is-capitalized">
+                    {% if user.vendor %}
+                        {{ user.vendor.name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </a>
+
+                <div class="navbar-dropdown is-right">
+                    <!-- PERFIL UNIFICADO -->
+                    <a class="navbar-item"
+                        href="
+                                {% if user.is_staff %}
+                                    {% url 'core:admin_landing' %}
+                                {% elif user.vendor %}
+                                    {% url 'vendor:profile' %}
+                                {% else %}
+                                    {% url 'vendor:profile' %}
+                                {% endif %}
+                        "
+                        >
+                            {% if user.is_staff %}
+                                Panel de Control
+                            {% elif user.vendor %}
+                                Perfil de Vendedor
+                            {% else %}
+                                Mi Perfil
+                            {% endif %}
+                        </a>
+
+                    {% if user.vendor %}
+                        <a class="navbar-item" href="{% url 'vendor:add-product' %}">Agregar Producto</a>
+                        <hr class="navbar-divider">
+                    {% endif %}
+
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="navbar-item button is-white" style="width: 100%; text-align: left;">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% else %}
+
+            <!-- Usuario no logueado -->
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary" href="{% url 'vendor:become-vendor' %}">
+                        <strong>Hazte Vendedor</strong>
+                    </a>
+                    <a class="button is-primary" href="{% url 'vendor:become-customer' %}">
+                        <strong>Hazte Cliente</strong>
+                    </a>
+                    <a class="button is-light" href="{% url 'core:login' %}">
+                        Iniciar sesión
+                    </a>
+                </div>
+            </div>
+
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+
+<!-- TOASTS -->
+{% if messages %}
+<div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999;">
+    {% for message in messages %}
+        <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %}"
+             style="min-width: 250px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                    animation: slide-in 0.4s ease, fade-out 0.4s ease 2.5s forwards;">
+            <button class="delete"></button>
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<style>
+@keyframes slide-in { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; }}
+@keyframes fade-out { to { opacity: 0; transform: translateX(120%); }}
+</style>
+
+
+<!-- CONTENIDO -->
+<section class="section">
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</section>
+
+
+<!--  MODAL UBICACION -->
+<div class="modal" id="locationModal">
+  <div class="modal-background" style="backdrop-filter: blur(4px);" onclick="closeLocationModal()"></div>
+
+  <div class="modal-card location-card">
+
+    <header class="modal-card-head" style="border-bottom: none;">
+      <p class="modal-card-title">Tu ubicación</p>
+      <button class="delete" aria-label="close" onclick="closeLocationModal()"></button>
+    </header>
+
+    <section class="modal-card-body">
+
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span style="font-size: 48px;">📍</span>
+        </div>
+
+        <h3 class="title is-5 has-text-centered mb-3">
+            Para mostrarte pizzerías cerca de ti
+        </h3>
+
+        <p class="has-text-centered mb-5" style="color: #555;">
+            Solo necesitamos tu ubicación aproximada 🍕
+        </p>
+
+        <button id="use-my-location"
+                class="button is-success is-fullwidth is-medium"
+                style="border-radius: 10px; font-size: 1.1rem;">
+            📡 Usar mi ubicación actual
+        </button>
+
+        <p class="has-text-centered mt-4" style="font-size: 0.85rem; color: #999;">
+            Tu ubicación no se compartirá con nadie.
+        </p>
+
+    </section>
+
+  </div>
+</div>
+
+<style>
+.location-card {
+    animation: slideUp 0.35s ease;
+    border-radius: 15px;
+}
+@keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+</style>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="content has-text-centered">
+        <h3 class="is-size-4 mb-4">🍕 Pizza Marketplace</h3>
+
+        {% if not request.user.is_authenticated %}
+            <a href="{% url 'vendor:become-vendor' %}">Hazte Vendedor</a>
+        {% endif %}
+
+        <br>
+        <a href="{% url 'vendor:vendors' %}">Todos los vendedores</a>
+
+        <p style="font-size: 0.9rem; color: #777; margin-top: 1rem;">
+            © 2025 Nicolás Briceño. Todos los derechos reservados.
+        </p>
+    </div>
+</footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const burgers = Array.from(document.querySelectorAll('.navbar-burger'));
+    burgers.forEach(burger => {
+        burger.addEventListener('click', () => {
+            const target = burger.dataset.target;
+            const menu = document.getElementById(target);
+            burger.classList.toggle('is-active');
+            menu.classList.toggle('is-active');
+        });
+    });
+});
+</script>
+
+
+<!-- SCRIPT UBICACIÓN  -->
+<script>
+function openLocationModal() {
+    document.getElementById("locationModal").classList.add("is-active");
+}
+function closeLocationModal() {
+    document.getElementById("locationModal").classList.remove("is-active");
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+            cookieValue = cookie.substring(name.length + 1);
+        }
+    }
+    return cookieValue;
+}
+
+document.getElementById("use-my-location").addEventListener("click", () => {
+
+    if (!navigator.geolocation) {
+        alert("Tu navegador no soporta geolocalización.");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                .then(r => r.json())
+                .then(data => {
+
+                    const comuna = data.address.city ||
+                                   data.address.town ||
+                                   data.address.village ||
+                                   data.address.suburb ||
+                                   data.address.neighbourhood;
+
+                    fetch("/api/set-location-auto/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                        body: JSON.stringify({ comuna: comuna })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+
+
+
+                        location.reload();
+                    });
+                });
+        },
+        () => alert("Debes permitir acceso a tu ubicación.")
+    );
+});
+</script>
+
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block scripts %}{% endblock %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* HAMBURGUESA */
+    const burgers = Array.from(document.querySelectorAll('.navbar-burger'));
+    burgers.forEach(burger => {
+        burger.addEventListener('click', () => {
+            const target = burger.dataset.target;
+            const menu = document.getElementById(target);
+            burger.classList.toggle('is-active');
+            menu.classList.toggle('is-active');
+        });
+    });
+
+    /* DROPDOWNS */
+    const dropdowns = document.querySelectorAll('.navbar-item.has-dropdown');
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('mouseenter', () => {
+            dropdown.classList.add('is-active');
+        });
+        dropdown.addEventListener('mouseleave', () => {
+            dropdown.classList.remove('is-active');
+        });
+    });
+
+});
+</script>
+
+
+</body>
+</html>

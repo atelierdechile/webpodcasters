@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5" style="max-width: 700px;">
+  <h1 class="h4 mb-3">Eliminar producto</h1>
+
+  <div class="alert alert-warning">
+    <strong>¡Atención!</strong> Estás a punto de eliminar el producto:
+    <br>
+    <strong>#{{ product.id }} - {{ product.title }}</strong>
+    <br>
+    del vendedor <strong>{{ product.vendor.name }}</strong>.
+    <br><br>
+    Esta acción no se puede deshacer.
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="d-flex justify-content-between mt-4">
+      <a href="{% url 'superadmin_panel:vendor_products' product.vendor.id %}" class="btn btn-secondary">
+        ← Cancelar
+      </a>
+      <button type="submit" class="btn btn-danger">
+        Sí, eliminar producto
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

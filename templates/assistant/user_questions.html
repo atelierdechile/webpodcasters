@@ -1,0 +1,149 @@
+{% extends "core/base.html" %}
+{% block title %}Resumen Diario de Usuarios{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background: #f9fafb;
+    }
+
+    .container-summary {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-top: 4rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        font-size: 2rem;
+        color: #0d9488;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    p.subtitle {
+        text-align: center;
+        color: #555;
+        margin-bottom: 2rem;
+    }
+
+    /* Botón */
+    .generate-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #10b981;
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 25px;
+        transition: background 0.2s;
+    }
+    .generate-btn:hover {
+        background: #0a9169;
+    }
+
+    /* Caja de resumen */
+    .summary-box {
+        background: #f1fdf7;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 6px solid #10b981;
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-title {
+        font-size: 1.3rem;
+        color: #047857;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .small-date {
+        color: #6b7280;
+        font-size: 0.85rem;
+    }
+
+    /* Caja de texto crudo */
+    .raw-data-box {
+        margin-top: 10px;
+        background: #f3f4f6;
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        white-space: pre-line;
+        border-left: 4px solid #9ca3af;
+    }
+</style>
+
+
+<div class="container-summary">
+
+    <h1> Resumen Diario de Dudas de Usuarios</h1>
+    <p class="subtitle">Este panel resume las inquietudes más importantes enviadas por los usuarios hoy.</p>
+
+    <div style="text-align:center;">
+        <a href="{% url 'assistant:generate_daily_summary' %}"
+           class="generate-btn">
+            Generar resumen del día
+        </a>
+    </div>
+
+    {% if latest_summary %}
+    <div class="summary-box">
+        <div class="summary-title">Resumen del día:</div>
+        <p>{{ latest_summary.summary_question }}</p>
+        <p class="small-date">Generado el {{ latest_summary.date }}</p>
+    </div>
+
+    {% else %}
+    <p class="empty" style="text-align:center; margin-top:20px;">
+        📭 Aún no se ha generado un resumen hoy.
+    </p>
+    {% endif %}
+
+</div>
+
+
+<div class="container-summary" style="margin-top: 3rem;">
+
+    <h1>Buscar resúmenes anteriores</h1>
+    <p class="subtitle">Selecciona un día para ver los resúmenes generados en esa fecha.</p>
+
+    <form method="GET" action="{% url 'assistant:daily_summary_panel' %}">
+        <label class="label">📆 Selecciona una fecha:</label>
+        <input type="date" name="date" class="input" style="max-width: 250px;"
+            value="{{ selected_date }}">
+        <button class="button is-primary" style="margin-top: 10px;">
+            Buscar
+        </button>
+    </form>
+
+
+    {% if selected_date %}
+        <h2 class="title is-4" style="margin-top: 2rem;">
+            📝 Resúmenes del {{ selected_date }}
+        </h2>
+
+        {% if summaries_by_date %}
+            {% for s in summaries_by_date %}
+                <div class="summary-box">
+                    <div class="summary-title">Resumen</div>
+                    <p>{{ s.summary_question }}</p>
+                    <p class="small-date">Generado: {{ s.created_at }}</p>
+
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="notification is-warning" style="margin-top: 1rem;">
+                No hay resúmenes para esta fecha.
+            </p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

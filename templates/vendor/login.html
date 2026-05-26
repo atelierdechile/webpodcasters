@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Iniciar sesión{% endblock title %}
+
+{% block content %}
+<div class="container mt-6" style="max-width: 450px;">
+    <h1 class="title has-text-centered">Iniciar sesión</h1>
+    <p class="subtitle has-text-centered mb-5">Accede a tu cuenta</p>
+
+    <!-- ✅ Bloque de mensajes -->
+    {% if messages %}
+      <div style="margin-bottom: 1.5rem;">
+        {% for message in messages %}
+          <div class="notification 
+            {% if message.tags == 'success' %}is-success{% elif message.tags == 'error' %}is-danger{% else %}is-info{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- 🔒 Formulario -->
+    <form method="post" action="" class="box">
+        {% csrf_token %}
+
+        <!-- Usuario -->
+        <div class="field">
+            <label class="label">Usuario</label>
+            <div class="control has-icons-left">
+                {{ form.username|add_class:"input is-fullwidth" }}
+                <span class="icon is-small is-left">
+                    <i class="fas fa-user"></i>
+                </span>
+            </div>
+            <p class="help is-danger">{{ form.username.errors }}</p>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="field">
+            <label class="label">Contraseña</label>
+            <div class="control has-icons-left">
+                {{ form.password|add_class:"input is-fullwidth" }}
+                <span class="icon is-small is-left">
+                    <i class="fas fa-lock"></i>
+                </span>
+            </div>
+            <p class="help is-danger">{{ form.password.errors }}</p>
+
+            <!-- ✅ Olvidé mi contraseña -->
+            <p class="has-text-right mt-2">
+                <a href="{% url 'vendor:password_reset' %}" class="has-text-grey is-size-7">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </p>
+        </div>
+
+        <!-- Botón -->
+        <div class="field mt-4">
+            <div class="control">
+                <button type="submit" class="button is-primary is-fullwidth is-uppercase">
+                    Iniciar sesión
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Registro -->
+    <p class="has-text-centered mt-3">
+        ¿No tienes cuenta? <br>
+        <a href="{% url 'vendor:become-customer' %}" class="has-text-primary has-text-weight-semibold">
+            Regístrate como cliente
+        </a>
+        <span> o </span>
+        <a href="{% url 'vendor:become-vendor' %}" class="has-text-primary has-text-weight-semibold">
+            como vendedor
+        </a>
+    </p>
+</div>
+
+<!-- 🎨 Estilos -->
+<style>
+    input.input {
+        border-radius: 8px;
+    }
+
+    .notification {
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+</style>
+
+<!-- Íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock content %}

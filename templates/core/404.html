@@ -1,0 +1,8 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div style="text-align:center; padding:5rem;">
+  <h1 style="color:#0d9488;">😕 ¡Ups! Página no encontrada</h1>
+  <p>La página que buscas no existe o fue movida.</p>
+  <a href="{% url 'core:home' %}" class="button is-primary mt-4">Volver al inicio</a>
+</div>
+{% endblock %}

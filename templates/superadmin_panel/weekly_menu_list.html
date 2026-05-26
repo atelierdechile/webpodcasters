@@ -1,0 +1,328 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<style>
+  /* Si prefieres no tocar el fondo global, puedes mover esto a .weekly-admin-page */
+  body {
+    background: #f5f5f7;
+  }
+
+  .weekly-admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .weekly-admin-header {
+    margin-bottom: 20px;
+  }
+
+  .weekly-admin-subtitle {
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .panel-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #e3e3e7;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid #ececf1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #f7f9ff, #fdfdff);
+  }
+
+  .panel-title {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+  }
+
+  .panel-tag {
+    font-size: 0.78rem;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3730a3;
+    font-weight: 500;
+  }
+
+  .panel-body {
+    padding: 14px 16px 16px 16px;
+  }
+
+  .filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+  }
+
+  .filters-row .input,
+  .filters-row .select select {
+    font-size: 0.88rem;
+  }
+
+  .filters-row label {
+    font-size: 0.8rem;
+    color: #4b5563;
+    margin-bottom: 4px;
+  }
+
+  .table-wrapper {
+    margin-top: 16px;
+  }
+
+  .table thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6b7280;
+    border-bottom-color: #e5e7eb;
+  }
+
+  .table tbody td {
+    font-size: 0.86rem;
+    vertical-align: middle;
+  }
+
+  .vendor-group-row td {
+    background: #f9fafb;
+    font-weight: 600;
+    font-size: 0.86rem;
+    color: #374151;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .badge-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.76rem;
+  }
+
+  .badge-date span {
+    font-weight: 500;
+  }
+
+  .badge-weekday {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+
+  .product-cell-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .product-cell-price {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0;
+  }
+
+  .menu-empty-message {
+    font-size: 0.86rem;
+    color: #9ca3af;
+    padding: 16px 4px;
+    text-align: center;
+  }
+
+  .btn-sm {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+
+  .has-text-right {
+    text-align: right;
+  }
+
+  @media (max-width: 768px) {
+    .filters-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
+
+<section class="section">
+  <div class="weekly-admin-page">
+
+    <!-- Breadcrumb Bulma -->
+    <nav class="breadcrumb mb-4" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
+        <li class="is-active"><a aria-current="page">Menú semanal</a></li>
+      </ul>
+    </nav>
+
+    <!-- Header -->
+    <div class="weekly-admin-header mb-3">
+      <div class="level mb-1">
+        <div class="level-left">
+          <div>
+            <h2 class="title is-4 mb-1">📊 Menú semanal (Súper Admin)</h2>
+            <p class="weekly-admin-subtitle mb-0">
+              Revisa qué pizza tiene asignada cada día por vendedor. Usa los filtros para acotar por vendedor y rango de fechas.
+            </p>
+          </div>
+        </div>
+        <div class="level-right">
+          <a href="{% url 'superadmin_panel:weekly_menu_create' %}"
+             class="button is-success is-small">
+            ➕ Nuevo registro
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL DE FILTROS Y LISTADO -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h5 class="panel-title mb-0">Filtros y registros</h5>
+        <span class="panel-tag">
+          Total: {{ menus|length }} registros
+        </span>
+      </div>
+
+      <div class="panel-body">
+        <!-- FILTROS -->
+        <form method="get" class="mb-3">
+          <div class="filters-row">
+
+            <div class="flex-grow-1" style="min-width:220px;">
+              <label for="vendor">Vendedor</label>
+              <div class="select is-fullwidth">
+                <select name="vendor" id="vendor">
+                  <option value="">Todos</option>
+                  {% for v in vendors %}
+                    <option value="{{ v.id }}"
+                            {% if vendor_id|default:'' == v.id|stringformat:'s' %}selected{% endif %}>
+                      {{ v.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="start">Desde fecha</label>
+              <input type="date"
+                     id="start"
+                     name="start"
+                     class="input"
+                     value="{{ start|default:'' }}">
+            </div>
+
+            <div>
+              <label for="end">Hasta fecha</label>
+              <input type="date"
+                     id="end"
+                     name="end"
+                     class="input"
+                     value="{{ end|default:'' }}">
+            </div>
+
+            <div class="is-flex" style="gap: 8px;">
+              <button type="submit" class="button is-primary is-small btn-sm">
+                Aplicar filtros
+              </button>
+              <a href="{% url 'superadmin_panel:weekly_menu_list' %}"
+                 class="button is-light is-small btn-sm">
+                Limpiar
+              </a>
+            </div>
+          </div>
+        </form>
+
+        <!-- TABLA DE REGISTROS -->
+        <div class="table-wrapper table-container">
+          {% if menus %}
+            <table class="table is-fullwidth is-striped is-hoverable">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Vendedor</th>
+                  <th>Producto</th>
+                  <th>Precio base</th>
+                  <th class="has-text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% regroup menus by vendor as vendor_list %}
+
+                {% for group in vendor_list %}
+                  <tr class="vendor-group-row">
+                    <td colspan="5">
+                      🏪 {{ group.grouper.name }}
+                    </td>
+                  </tr>
+
+                  {% for m in group.list %}
+                    <tr>
+                      <td>
+                        <div class="badge-date">
+                          <span>{{ m.date|date:"d/m/Y" }}</span>
+                          <span class="badge-weekday">
+                            {{ m.date|date:"D" }}
+                          </span>
+                        </div>
+                      </td>
+                      <td>
+                        {{ m.vendor.name }}
+                      </td>
+                      <td>
+                        <div class="product-cell-title">{{ m.product.title }}</div>
+                        <p class="product-cell-price mb-0">
+                          ID: {{ m.product.id }}
+                        </p>
+                      </td>
+                      <td>
+                        {% if m.product.price %}
+                          ${{ m.product.price|floatformat:0 }}
+                        {% else %}
+                          <span class="has-text-grey">Sin precio</span>
+                        {% endif %}
+                      </td>
+                      <td class="has-text-right">
+                        <div class="buttons are-small is-right">
+                          <a href="{% url 'superadmin_panel:weekly_menu_edit' m.id %}"
+                             class="button is-info is-light">
+                            Editar
+                          </a>
+                          <a href="{% url 'superadmin_panel:weekly_menu_delete' m.id %}"
+                             class="button is-danger is-light">
+                            Eliminar
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="menu-empty-message">
+              No hay registros de menú semanal para los filtros seleccionados.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

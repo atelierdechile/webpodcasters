@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Pago Pendiente{% endblock %}
+
+{% block content %}
+<div class="box has-text-centered">
+    <div class="icon is-large has-text-warning mb-4">
+        <i class="fas fa-clock fa-3x"></i>
+    </div>
+    <h1 class="title">Pago Pendiente</h1>
+    <p class="subtitle">Tu pago está siendo procesado.</p>
+    
+    {% if order_id %}
+    <p class="mb-4">Número de orden: <strong>#{{ order_id }}</strong></p>
+    {% endif %}
+    
+    <p class="mb-6">Te notificaremos por email cuando el pago sea confirmado.</p>
+    
+    <div class="buttons is-centered">
+        <a href="{% url 'core:frontpage' %}" class="button is-primary">Ir al inicio</a>
+    </div>
+</div>
+{% endblock %}

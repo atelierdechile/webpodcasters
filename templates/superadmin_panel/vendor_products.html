@@ -1,0 +1,216 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <!-- Breadcrumb Bulma -->
+    <nav class="breadcrumb mb-5" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
+        <li><a href="{% url 'superadmin_panel:vendor_list' %}">Vendedores</a></li>
+        <li class="is-active"><a aria-current="page">{{ vendor.name }}</a></li>
+      </ul>
+    </nav>
+
+    <!-- Header -->
+    <div class="columns is-vcentered mb-5">
+      <div class="column">
+        <h1 class="title is-4 mb-2">{{ vendor.name }}</h1>
+
+        <p class="has-text-grey">
+          Usuario: <strong>@{{ vendor.created_by.username }}</strong> ·  
+          País: {{ vendor.country.name|default:"-" }}
+        </p>
+      </div>
+
+      <div class="column is-narrow has-text-right">
+        <p class="is-size-7 has-text-grey">
+          <strong>ID:</strong> {{ vendor.id }} <br>
+          <strong>Creado:</strong> {{ vendor.created_at|date:"d/m/Y H:i" }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Tabs Bulma -->
+    <div class="tabs is-boxed mb-4">
+      <ul>
+        <li class="is-active">
+          <a>
+            <span>Productos</span>
+            <span class="tag is-primary is-light ml-2">{{ products|length }}</span>
+          </a>
+        </li>
+  
+        <li>
+          <a href="{% url 'superadmin_panel:weekly_menu_list' %}?vendor={{ vendor.id }}">
+            Menú semanal
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Contenido -->
+    <div class="box" style="box-shadow:0 10px 30px rgba(0,0,0,0.04);">
+
+      <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+        <h2 class="title is-5 mb-0">Productos del vendedor</h2>
+        <span class="has-text-grey is-size-7">
+          Total: {{ products|length }} productos
+        </span>
+      </div>
+
+      <!-- TABLE DESKTOP -->
+      <div class="table-container is-hidden-mobile">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Imagen</th>
+              <th>Título</th>
+              <th>Categoría</th>
+              <th>Precio base</th>
+              <th>Oferta</th>
+              <th>Creado</th>
+              <th class="has-text-right">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for p in products %}
+            <tr>
+              <td>#{{ p.id }}</td>
+              <td style="width:70px;">
+                {% if p.thumbnail %}
+                  <img src="{{ p.get_thumbnail }}" class="image is-64x64 is-rounded" alt="{{ p.title }}">
+                {% else %}
+                  <span class="has-text-grey is-size-7">Sin imagen</span>
+                {% endif %}
+              </td>
+              <td>{{ p.title }}</td>
+              <td>{{ p.category.title }}</td>
+              <td>${{ p.price }}</td>
+
+              <td>
+                {% if p.active_offer %}
+                  <span class="tag is-success is-light">Activa</span>
+                {% else %}
+                  <span class="tag is-light">Sin oferta</span>
+                {% endif %}
+              </td>
+
+              <td>{{ p.added_date|date:"d/m/Y" }}</td>
+
+              <td class="has-text-right">
+                <div class="buttons are-small is-right">
+                  <a href="{% url 'superadmin_panel:product_edit' p.id %}" class="button is-info is-light">
+                    Editar
+                  </a>
+
+                  <!-- ELIMINAR POR POST CON CONFIRM -->
+                  <form method="post"
+                        action="{% url 'superadmin_panel:product_delete' p.id %}"
+                        style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="button is-danger is-light"
+                            onclick="return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.');">
+                      Eliminar
+                    </button>
+                  </form>
+
+                  {% if p.offer %}
+                    <a href="{% url 'superadmin_panel:offer_edit' p.offer.id %}" class="button is-warning is-light">
+                      Editar oferta
+                    </a>
+                  {% else %}
+                    <a href="{% url 'superadmin_panel:offer_create' %}?product={{ p.id }}" class="button is-primary is-light">
+                      Crear oferta
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="has-text-centered has-text-grey py-5">
+                Este vendedor aún no tiene productos.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MOBILE VERSION (Cards) -->
+      <div class="is-hidden-tablet mt-4">
+        {% for p in products %}
+        <div class="box mb-4" style="border-radius:10px;">
+          <div class="is-flex mb-3">
+
+            <div class="mr-3">
+              {% if p.thumbnail %}
+                <img src="{{ p.get_thumbnail }}" class="image is-64x64 is-rounded">
+              {% else %}
+                <span class="has-text-grey is-size-7">Sin imagen</span>
+              {% endif %}
+            </div>
+
+            <div>
+              <p class="has-text-weight-semibold">{{ p.title }}</p>
+              <p class="is-size-7 has-text-grey">{{ p.category.title }}</p>
+
+              <div class="mt-1">
+                {% if p.active_offer %}
+                  <span class="tag is-success is-light is-size-7">Oferta activa</span>
+                {% else %}
+                  <span class="tag is-light is-size-7">Sin oferta</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <p class="is-size-7 has-text-grey mb-2">
+            <strong>Precio:</strong> ${{ p.price }} <br>
+            <strong>Creado:</strong> {{ p.added_date|date:"d/m/Y" }}
+          </p>
+
+          <div class="buttons are-small is-flex is-flex-direction-column">
+            <a href="{% url 'superadmin_panel:product_edit' p.id %}" class="button is-info is-light is-fullwidth">
+              Editar
+            </a>
+
+            <!-- ELIMINAR POR POST CON CONFIRM (MÓVIL) -->
+            <form method="post"
+                  action="{% url 'superadmin_panel:product_delete' p.id %}">
+              {% csrf_token %}
+              <button type="submit"
+                      class="button is-danger is-light is-fullwidth"
+                      onclick="return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.');">
+                Eliminar
+              </button>
+            </form>
+
+            {% if p.offer %}
+              <a href="{% url 'superadmin_panel:offer_edit' p.offer.id %}" class="button is-warning is-light is-fullwidth">
+                Editar oferta
+              </a>
+            {% else %}
+              <a href="{% url 'superadmin_panel:offer_create' %}?product={{ p.id }}" class="button is-primary is-light is-fullwidth">
+                Crear oferta
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p class="has-text-centered has-text-grey py-5">
+          Este vendedor aún no tiene productos.
+        </p>
+        {% endfor %}
+      </div>
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}

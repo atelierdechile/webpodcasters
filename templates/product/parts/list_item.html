@@ -1,0 +1,96 @@
+<div class="column is-3 product-list-item">
+    <div class="box" style="position: relative; overflow: hidden;">
+
+        <!-- 🔥 BADGE DE OFERTA -->
+        {% if product.active_offer %}
+            
+            {% if product.active_offer.is_2x1 %}
+                <!-- ⭐ BADGE 2x1 -->
+                <span style="
+                    position:absolute;
+                    top:10px;
+                    left:10px;
+                    background:#ff0000;
+                    color:white;
+                    padding:4px 12px;
+                    font-size:0.85rem;
+                    border-radius:6px;
+                    font-weight:700;
+                    z-index:5;">
+                    2×1 🔥
+                </span>
+
+            {% else %}
+                <!-- ⭐ BADGE DESCUENTO NORMAL -->
+                <span style="
+                    position:absolute;
+                    top:10px;
+                    left:10px;
+                    background:#ff4444;
+                    color:white;
+                    padding:4px 12px;
+                    font-size:0.8rem;
+                    border-radius:6px;
+                    font-weight:600;
+                    z-index:5;">
+                    🔥 Oferta -{{ product.get_offer_percentage }}%
+                </span>
+            {% endif %}
+
+        {% endif %}
+
+        <!-- 📸 Imagen -->
+        <figure class="image is-4by3 mb-4">
+            <img src="{{ product.get_thumbnail }}" alt="{{ product.title }}">
+        </figure>
+
+        <!-- 🧀 Nombre -->
+        <h2 class="subtitle">{{ product.title }}</h2>
+
+        <!-- 💰 Precio -->
+        <h3 class="price is-size-6 mb-5">
+
+            {% if product.active_offer %}
+
+                {% if product.active_offer.is_2x1 %}
+                    <!-- 💥 Precio normal tachado -->
+                    <span style="text-decoration: line-through; color:#999;">
+                        {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.price }}
+                    </span>
+
+                    <!-- 💥 Precio final por unidad -->
+                    <span style="color:#d10000; font-weight:700; margin-left:6px;">
+                        {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.get_final_price }}
+                    </span>
+
+                    <br>
+                    <small style="color:#555;">Llévate 2, paga 1 🍕</small>
+
+                {% else %}
+                    <!-- 💸 Oferta normal -->
+                    <span style="text-decoration: line-through; color:#999;">
+                        {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.price }}
+                    </span>
+
+                    <span style="color:#d10000; font-weight:700; margin-left:6px;">
+                        {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.get_final_price }}
+                    </span>
+                {% endif %}
+
+            {% else %}
+                <!-- Precio normal -->
+                {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.price }}
+            {% endif %}
+
+        </h3>
+
+        <hr>
+
+        <!-- 🔗 Botón -->
+        <a href="{% url 'product:product' product.category.slug product.slug %}" 
+           class="button is-dark is-uppercase">
+            Ver pizza
+        </a>
+
+    </div>
+</div>

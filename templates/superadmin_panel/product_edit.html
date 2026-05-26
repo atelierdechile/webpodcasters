@@ -1,0 +1,486 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Editar Producto{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column is-10-tablet is-8-desktop">
+            <div class="box">
+                <h1 class="title has-text-centered mb-5">✏️ Editar producto</h1>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <style>
+                    /* --------- Layout general --------- */
+                    .section-card {
+                        margin-bottom: 2rem;
+                        border-radius: 1rem;
+                        border: 1px solid #e5e7eb;
+                        padding: 1.25rem 1.5rem;
+                        background: #ffffff;
+                    }
+
+                    .section-card-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        margin-bottom: 0.75rem;
+                    }
+
+                    .section-card-title {
+                        font-size: 1.1rem;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: .4rem;
+                    }
+
+                    /* --------- Chips base --------- */
+                    .pref-grid,
+                    .ing-grid {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: .6rem;
+                        margin-bottom: 0.5rem;
+                    }
+                    .pref-chip,
+                    .ing-chip {
+                        position: relative;
+                        padding: .55rem 1rem .55rem 2.1rem;
+                        border-radius: 9999px;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                        background: #eef2f7;
+                        color: #111;
+                        border: 1px solid transparent;
+                        transition: .15s ease;
+                        user-select: none;
+                        display: inline-flex;
+                        align-items: center;
+                        line-height: 1.2;
+                    }
+                    .pref-chip[data-selected="true"],
+                    .ing-chip[data-selected="true"] {
+                        transform: translateY(-1px);
+                        box-shadow: 0 3px 8px rgba(0,0,0,.10);
+                    }
+
+                    .pref-chip[data-selected="true"] {
+                        background: #0d9488;
+                        color: #fff;
+                        border-color: #0b7669;
+                    }
+                    .ing-chip[data-selected="true"] {
+                        background: #f97316;
+                        color: #fff;
+                        border-color: #ea580c;
+                    }
+
+                    .pref-chip .check,
+                    .ing-chip .check {
+                        position: absolute;
+                        left: .6rem;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        width: 1.1rem;
+                        height: 1.1rem;
+                        border-radius: 9999px;
+                        display: grid;
+                        place-items: center;
+                        background: #cbd5e1;
+                        color: #111;
+                        font-size: .75rem;
+                        transition: .15s ease;
+                    }
+                    .pref-chip[data-selected="true"] .check {
+                        background: #0b7669;
+                        color: #fff;
+                    }
+                    .ing-chip[data-selected="true"] .check {
+                        background: #ea580c;
+                        color: #fff;
+                    }
+
+                    .pref-hidden,
+                    .ing-hidden {
+                        display: none !important;
+                    }
+
+                    /* --------- Ingredientes: acordeón --------- */
+                    .ingredients-box {
+                        border-radius: 0.75rem;
+                        background: #f9fafb;
+                        padding: 0.75rem 0.75rem 0.25rem;
+                        max-height: 420px;
+                        overflow-y: auto;
+                    }
+                    .ingredients-box::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    .ingredients-box::-webkit-scrollbar-thumb {
+                        background: #cbd5e1;
+                        border-radius: 9999px;
+                    }
+
+                    .ing-card {
+                        border-radius: 0.75rem;
+                        border: 1px solid #e5e7eb;
+                        margin-bottom: 0.6rem;
+                        background: #ffffff;
+                        overflow: hidden;
+                    }
+
+                    .ing-card-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 0.55rem 0.9rem;
+                        cursor: pointer;
+                        background: linear-gradient(to right, #f1f5f9, #e5e7eb);
+                    }
+
+                    .ing-card-title {
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.04em;
+                        color: #475569;
+                        display: flex;
+                        align-items: center;
+                        gap: .4rem;
+                    }
+
+                    .ing-card-toggle {
+                        font-size: 0.8rem;
+                        color: #64748b;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.25rem;
+                    }
+
+                    .ing-card-body {
+                        padding: 0.6rem 0.9rem 0.75rem;
+                        display: none;
+                    }
+                    .ing-card-body.is-open {
+                        display: block;
+                    }
+
+                    .ing-card-chevron {
+                        transition: transform .15s ease;
+                    }
+                    .ing-card-header[aria-expanded="true"] .ing-card-chevron {
+                        transform: rotate(90deg);
+                    }
+
+                    /* --------- Search --------- */
+                    .ingredient-search {
+                        margin-bottom: 0.75rem;
+                    }
+                    .ingredient-search input {
+                        font-size: 0.9rem;
+                    }
+                    .ingredient-search .help {
+                        font-size: 0.8rem;
+                        color: #6b7280;
+                    }
+                    </style>
+
+                    <!-- ========================== -->
+                    <!-- 1. DATOS BÁSICOS DEL PROD. -->
+                    <!-- ========================== -->
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div class="section-card-title">
+                                <span>📦 Datos del producto</span>
+                            </div>
+                        </div>
+
+                        {# Renderizamos todos los campos excepto preferences e ingredients, con un trato especial para imagen #}
+                        {% for field in form %}
+                            {% if field.name != "preferences" and field.name != "ingredients" %}
+                            <div class="field">
+                                <label class="label">{{ field.label }}</label>
+
+                                {% if field.name == "image" and product.image %}
+                                    <figure class="image mb-3" style="max-width: 200px;">
+                                        <img src="{{ product.image.url }}" style="border-radius: 12px; border: 1px solid #e5e7eb;">
+                                    </figure>
+                                {% endif %}
+
+                                <div class="control">
+                                    {% if field.field.widget.input_type == "file" %}
+                                        <div class="file has-name is-fullwidth">
+                                            <label class="file-label">
+                                                {{ field }}
+                                            </label>
+                                        </div>
+                                    {% else %}
+                                        {{ field|add_class:"input" }}
+                                    {% endif %}
+                                </div>
+
+                                {% if field.errors %}
+                                    <p class="help is-danger">{{ field.errors|join:", " }}</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div class="section-card-title">
+                                <span>🎯 Preferencias del producto</span>
+                            </div>
+                        </div>
+
+                        <p class="help mb-2">
+                            Marca las preferencias alimentarias que aplican a este producto.
+                        </p>
+
+                        <div class="pref-grid">
+                            {% with selected_prefs=form.preferences.value %}
+                            {% for pref in form.preferences.field.queryset %}
+                                {% with pref_id=pref.id|stringformat:"s" %}
+                                <label 
+                                    class="pref-chip"
+                                    tabindex="0"
+                                    data-selected="{% if selected_prefs and pref_id in selected_prefs %}true{% else %}false{% endif %}"
+                                >
+                                    <span class="check">✓</span>
+
+                                    {% if pref.name|lower == "vegana" %}
+                                        🌱 {{ pref.name }}
+                                    {% elif pref.name|lower == "sin gluten" %}
+                                        🌾 {{ pref.name }}
+                                    {% else %}
+                                        🍕 {{ pref.name }}
+                                    {% endif %}
+
+                                    <input 
+                                        type="checkbox"
+                                        class="pref-hidden"
+                                        name="preferences"
+                                        value="{{ pref.id }}"
+                                        {% if selected_prefs and pref_id in selected_prefs %}checked{% endif %}
+                                    >
+                                </label>
+                                {% endwith %}
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+
+                        {% if form.preferences.errors %}
+                            <p class="help is-danger">{{ form.preferences.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div class="section-card-title">
+                                <span>🧀 Ingredientes del producto</span>
+                            </div>
+                        </div>
+
+                        <div class="ingredient-search">
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input 
+                                        id="ingredient-search"
+                                        class="input"
+                                        type="search"
+                                        placeholder="Buscar ingrediente (ej: queso, pollo, tomate)...">
+                                </div>
+                                <div class="control">
+                                    <button type="button" class="button is-light" id="ingredient-clear">
+                                        Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="help">
+                                Puedes colapsar/expandir las categorías y usar el buscador para encontrar ingredientes rápido.
+                            </p>
+                        </div>
+
+                        <div class="ingredients-box">
+                            {% with ingredients=form.ingredients.field.queryset selected_ings=form.ingredients.value %}
+                                {% if ingredients %}
+                                    {% for ing in ingredients %}
+                                        {% ifchanged ing.category_id %}
+                                            {% if not forloop.first %}
+                                                    </div> <!-- .ing-grid -->
+                                                </div> <!-- .ing-card-body -->
+                                            </div> <!-- .ing-card -->
+                                            {% endif %}
+                                            <div class="ing-card" data-category-id="{{ ing.category.id|default:'0' }}">
+                                                <div class="ing-card-header" tabindex="0" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                                    <div class="ing-card-title">
+                                                        {% if ing.category %}
+                                                            {{ ing.category.name }}
+                                                        {% else %}
+                                                            Otros
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="ing-card-toggle">
+                                                        <span class="ing-card-chevron">▶</span>
+                                                        <span class="is-hidden-mobile">Ver ingredientes</span>
+                                                    </div>
+                                                </div>
+                                                <div class="ing-card-body {% if forloop.first %}is-open{% endif %}">
+                                                    <div class="ing-grid">
+                                        {% endifchanged %}
+
+                                        {% with ing_id=ing.id|stringformat:"s" %}
+                                        <label 
+                                            class="ing-chip"
+                                            tabindex="0"
+                                            data-selected="{% if selected_ings and ing_id in selected_ings %}true{% else %}false{% endif %}"
+                                        >
+                                            <span class="check">✓</span>
+                                            {{ ing.name }}
+
+                                            <input
+                                                type="checkbox"
+                                                class="ing-hidden"
+                                                name="ingredients"
+                                                value="{{ ing.id }}"
+                                                {% if selected_ings and ing_id in selected_ings %}checked{% endif %}
+                                            >
+                                        </label>
+                                        {% endwith %}
+
+                                        {% if forloop.last %}
+                                                    </div> <!-- .ing-grid -->
+                                                </div> <!-- .ing-card-body -->
+                                            </div> <!-- .ing-card -->
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="has-text-grey">
+                                        Aún no hay ingredientes cargados. Ejecuta el comando 
+                                        <code>python manage.py load_ingredients</code> o crea ingredientes desde el admin.
+                                    </p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        {% if form.ingredients.errors %}
+                            <p class="help is-danger">{{ form.ingredients.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- ===================== -->
+                    <!--    BOTONES DEL FORM   -->
+                    <!-- ===================== -->
+                    <div class="field mt-4">
+                        <div class="columns is-variable is-2 is-mobile is-centered is-multiline">
+                            <div class="column is-full-mobile is-half-tablet is-one-third-desktop">
+                                <button class="button is-primary is-uppercase is-medium is-fullwidth">
+                                    <span class="icon">
+                                        <i class="fas fa-save"></i>
+                                    </span>
+                                    <span>Guardar cambios</span>
+                                </button>
+                            </div>
+
+                            <div class="column is-full-mobile is-half-tablet is-one-third-desktop">
+                                <a href="{% url 'superadmin_panel:vendor_products' product.vendor.id %}" 
+                                   class="button is-light is-uppercase is-medium is-fullwidth">
+                                    Volver
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS para interactividad -->
+<script>
+function setupChipToggle(selector, hiddenClass) {
+    document.querySelectorAll(selector).forEach(chip => {
+        chip.addEventListener("click", () => {
+            const input = chip.querySelector("input." + hiddenClass);
+            if (!input) return;
+            input.checked = !input.checked;
+            chip.dataset.selected = String(input.checked);
+        });
+
+        chip.addEventListener("keydown", e => {
+            if (e.key === " " || e.key === "Enter") {
+                e.preventDefault();
+                const input = chip.querySelector("input." + hiddenClass);
+                if (!input) return;
+                input.checked = !input.checked;
+                chip.dataset.selected = String(input.checked);
+            }
+        });
+    });
+}
+
+setupChipToggle(".pref-chip", "pref-hidden");
+setupChipToggle(".ing-chip", "ing-hidden");
+
+// Acordeón de categorías de ingredientes
+document.querySelectorAll(".ing-card-header").forEach(header => {
+    header.addEventListener("click", () => {
+        const body = header.nextElementSibling;
+        const expanded = header.getAttribute("aria-expanded") === "true";
+        header.setAttribute("aria-expanded", String(!expanded));
+        body.classList.toggle("is-open", !expanded);
+    });
+
+    header.addEventListener("keydown", e => {
+        if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            header.click();
+        }
+    });
+});
+
+// Buscador de ingredientes
+const searchInput = document.getElementById("ingredient-search");
+const clearBtn = document.getElementById("ingredient-clear");
+
+if (searchInput) {
+    const filterIngredients = () => {
+        const term = searchInput.value.trim().toLowerCase();
+        const cards = document.querySelectorAll(".ing-card");
+
+        cards.forEach(card => {
+            const chips = card.querySelectorAll(".ing-chip");
+            let visibleCount = 0;
+
+            chips.forEach(chip => {
+                const text = chip.textContent.toLowerCase();
+                const match = text.includes(term);
+                chip.style.display = match ? "" : "none";
+                if (match) visibleCount++;
+            });
+
+            card.style.display = visibleCount > 0 ? "" : "none";
+        });
+    };
+
+    searchInput.addEventListener("input", filterIngredients);
+
+    if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+            searchInput.value = "";
+            filterIngredients();
+        });
+    }
+}
+</script>
+
+{% endblock content %}

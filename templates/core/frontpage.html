@@ -1,0 +1,383 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Pizza Marketplace 🍕{% endblock title %}
+
+{% block content %}
+
+<!-- 🔥 HERO -->
+<section class="hero is-small" style="background: linear-gradient(120deg, #ff914d 0%, #ff4d4d 100%);">
+  <div class="hero-body py-5">
+    <div class="container has-text-centered" style="margin-top: -20px;">
+      <h1 class="title is-2 has-text-white has-text-weight-bold mb-2">
+        🍕 Bienvenido al Marketplace de Pizzas
+      </h1>
+      <p class="subtitle is-5 has-text-light mb-3 mt-1">
+        Descubre las mejores pizzas artesanales de tu país
+      </p>
+
+      {% if not user.is_authenticated %}
+      <div class="box p-4 has-text-centered"
+           style="border-radius: 16px; max-width: 450px; margin: 0 auto;">
+        <h2 class="title is-5 mb-3">Selecciona tu país para comenzar 🌎</h2>
+
+        <form method="get" class="is-inline-block">
+          <div class="select is-medium">
+            <select name="country" onchange="this.form.submit()">
+              <option value="">-- Elegir país --</option>
+              {% for country in countries %}
+                <option value="{{ country.id }}"
+                  {% if country.id|stringformat:"s" == selected_country|stringformat:"s" %}
+                    selected
+                  {% endif %}>
+                  {{ country.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+
+<!--PRODUCTOS RECIENTES -->
+<section class="section" style="background-color: #fdfdfd; margin-top: -60px;">
+  <div class="container">
+
+    <div class="has-text-centered mb-6">
+      <h2 class="title is-2 has-text-dark mb-2">🔥 Últimos productos</h2>
+      <p class="subtitle is-5 has-text-grey mt-1">
+        Pizzas recién salidas del horno
+      </p>
+      <hr class="is-centered" style="width: 80px; border: 2px solid #ff914d;">
+    </div>
+
+    <!-- 🧠 FILTRO DE PREFERENCIAS -->
+    {% if user.is_authenticated and user.profile.preferences.count > 0 %}
+    <div class="has-text-centered mb-5">
+      {% if solo_pref %}
+        <a href="?" class="button is-light is-rounded">
+          👀 Ver todas las pizzas
+        </a>
+        <p class="has-text-grey mt-2">Mostrando solo pizzas según tus preferencias 🍃</p>
+      {% else %}
+        <a href="?solo_pref=1" class="button is-success is-light is-rounded">
+          🌱 Ver solo mis preferencias
+        </a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if newest_products %}
+      <div class="columns is-multiline">
+        {% for product in newest_products %}
+        <div class="column is-3-desktop is-6-tablet">
+          <div class="card product-card" style="border-radius: 16px; overflow: hidden;">
+
+            <div class="card-image" style="position: relative;">
+              <figure class="image is-4by3">
+                <img src="{{ product.get_thumbnail }}" alt="{{ product.title }}">
+              </figure>
+
+              {% if product.active_offer %}
+                {% if product.active_offer.is_2x1 %}
+                  <span class="tag is-danger is-medium" 
+                        style="position:absolute; top:10px; left:10px;">
+                    🔥 2×1
+                  </span>
+                {% else %}
+                  <span class="tag is-danger is-medium" 
+                        style="position:absolute; top:10px; left:10px;">
+                    🔥 Oferta
+                  </span>
+                {% endif %}
+              {% endif %}
+            </div>
+
+            <div class="card-content has-text-centered">
+              <h3 class="title is-5 mb-2">{{ product.title }}</h3>
+
+              <!-- 🔥 PRECIOS -->
+              {% if product.active_offer %}
+
+                {% if product.active_offer.is_2x1 %}
+                  <p class="is-size-6 has-text-weight-semibold">
+                    <span class="has-text-grey-light" style="text-decoration: line-through;">
+                      {{ product.price }}
+                    </span>
+                    <br>
+                    <span class="has-text-danger has-text-weight-bold is-size-5">
+                      {{ product.get_final_price }} c/u (2×1)
+                    </span>
+                  </p>
+
+                {% else %}
+                  <p class="is-size-6 has-text-weight-semibold">
+                    <span class="has-text-grey-light" style="text-decoration: line-through;">
+                      {{ product.price }}
+                    </span>
+                    <br>
+                    <span class="has-text-danger has-text-weight-bold is-size-5">
+                      {{ product.get_final_price }}
+                    </span>
+                  </p>
+                {% endif %}
+
+              {% else %}
+                <p class="is-size-6 has-text-weight-semibold">
+                  {{ product.price }}
+                </p>
+              {% endif %}
+
+              <a href="{% url 'product:product' product.category.slug product.slug %}"
+                 class="button is-warning is-light is-small mt-3">
+                Ver pizza 🍕
+              </a>
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+
+    {% elif selected_country %}
+      <div class="has-text-centered mt-6">
+        <p class="has-text-grey">
+          🚫 No hay productos disponibles en este país por ahora.
+        </p>
+      </div>
+
+    {% elif not user.is_authenticated %}
+      <div class="has-text-centered mt-6">
+        <p class="has-text-grey">
+          Selecciona un país para comenzar a ver pizzas.
+        </p>
+      </div>
+
+    {% else %}
+      <div class="has-text-centered mt-6">
+        <p class="has-text-grey">No hay productos disponibles por el momento 🍕</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+
+
+
+
+<!-- 🎨 ESTILOS -->
+<style>
+  .product-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  }
+
+  .hero.is-small {
+    min-height: 35vh;
+  }
+
+  .hero-body {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  section.section {
+    position: relative;
+    z-index: 10;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+  }
+</style>
+
+{% endblock content %}
+
+{% block scripts %}
+
+{% if user.is_authenticated %}
+
+<style>
+    /* BURBUJA */
+    #chat-bubble {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        background: #ff5733;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        z-index: 9999;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* VENTANA DEL CHAT */
+    #chat-window {
+        position: fixed;
+        bottom: 100px;
+        right: 25px;
+        width: 350px;
+        height: 480px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 9999;
+        border: 1px solid #ddd;
+    }
+
+    #chat-header {
+        background: #ff5733;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+    }
+
+    #chat-messages {
+        flex: 1;
+        padding: 12px;
+        overflow-y: auto;
+        font-size: 14px;
+    }
+
+    .chat-user {
+        text-align: right;
+        margin: 6px 0;
+        background: #ffe5d0;
+        padding: 6px 10px;
+        display: inline-block;
+        border-radius: 8px;
+        max-width: 90%;
+    }
+
+    .chat-bot {
+        text-align: left;
+        margin: 6px 0;
+        background: #f0f0f0;
+        padding: 6px 10px;
+        display: inline-block;
+        border-radius: 8px;
+        max-width: 90%;
+    }
+
+    #quick-actions {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        background: #fafafa;
+    }
+
+    .quick-btn {
+        width: 100%;
+        padding: 8px 10px;
+        margin: 5px 0;
+        background: #f5f5f5;
+        border: none;
+        border-radius: 8px;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .quick-btn:hover {
+        background: #e8e8e8;
+    }
+
+    #chat-input-area {
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        border-top: 1px solid #ddd;
+    }
+
+    #chat-input {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 8px;
+    }
+</style>
+
+<div id="chat-bubble">💬</div>
+
+<div id="chat-window">
+    <div id="chat-header">🤖 Asistente PizzaBot</div>
+
+    <div id="quick-actions">
+        <button class="quick-btn" onclick="window.location.href='/vendor/preferences/'">🧀 Editar mis preferencias</button>
+        <button class="quick-btn" onclick="window.location.href='/cart/'">🛒 Ver mi carrito</button>
+        <button class="quick-btn" onclick="window.location.href='/vendor/profile/'">👤 Mi perfil</button>
+    </div>
+
+    <div id="chat-messages"></div>
+
+    <div id="chat-input-area">
+        <input id="chat-input" placeholder="¿Qué dudas tienes sobre nuestra página?">
+        <button onclick="sendChat()">➤</button>
+    </div>
+</div>
+
+<script>
+document.getElementById("chat-bubble").onclick = () => {
+    const win = document.getElementById("chat-window");
+    win.style.display = win.style.display === "flex" ? "none" : "flex";
+
+    if (win.style.display === "flex") {
+        setTimeout(() => {
+            document.getElementById("chat-input").focus();
+        }, 100);
+    }
+};
+
+function sendChat() {
+    let msg = document.getElementById("chat-input").value.trim();
+    if (!msg) return;
+
+    const messages = document.getElementById("chat-messages");
+
+    messages.innerHTML += `<div class='chat-user'>${msg}</div>`;
+    document.getElementById("chat-input").value = "";
+
+    fetch("/assistant/feedback/", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: msg})
+    })
+    .then(res => res.json())
+    .then(data => {
+        messages.innerHTML += `<div class='chat-bot'>${data.reply}</div>`;
+        messages.scrollTop = messages.scrollHeight;
+    })
+    .catch(err => {
+        messages.innerHTML += `<div class='chat-bot'>Error de conexión</div>`;
+    });
+}
+
+document.getElementById("chat-input").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        sendChat();
+    }
+});
+</script>
+
+{% endif %}
+
+
+{% endblock scripts %}
+

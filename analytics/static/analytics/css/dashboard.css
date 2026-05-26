@@ -1,0 +1,249 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f9fafb;
+  color: #222;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  color: #0d9488;
+  margin-bottom: 2rem; /* Aumento el margen inferior */
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* --- Tarjetas --- */
+.stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2.5rem; /* Aumento el margen inferior entre contadores y siguiente sección */
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card {
+  background: white;
+  padding: 1.5rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 250px;
+  transition: transform 0.3s ease-in-out;
+  text-align: center;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+.card h3 {
+  color: #0d9488;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* --- Filtros --- */
+.filters {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+label {
+  font-weight: bold;
+  color: #555;
+  font-size: 1rem;
+}
+
+select, input {
+  margin-right: 10px;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+select:hover, input:hover {
+  border-color: #0d9488;
+}
+
+button {
+  background: #0d9488;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #0b7669;
+}
+
+button:active {
+  background: #065f50;
+}
+
+/* --- Acciones más comunes --- */
+.top-actions {
+  background: #fff;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 2.5rem; /* Espacio extra entre las acciones y las estadísticas */
+  margin-bottom: 2rem; /* Separación del filtro */
+}
+
+.top-actions h3 {
+  color: #0d9488;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.top-actions ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.top-actions ul li {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.top-actions ul li strong {
+  color: #0d9488;
+}
+
+.top-actions ul li.empty {
+  font-style: italic;
+  color: #888;
+}
+
+/* --- Tabla --- */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+th {
+  background: #0d9488;
+  color: white;
+}
+
+tr:hover {
+  background-color: #e0f2fe;
+  transition: background-color 0.3s ease;
+}
+
+/* --- Colores por tipo de origen --- */
+.row-bot {
+  background-color: #e0f7fa;
+  border-left: 5px solid #06b6d4;
+}
+
+.row-web {
+  background-color: #fffde7;
+  border-left: 5px solid #facc15;
+}
+
+.row-error {
+  background-color: #ffebee;
+  border-left: 5px solid #ef4444;
+}
+
+/* --- Etiquetas de sección --- */
+.tag {
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: capitalize;
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.tag-productos {
+  background: #e0f7fa;
+  color: #006064;
+}
+
+.tag-categorias {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+.tag-carrito {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.tag-checkout {
+  background: #ede7f6;
+  color: #4a148c;
+}
+
+.tag-errores {
+  background: #ffebee;
+  color: #b71c1c;
+}
+
+.tag-bot {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.tag-otros {
+  background: #f3f3f3;
+  color: #616161;
+}
+
+.tag-default {
+  background: #eeeeee;
+  color: #616161;
+}
+
+/* --- JSON box --- */
+.json-box {
+  font-family: monospace;
+  background: #f3f4f6;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  overflow-x: auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+.json-box code {
+  color: #0d9488;
+  font-size: 1.1rem;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
