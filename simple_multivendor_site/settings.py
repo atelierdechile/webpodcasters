@@ -18,11 +18,13 @@ ALLOWED_HOSTS = [
     'sommstore.pythonanywhere.com',
     '127.0.0.1',
     'localhost',
-    'nonfimbriate-usha-aerobically.ngrok-free.dev'
+    'webpodcasters.onrender.com',
+    'nonfimbriate-usha-aerobically.ngrok-free.dev',
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://nonfimbriate-usha-aerobically.ngrok-free.dev",
-    "https://nicolasbriceno.pythonanywhere.com"
+    "https://nicolasbriceno.pythonanywhere.com",
+    "https://webpodcasters.onrender.com",
 ]
 
 #Apps instaladas
