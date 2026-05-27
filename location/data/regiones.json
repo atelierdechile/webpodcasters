@@ -1,1 +1,18 @@
-[{"codigo":"15","tipo":"region","nombre":"Arica y Parinacota","lat":-18.5075,"lng":-69.6451,"url":"","codigo_padre":"00"},{"codigo":"01","tipo":"region","nombre":"Tarapac\u00e1","lat":-20.164,"lng":-69.5541,"url":"","codigo_padre":"00"},{"codigo":"02","tipo":"region","nombre":"Antofagasta","lat":-23.7503,"lng":-69.6,"url":"","codigo_padre":"00"},{"codigo":"03","tipo":"region","nombre":"Atacama","lat":-27.5276,"lng":-70.2494,"url":"","codigo_padre":"00"},{"codigo":"04","tipo":"region","nombre":"Coquimbo","lat":-30.8301,"lng":-70.9816,"url":"","codigo_padre":"00"},{"codigo":"05","tipo":"region","nombre":"Valpara\u00edso","lat":-32.9039,"lng":-71.0262,"url":"","codigo_padre":"00"},{"codigo":"13","tipo":"region","nombre":"Metropolitana de Santiago","lat":-33.4417,"lng":-70.6541,"url":"","codigo_padre":"00"},{"codigo":"06","tipo":"region","nombre":"Del Libertador Gral. Bernardo O\u2019Higgins","lat":-34.4294,"lng":-71.0393,"url":"","codigo_padre":"00"},{"codigo":"07","tipo":"region","nombre":"Del Maule","lat":-35.5892,"lng":-71.5007,"url":"","codigo_padre":"00"},{"codigo":"08","tipo":"region","nombre":"Del Biob\u00edo","lat":-37.2442,"lng":-72.4661,"url":"","codigo_padre":"00"},{"codigo":"09","tipo":"region","nombre":"De la Araucan\u00eda","lat":-38.5505,"lng":-72.4382,"url":"","codigo_padre":"00"},{"codigo":"14","tipo":"region","nombre":"De los R\u00edos","lat":-39.9086,"lng":-72.7034,"url":"","codigo_padre":"00"},{"codigo":"10","tipo":"region","nombre":"De los Lagos","lat":-42.1071,"lng":-72.6425,"url":"","codigo_padre":"00"},{"codigo":"11","tipo":"region","nombre":"Ays\u00e9n del Gral. Carlos Ib\u00e1\u00f1ez del Campo","lat":-46.2772,"lng":-73.6628,"url":"","codigo_padre":"00"},{"codigo":"12","tipo":"region","nombre":"Magallanes y de la Ant\u00e1rtica Chilena","lat":-54.3551,"lng":-70.5284,"url":"","codigo_padre":"00"},{"codigo":"16","tipo":"region","nombre":"\u00d1uble","lat":-366.191,"lng":-720.182,"url":"","codigo_padre":"00"}]
+[
+  {"model": "location.region", "pk": 1, "fields": {"codigo": "15", "nombre": "Arica y Parinacota"}},
+  {"model": "location.region", "pk": 2, "fields": {"codigo": "01", "nombre": "Tarapacá"}},
+  {"model": "location.region", "pk": 3, "fields": {"codigo": "02", "nombre": "Antofagasta"}},
+  {"model": "location.region", "pk": 4, "fields": {"codigo": "03", "nombre": "Atacama"}},
+  {"model": "location.region", "pk": 5, "fields": {"codigo": "04", "nombre": "Coquimbo"}},
+  {"model": "location.region", "pk": 6, "fields": {"codigo": "05", "nombre": "Valparaíso"}},
+  {"model": "location.region", "pk": 7, "fields": {"codigo": "13", "nombre": "Metropolitana de Santiago"}},
+  {"model": "location.region", "pk": 8, "fields": {"codigo": "06", "nombre": "Del Libertador Gral. Bernardo O’Higgins"}},
+  {"model": "location.region", "pk": 9, "fields": {"codigo": "07", "nombre": "Del Maule"}},
+  {"model": "location.region", "pk": 10, "fields": {"codigo": "08", "nombre": "Del Biobío"}},
+  {"model": "location.region", "pk": 11, "fields": {"codigo": "09", "nombre": "De la Araucanía"}},
+  {"model": "location.region", "pk": 12, "fields": {"codigo": "14", "nombre": "De los Ríos"}},
+  {"model": "location.region", "pk": 13, "fields": {"codigo": "10", "nombre": "De los Lagos"}},
+  {"model": "location.region", "pk": 14, "fields": {"codigo": "11", "nombre": "Aysén del Gral. Carlos Ibáñez del Campo"}},
+  {"model": "location.region", "pk": 15, "fields": {"codigo": "12", "nombre": "Magallanes y de la Antártica Chilena"}},
+  {"model": "location.region", "pk": 16, "fields": {"codigo": "16", "nombre": "Ñuble"}}
+]
