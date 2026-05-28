@@ -45,7 +45,7 @@
                 <span class="tag is-warning is-light" style="font-size: .95rem; padding: .6rem 1rem; border-radius: 8px; font-weight: 500; display:inline-flex; align-items:center; gap:.4rem; color: #534000;">
                     {% if "gluten" in alg.name|lower %}⚙️
                     {% elif "lácteos" in alg.name|lower or "lacteos" in alg.name|lower %}📁
-                    {% else %}⚠️{% endif %}
+                    {% .else %}⚠️{% endif %}
                     {{ alg.name }}
                 </span>
             {% endfor %}
@@ -66,11 +66,12 @@
                 display: flex; 
                 flex-wrap: wrap; 
                 gap: .8rem;
+                margin-top: 1rem;
                 margin-bottom: 1.5rem;
             }
             .pref-chip, .alg-chip {
                 position: relative;
-                padding: .7rem 1.2rem .7rem 2.2rem;
+                padding: .6rem 1.1rem .6rem 2.1rem;
                 border-radius: 9999px;
                 cursor: pointer;
                 font-size: 0.95rem;
@@ -85,16 +86,114 @@
                 gap: .4rem;
                 font-weight: 500;
             }
+            .pref-chip[data-selected="true"], .alg-chip[data-selected="true"] {
+                transform: translateY(-1px);
+            }
             /* Chips morados para filtros */
-            .pref-chip.selected {
+            .pref-chip[data-selected="true"] {
                 background: #6344ff;
                 color: #fff;
                 border-color: #492bdf;
-                transform: translateY(-1px);
                 box-shadow: 0 4px 10px rgba(99, 68, 255, 0.15);
             }
             /* Chips azules para exclusiones */
-            .alg-chip.selected {
+            .alg-chip[data-selected="true"] {
                 background: #485fc7;
                 color: #fff;
-                border-color: #384db0
+                border-color: #384db0;
+                box-shadow: 0 4px 10px rgba(72, 95, 199, 0.15);
+            }
+            .pref-chip .check, .alg-chip .check {
+                position: absolute;
+                left: .6rem;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 1.1rem;
+                height: 1.1rem;
+                border-radius: 9999px;
+                display: grid;
+                place-items: center;
+                background: #cbd5e1;
+                color: #111;
+                font-size: .75rem;
+                transition: all .12s ease;
+            }
+            .pref-chip[data-selected="true"] .check {
+                background: #492bdf;
+                color: #fff;
+            }
+            .alg-chip[data-selected="true"] .check {
+                background: #384db0;
+                color: #fff;
+            }
+            .pref-hidden, .alg-hidden {
+                display: none !important;
+            }
+        </style>
+
+        <h3 class="title is-5 mb-2" style="color: #1a1c29;">🎯 Mis Intereses de Contenido</h3>
+        <div class="pref-grid">
+            {% with selected_prefs=profile.preferences.all %}
+                {% for pref in all_preferences %}
+                    <label class="pref-chip" tabindex="0" data-selected="{% if pref in selected_prefs %}true{% else %}false{% endif %}">
+                        <span class="check">✓</span>
+                        {% if pref.name|lower == "vegana" %}💻{% elif pref.name|lower == "sin gluten" %}⚙️{% else %}📦{% endif %}
+                        {{ pref.name }}
+                        <input type="checkbox" name="preferences" value="{{ pref.id }}" class="pref-hidden" {% if pref in selected_prefs %}checked{% endif %}>
+                    </label>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+        <h3 class="title is-5 mb-2" style="color: #1a1c29;">🛠️ Mis Exclusiones de Entorno</h3>
+        <div class="alg-grid">
+            {% with selected_algs=profile.allergies.all %}
+                {% for alg in all_allergies %}
+                    <label class="alg-chip" tabindex="0" data-selected="{% if alg in selected_algs %}true{% else %}false{% endif %}">
+                        <span class="check">!</span>
+                        {% if "gluten" in alg.name|lower %}⚙️
+                        {% elif "lácteos" in alg.name|lower or "lacteos" in alg.name|lower %}📁
+                        {% else %}⚠️{% endif %}
+                        {{ alg.name }}
+                        <input type="checkbox" name="allergies" value="{{ alg.id }}" class="alg-hidden" {% if alg in selected_algs %}checked{% endif %}>
+                    </label>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+        <div class="field mt-5">
+            <button type="submit" class="button is-link is-medium" style="background-color: #6344ff; font-weight: 600; border-radius: 8px;">
+                Actualizar parámetros del perfil
+            </button>
+        </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+(function() {
+    function setupProfileChips(selector, inputClass) {
+        const chips = [...document.querySelectorAll(selector)];
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => toggleChip(chip, inputClass));
+            chip.addEventListener('keydown', e => {
+                if (e.key === " " || e.key === "Enter") {
+                    e.preventDefault();
+                    toggleChip(chip, inputClass);
+                }
+            });
+        });
+
+        function toggleChip(chip, inputClass) {
+            const input = chip.querySelector('input.' + inputClass);
+            if (!input) return;
+            input.checked = !input.checked;
+            chip.dataset.selected = String(input.checked);
+        }
+    }
+    setupProfileChips('.pref-chip', 'pref-hidden');
+    setupProfileChips('.alg-chip', 'alg-hidden');
+})();
+</script>
+{% endblock %}
