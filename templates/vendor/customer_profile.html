@@ -45,7 +45,7 @@
                 <span class="tag is-warning is-light" style="font-size: .95rem; padding: .6rem 1rem; border-radius: 8px; font-weight: 500; display:inline-flex; align-items:center; gap:.4rem; color: #534000;">
                     {% if "gluten" in alg.name|lower %}⚙️
                     {% elif "lácteos" in alg.name|lower or "lacteos" in alg.name|lower %}📁
-                    {% .else %}⚠️{% endif %}
+                    {% else %}⚠️{% endif %}
                     {{ alg.name }}
                 </span>
             {% endfor %}
