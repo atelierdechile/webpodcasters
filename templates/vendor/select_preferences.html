@@ -1,27 +1,28 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block title %}Selecciona tus preferencias{% endblock %}
+{% block title %}Personaliza tu Experiencia - Web Podcasters{% endblock %}
 
 {% block content %}
 
-<div class="container" style="max-width: 700px; margin-top: 60px; margin-bottom: 50px;">
+<div class="container" style="max-width: 700px; margin-top: 60px; margin-bottom: 50px; padding: 0 1.5rem;">
     
     <div class="card" style="
         padding: 35px;
-        border-radius: 14px;
-        box-shadow: 0px 6px 16px rgba(0,0,0,0.08);
+        border-radius: 16px;
+        box-shadow: 0px 6px 20px rgba(99, 68, 255, 0.05);
+        border: 1px solid #e1e4e8;
+        background: #ffffff;
     ">
         
-        <h2 class="has-text-centered mb-2" style="font-size: 1.8rem; font-weight: 700;">
-            🍕 Personaliza tu experiencia
+        <h2 class="title is-3 has-text-centered mb-2" style="color: #1a1c29; font-weight: 700;">
+            ✨ Personaliza tu experiencia
         </h2>
 
-        <p class="has-text-centered mb-5" style="font-size: 1.15rem; color: #555;">
-            Cuéntanos tus preferencias y posibles alergias para recomendarte pizzas más seguras y a tu gusto.
+        <p class="has-text-centered mb-5 has-text-grey" style="font-size: 1.1rem;">
+            Configura tus preferencias de entorno y filtros de exclusión para adaptar el catálogo a tus requerimientos técnicos.
         </p>
 
-        <!-- 🔥 ESTILOS DE LOS CHIPS -->
         <style>
             .pref-grid,
             .alg-grid {
@@ -39,36 +40,38 @@
                 border-radius: 9999px;
                 cursor: pointer;
                 font-size: 1.05rem;
-                background: #eef2f7;
-                color: #111;
+                background: #f3f4f6;
+                color: #4a4a4a;
                 border: 2px solid transparent;
 
                 display: inline-flex;
                 align-items: center;
                 gap: .4rem;
-
-                transition: transform .12s ease, box-shadow .12s ease, 
-                            background .12s ease, border-color .12s ease;
+                font-weight: 500;
+                transition: all .15s ease;
                 user-select: none;
                 outline: none;
             }
 
             .pref-chip[data-selected="true"],
             .alg-chip[data-selected="true"] {
-                transform: translateY(-1px) scale(1.03);
-                box-shadow: 0 6px 12px rgba(0,0,0,.15);
+                transform: translateY(-1px);
             }
 
+            /* Foco Morado para Intereses */
             .pref-chip[data-selected="true"] {
-                background: #0d9488;
+                background: #6344ff;
                 color: #fff;
-                border-color: #0b7669;
+                border-color: #492bdf;
+                box-shadow: 0 4px 10px rgba(99, 68, 255, 0.15);
             }
 
+            /* Foco Azul para Exclusiones Técnicas */
             .alg-chip[data-selected="true"] {
-                background: #f97316;
+                background: #485fc7;
                 color: #fff;
-                border-color: #ea580c;
+                border-color: #384db0;
+                box-shadow: 0 4px 10px rgba(72, 95, 199, 0.15);
             }
 
             .pref-chip .check,
@@ -85,16 +88,16 @@
                 font-size: .85rem;
                 display: grid;
                 place-items: center;
-                transition: background .12s ease, color .12s ease;
+                transition: all .12s ease;
             }
 
             .pref-chip[data-selected="true"] .check {
-                background: #0b7669;
+                background: #492bdf;
                 color: #fff;
             }
 
             .alg-chip[data-selected="true"] .check {
-                background: #ea580c;
+                background: #384db0;
                 color: #fff;
             }
 
@@ -104,36 +107,37 @@
             }
 
             .section-title {
-                font-size: 1.2rem;
-                font-weight: 600;
+                font-size: 1.25rem;
+                font-weight: 700;
                 margin-top: 1.5rem;
                 text-align: center;
+                color: #1a1c29;
             }
 
             .section-subtitle {
                 font-size: .95rem;
-                color: #666;
+                color: #6b7280;
                 text-align: center;
                 margin-top: .25rem;
+                max-width: 90%;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             hr.section-divider {
                 margin: 2rem auto 1.5rem;
                 max-width: 60%;
                 border: none;
-                border-top: 1px solid #e5e7eb;
+                border-top: 1px solid #e1e4e8;
             }
         </style>
 
         <form method="POST" id="prefForm">
             {% csrf_token %}
 
-            <!-- ========================= -->
-            <!-- PREFERENCIAS ALIMENTARIAS -->
-            <!-- ========================= -->
-            <h3 class="section-title">Preferencias alimentarias</h3>
+            <h3 class="section-title">🎯 Filtros de Interés Principal</h3>
             <p class="section-subtitle">
-                Elige estilos de alimentación que te gusten (por ejemplo, sin gluten, vegana).
+                Elige las clasificaciones o perfiles que se alineen con el tipo de soluciones o elementos que buscas indexar.
             </p>
 
             <div class="pref-grid">
@@ -148,11 +152,11 @@
                             <span class="check">✓</span>
 
                             {% if pref.name|lower == "vegana" %}
-                                🌱 {{ pref.name }}
+                                💻 {{ pref.name }}
                             {% elif pref.name|lower == "sin gluten" %}
-                                🌾 {{ pref.name }}
+                                ⚙️ {{ pref.name }}
                             {% else %}
-                                🍕 {{ pref.name }}
+                                📦 {{ pref.name }}
                             {% endif %}
 
                             <input 
@@ -168,14 +172,11 @@
                 {% endwith %}
             </div>
 
-            <!-- ========================= -->
-            <!-- ALERGIAS ALIMENTARIAS     -->
-            <!-- ========================= -->
             <hr class="section-divider">
 
-            <h3 class="section-title">¿Tienes alguna alergia?</h3>
+            <h3 class="section-title">🛠️ Exclusiones de Compatibilidad</h3>
             <p class="section-subtitle">
-                Si marcas alguna alergia, te avisaremos cuando un producto tenga ingredientes que puedan afectarte.
+                Si marcas parámetros incompatibles, la plataforma te avisará cuando un elemento posea requerimientos de sistema en conflicto.
             </p>
 
             <div class="alg-grid">
@@ -190,21 +191,9 @@
                             <span class="check">!</span>
 
                             {% if "gluten" in alg.name|lower %}
-                                🌾 {{ alg.name }}
+                                ⚙️ {{ alg.name }}
                             {% elif "lácteos" in alg.name|lower or "lacteos" in alg.name|lower %}
-                                🧀 {{ alg.name }}
-                            {% elif "cerdo" in alg.name|lower %}
-                                🐖 {{ alg.name }}
-                            {% elif "vacuno" in alg.name|lower %}
-                                🐮 {{ alg.name }}
-                            {% elif "pollo" in alg.name|lower %}
-                                🍗 {{ alg.name }}
-                            {% elif "hongos" in alg.name|lower %}
-                                🍄 {{ alg.name }}
-                            {% elif "frutos secos" in alg.name|lower %}
-                                🥜 {{ alg.name }}
-                            {% elif "piña" in alg.name|lower %}
-                                🍍 {{ alg.name }}
+                                📁 {{ alg.name }}
                             {% else %}
                                 ⚠️ {{ alg.name }}
                             {% endif %}
@@ -222,14 +211,14 @@
                 {% endwith %}
             </div>
 
-            <div class="has-text-centered mt-5" style="display:flex; flex-direction:column; gap:10px;">
-                <button class="button is-primary is-medium" style="width: 70%; margin: 0 auto;" type="submit">
-                    Guardar configuración
+            <div class="has-text-centered mt-6" style="display:flex; flex-direction:column; gap:12px;">
+                <button class="button is-link is-medium" style="width: 70%; margin: 0 auto; background-color: #6344ff; font-weight: 600; border-radius: 8px;" type="submit">
+                    Guardar configuración inicial
                 </button>
 
-                <a href="{% url 'core:home' %}" class="button is-light" style="width:60%; margin:0 auto;">
-                    Saltar por ahora
-                </a>
+                <a href="{% url 'core:home' %}" class="button is-light" style="width:50%; margin:0 auto; font-weight: 600; border-radius: 8px; color: #718096;">
+                    Omitir por ahora
+                </button>
             </div>
 
         </form>

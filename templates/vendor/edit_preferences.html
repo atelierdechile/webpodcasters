@@ -1,6 +1,6 @@
 {% extends "core/base.html" %}
 
-{% block title %}Editar Preferencias{% endblock %}
+{% block title %}Editar Preferencias - Web Podcasters{% endblock %}
 
 {% block content %}
 <style>
@@ -17,18 +17,23 @@
   border-radius: 12px;
   cursor: pointer;
   font-size: 1rem;
-  background: #e5e7eb;
-  color: #111;
-  transition: 0.25s;
+  background: #eef2f7;
+  color: #4a4a4a;
+  transition: all 0.2s ease;
   user-select: none;
   border: 2px solid transparent;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
+/* 🎙️ Cambiado el verde de la pizzería al morado corporativo brillante */
 .pref-chip.selected {
-  background: #0d9488;
+  background: #6344ff;
   color: white;
-  border-color: #0b7669;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-color: #492bdf;
+  box-shadow: 0 4px 10px rgba(99, 68, 255, 0.15);
 }
 
 .pref-checkbox {
@@ -36,42 +41,57 @@
 }
 </style>
 
-<div class="container mt-5">
-  <h1 class="title has-text-centered">Editar Preferencias 🍕</h1>
-  <p class="has-text-centered mb-4">
-    Selecciona tus preferencias alimentarias. Esto nos ayudará a mostrarte las pizzas adecuadas.
-  </p>
+<div class="container mt-5 mb-6" style="padding: 0 1.5rem;">
+  <div class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; padding: 2.5rem; max-width: 700px; margin: 0 auto; background: white;">
+    
+    <h1 class="title is-3 has-text-centered" style="color: #1a1c29; font-weight: 700;">Configurar Filtros de Interés 🎯</h1>
+    <p class="has-text-centered has-text-grey mb-5 is-size-6">
+      Selecciona tus preferencias y categorías principales. Esto nos ayudará a optimizar los elementos que se despliegan en tu catálogo.
+    </p>
 
-  <form method="POST" class="has-text-centered">
-    {% csrf_token %}
-    <div class="pref-container">
-      {% for pref in preferences %}
-        <label class="pref-chip {% if pref in selected %}selected{% endif %}">
-          <input type="checkbox" class="pref-checkbox" name="preferences" value="{{ pref.id }}"
-                 {% if pref in selected %}checked{% endif %}>
-          {% if pref.name|lower == "vegana" %}
-            🌱 {{ pref.name }}
-          {% elif pref.name|lower == "sin gluten" %}
-            🌾 {{ pref.name }}
-          {% else %}
-            🍕 {{ pref.name }}
-          {% endif %}
-        </label>
-      {% endfor %}
-    </div>
+    <form method="POST" class="has-text-centered">
+      {% csrf_token %}
+      <div class="pref-container">
+        {% for pref in preferences %}
+          <label class="pref-chip {% if pref in selected %}selected{% endif %}">
+            <input type="checkbox" class="pref-checkbox" name="preferences" value="{{ pref.id }}"
+                   {% if pref in selected %}checked{% endif %}>
+            
+            {% if pref.name|lower == "vegana" %}
+              💻 {{ pref.name }}
+            {% elif pref.name|lower == "sin gluten" %}
+              ⚙️ {{ pref.name }}
+            {% else %}
+              📦 {{ pref.name }}
+            {% endif %}
+          </label>
+        {% endfor %}
+      </div>
 
-    <button type="submit" class="button is-link is-medium mt-5">
-      Guardar Cambios
-    </button>
-  </form>
+      <button type="submit" class="button is-link is-medium mt-6" style="font-weight: 600; border-radius: 8px; background-color: #6344ff; padding-left: 2rem; padding-right: 2rem;">
+        Guardar Configuración
+      </button>
+    </form>
+
+  </div>
 </div>
 
 <script>
 document.querySelectorAll(".pref-chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    const checkbox = chip.querySelector(".pref-checkbox");
-    checkbox.checked = !checkbox.checked;
-    chip.classList.toggle("selected");
+  const checkbox = chip.querySelector(".pref-checkbox");
+  
+  chip.addEventListener("click", (e) => {
+    // Si el clic no vino directamente del input, manejamos el toggle manualmente
+    if (e.target !== checkbox) {
+      e.preventDefault();
+      checkbox.checked = !checkbox.checked;
+      chip.classList.toggle("selected", checkbox.checked);
+    }
+  });
+
+  // Evento por si cambia directamente (accesibilidad)
+  checkbox.addEventListener("change", () => {
+    chip.classList.toggle("selected", checkbox.checked);
   });
 });
 </script>

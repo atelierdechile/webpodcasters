@@ -17,37 +17,43 @@
       background-color: #ffffff;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 30px;
+      padding: 0; /* Ajustado para que el header cubra los bordes redondeados */
+      overflow: hidden;
     }
     .header {
       text-align: center;
-      background: linear-gradient(135deg, #ff4d4d, #ff944d);
+      /* 🎙️ Cambiado el degradado rojo/naranja a Morado Tecnológico */
+      background: linear-gradient(135deg, #6344ff, #8c76ff);
       color: white;
-      padding: 20px;
-      border-radius: 10px 10px 0 0;
+      padding: 30px 20px;
     }
     .header h1 {
       margin: 0;
       font-size: 24px;
+      font-weight: 700;
     }
-    .order-info {
-      margin-top: 20px;
+    .order-content {
+      padding: 30px;
     }
     .order-info p {
-      margin: 6px 0;
+      margin: 8px 0;
+      line-height: 1.4;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
+      margin-bottom: 20px;
     }
     th, td {
       text-align: left;
-      padding: 8px;
+      padding: 12px 8px;
       border-bottom: 1px solid #eee;
     }
     th {
       background-color: #fafafa;
+      color: #555;
+      font-weight: 600;
     }
 
     .old-price {
@@ -56,7 +62,7 @@
       font-size: 13px;
     }
     .discount-badge {
-      background: #ff5252;
+      background: #6344ff;
       color: white;
       padding: 2px 6px;
       border-radius: 4px;
@@ -67,76 +73,79 @@
     .total {
       text-align: right;
       font-weight: bold;
-      font-size: 16px;
-      margin-top: 15px;
+      font-size: 18px;
+      margin-top: 20px;
+      color: #1a1c29;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🍕 Nueva orden #{{ order.id }}</h1>
-      <p>¡Hola {{ vendor.name }}!</p>
+      <h1>🔔 Nueva solicitud registrada #{{ order.id }}</h1>
+      <p style="margin: 5px 0 0; opacity: 0.9;">¡Hola {{ vendor.name }}!</p>
     </div>
 
-    <div class="order-info">
-      <p>Tienes una nueva orden en tu tienda dentro de <strong>Pizza Marketplace</strong>.</p>
+    <div class="order-content">
+      <div class="order-info">
+        <p>Registras una nueva solicitud asignada a tu perfil en <strong>Web Podcasters</strong>.</p>
 
-      <h3>🧾 Detalles del pedido:</h3>
+        <h3 style="margin-top: 25px; color: #1a1c29; border-bottom: 2px solid #f4f5f7; padding-bottom: 5px;">🧾 Detalles del elemento requerido:</h3>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          {% for item in order.items.all %}
-            {% if item.vendor == vendor %}
-
+        <table>
+          <thead>
             <tr>
-              <td>
-                <strong>{{ item.product.title }}</strong><br>
-
-                {% if item.discount_percentage > 0 %}
-                  <span class="old-price">{{ item.original_price }} CLP</span>
-                  <span class="discount-badge">-{{ item.discount_percentage }}%</span><br>
-                  <span>{{ item.price }} CLP c/u</span>
-
-                {% elif item.original_price > item.price %}
-                  <span class="old-price">{{ item.original_price }} CLP</span><br>
-                  <span>{{ item.price }} CLP c/u</span>
-
-                {% else %}
-                  <span>{{ item.price }} CLP c/u</span>
-                {% endif %}
-              </td>
-
-              <td>{{ item.quantity }}</td>
-
-              <td>{{ item.get_total_price }} CLP</td>
+              <th>Elemento / Servicio</th>
+              <th>Cantidad</th>
+              <th>Total</th>
             </tr>
+          </thead>
 
-            {% endif %}
-          {% endfor %}
+          <tbody>
+            {% for item in order.items.all %}
+              {% if item.vendor == vendor %}
 
-        </tbody>
-      </table>
+              <tr>
+                <td>
+                  <strong style="color: #6344ff;">{{ item.product.title }}</strong><br>
 
-      <p class="total">
-        💰 Total pagado por el cliente: <strong>{{ order.paid_amount|floatformat:0 }} CLP</strong>
-      </p>
+                  {% if item.discount_percentage > 0 %}
+                    <span class="old-price">{{ item.original_price }} CLP</span>
+                    <span class="discount-badge">-{{ item.discount_percentage }}%</span><br>
+                    <span style="font-size: 13px; color: #666;">{{ item.price }} CLP c/u</span>
 
-      <h3>👤 Datos del cliente:</h3>
-      <p><strong>Nombre:</strong> {{ order.first_name }} {{ order.last_name }}</p>
-      <p><strong>Email:</strong> {{ order.email }}</p>
-      <p><strong>Teléfono:</strong> {{ order.phone }}</p>
-      <p><strong>Dirección:</strong> {{ order.address }}, {{ order.place }}</p>
-      <p><strong>Código postal:</strong> {{ order.zipcode }}</p>
+                  {% elif item.original_price > item.price %}
+                    <span class="old-price">{{ item.original_price }} CLP</span><br>
+                    <span style="font-size: 13px; color: #666;">{{ item.price }} CLP c/u</span>
+
+                  {% else %}
+                    <span style="font-size: 13px; color: #666;">{{ item.price }} CLP c/u</span>
+                  {% endif %}
+                </td>
+
+                <td style="color: #555;">{{ item.quantity }}</td>
+
+                <td style="font-weight: 600; color: #1a1c29;">{{ item.get_total_price }} CLP</td>
+              </tr>
+
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <p class="total">
+          💰 Total abonado: <strong>{{ order.paid_amount|floatformat:0 }} CLP</strong>
+        </p>
+
+        <h3 style="margin-top: 25px; color: #1a1c29; border-bottom: 2px solid #f4f5f7; padding-bottom: 5px;">👤 Información de contacto del usuario:</h3>
+        <p><strong>Nombre completo:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+        <p><strong>Teléfono:</strong> {{ order.phone }}</p>
+        <p><strong>Ubicación registrada:</strong> {{ order.address }}, {{ order.place }}</p>
+        {% if order.zipcode %}
+          <p><strong>Código postal:</strong> {{ order.zipcode }}</p>
+        {% endif %}
+      </div>
     </div>
 
   </div>

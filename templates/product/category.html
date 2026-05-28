@@ -4,27 +4,30 @@
 
 {% block content %}
 
-<div class="columns is-multiline mb-6">
+<div class="columns is-multiline mb-6 container" style="margin: 0 auto; padding: 0 1rem;">
 
   <!-- TÍTULO DE LA CATEGORÍA -->
   <div class="column is-12 has-text-centered mt-6 mb-4">
-    <h2 class="is-size-3">{{ category.title }}</h2>
+    <h2 class="title is-2" style="color: #1a1c29; font-weight: 700;">{{ category.title }}</h2>
+    <hr style="width: 60px; height: 4px; background: #6344ff; margin: 1rem auto 0; border-radius: 2px;">
   </div>
 
-  <!-- 🌱 FILTRO DE PREFERENCIAS -->
+  <!-- ⚙️ FILTRO DE PREFERENCIAS ADAPTADO -->
   {% if user.is_authenticated and user.profile.preferences.count > 0 %}
     <div class="column is-12 has-text-centered mb-5">
 
       {% if solo_pref %}
-        <a href="?" class="button is-light is-rounded">
-          👀 Ver todas las pizzas
+        <!-- 🎙️ Texto abstractificado: de "todas las pizzas" a "catálogo completo" -->
+        <a href="?" class="button is-link is-light is-rounded style-filter-btn">
+          👀 Ver catálogo completo
         </a>
-        <p class="has-text-grey mt-2">
-          Mostrando solo pizzas según tus preferencias 🍃
+        <p class="has-text-grey mt-2 is-size-6">
+          Mostrando elementos filtrados según tus preferencias configuradas ✨
         </p>
       {% else %}
-        <a href="?solo_pref=1" class="button is-success is-light is-rounded">
-          🌱 Ver solo mis preferencias
+        <!-- 🎙️ Cambiado de is-success (verde) a un diseño estilizado morado de link -->
+        <a href="?solo_pref=1" class="button is-link is-rounded style-filter-btn">
+          🎯 Filtrar por mis intereses
         </a>
       {% endif %}
 
@@ -35,12 +38,29 @@
   {% for product in products %}
     {% include 'product/parts/list_item.html' %}
   {% empty %}
-    <div class="column is-12 has-text-centered">
-      <p class="has-text-grey">
-        🚫 No hay productos disponibles. Inicia sesión o selecciona un país en la página principal.
-      </p>
+    <div class="column is-12 has-text-centered py-6">
+      <div style="background: white; border-radius: 12px; border: 1px solid #e1e4e8; padding: 3rem; max-width: 500px; margin: 0 auto;">
+        <p class="has-text-grey is-size-5 mb-3">📭 No hay elementos disponibles</p>
+        <p class="has-text-grey-light is-size-6">
+          Asegúrate de haber seleccionado un país en la página principal para explorar los elementos indexados en tu zona.
+        </p>
+      </div>
     </div>
   {% endfor %}
 </div>
+
+<style>
+  /* Estilo personalizado para los botones de filtrado rápido */
+  .style-filter-btn {
+      font-weight: 600 !important;
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+      box-shadow: 0 4px 10px rgba(99, 68, 255, 0.15) !important;
+      transition: background 0.2s, transform 0.2s !important;
+  }
+  .style-filter-btn:hover {
+      transform: translateY(-1px);
+  }
+</style>
 
 {% endblock content %}

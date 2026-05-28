@@ -17,43 +17,50 @@
       background-color: #ffffff;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 30px;
+      padding: 0; /* Cambiado para que el header cubra los bordes redondeados */
+      overflow: hidden;
     }
     .header {
       text-align: center;
-      background: linear-gradient(135deg, #4CAF50, #81C784);
+      /* 🎙️ Cambiado el degradado verde a Morado Tecnológico */
+      background: linear-gradient(135deg, #6344ff, #8c76ff);
       color: white;
-      padding: 20px;
-      border-radius: 10px 10px 0 0;
+      padding: 30px 20px;
     }
     .header h1 {
       margin: 0;
       font-size: 24px;
+      font-weight: 700;
     }
-    .order-info {
-      margin-top: 20px;
+    .order-content {
+      padding: 30px;
     }
     .order-info p {
-      margin: 6px 0;
+      margin: 8px 0;
+      line-height: 1.4;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
+      margin-bottom: 20px;
     }
     th, td {
       text-align: left;
-      padding: 8px;
+      padding: 12px 8px;
       border-bottom: 1px solid #eee;
     }
     th {
       background-color: #fafafa;
+      color: #555;
+      font-weight: 600;
     }
     .total {
       text-align: right;
       font-weight: bold;
-      font-size: 16px;
-      margin-top: 15px;
+      font-size: 18px;
+      margin-top: 20px;
+      color: #1a1c29;
     }
     .footer {
       text-align: center;
@@ -61,17 +68,13 @@
       color: #777;
       font-size: 13px;
     }
-    .footer a {
-      color: #4CAF50;
-      text-decoration: none;
-    }
     .old-price {
       text-decoration: line-through;
       color: #888;
       font-size: 13px;
     }
     .discount-badge {
-      background: #ff5252;
+      background: #6344ff; /* Match con la paleta */
       color: white;
       padding: 2px 6px;
       border-radius: 4px;
@@ -84,66 +87,69 @@
   <div class="container">
     <div class="header">
       <h1>✅ ¡Gracias por tu pedido!</h1>
-      <p>Orden #{{ order.id }}</p>
+      <p style="margin: 5px 0 0; opacity: 0.9;">Orden #{{ order.id }}</p>
     </div>
 
-    <div class="order-info">
-      <p>Hola <strong>{{ order.first_name }}</strong>,</p>
-      <p>Tu orden ha sido recibida con éxito y ya está siendo procesada por nuestras tiendas 🍕.</p>
+    <div class="order-content">
+      <div class="order-info">
+        <p>Hola <strong>{{ order.first_name }}</strong>,</p>
+        <p>Tu orden ha sido recibida con éxito y ya está siendo procesada por nuestros proveedores asociados.</p>
 
-      <h3>🧾 Detalles del pedido:</h3>
+        <h3 style="margin-top: 25px; color: #1a1c29; border-bottom: 2px solid #f4f5f7; padding-bottom: 5px;">🧾 Detalles del pedido:</h3>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-          </tr>
-        </thead>
+        <table>
+          <thead>
+            <tr>
+              <th>Elemento / Servicio</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+            </tr>
+          </thead>
 
-        <tbody>
+          <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>
+                <strong style="color: #6344ff;">{{ item.product.title }}</strong><br>
 
-        {% for item in order.items.all %}
-          <tr>
-            <td>
-              <strong>{{ item.product.title }}</strong><br>
+                {% if item.discount_percentage > 0 %}
+                  <span class="old-price">
+                    {{ item.original_price }} CLP
+                  </span>
+                  <span class="discount-badge">
+                    -{{ item.discount_percentage }}%
+                  </span><br>
+                  <span style="font-size: 13px; color: #666;">{{ item.price }} CLP c/u</span>
+                
+                {% elif item.original_price > item.price %}
+                  <span class="old-price">{{ item.original_price }} CLP</span><br>
+                  <span style="font-size: 13px; color: #666;">{{ item.price }} CLP c/u</span>
 
-              {% if item.discount_percentage > 0 %}
-                <span class="old-price">
-                  {{ item.original_price }} CLP
-                </span>
-                <span class="discount-badge">
-                  -{{ item.discount_percentage }}%
-                </span><br>
-                <span>{{ item.price }} CLP c/u</span>
-              
-              {% elif item.original_price > item.price %}
-                <span class="old-price">{{ item.original_price }} CLP</span><br>
-                <span>{{ item.price }} CLP c/u</span>
+                {% else %}
+                  <span style="font-size: 13px; color: #666;">{{ item.price }} CLP c/u</span>
+                {% endif %}
+              </td>
 
-              {% else %}
-                <span>{{ item.price }} CLP c/u</span>
-              {% endif %}
-            </td>
+              <td style="color: #555;">{{ item.quantity }}</td>
 
-            <td>{{ item.quantity }}</td>
+              <td style="font-weight: 600; color: #1a1c29;">{{ item.get_total_price }} CLP</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
 
-            <td>{{ item.get_total_price }} CLP</td>
-          </tr>
-        {% endfor %}
+        <p class="total">
+          💰 Total pagado: <span>{{ order.paid_amount|floatformat:0 }} CLP</span>
+        </p>
 
-        </tbody>
-      </table>
+        <h3 style="margin-top: 25px; color: #1a1c29; border-bottom: 2px solid #f4f5f7; padding-bottom: 5px;">📍 Información de despacho / contacto:</h3>
+        <p style="margin-bottom: 5px;"><strong>Destino registrado:</strong> {{ order.address }}, {{ order.place }} {% if order.zipcode %}({{ order.zipcode }}){% endif %}</p>
+        <p><strong>Teléfono de contacto:</strong> {{ order.phone }}</p>
+      </div>
 
-      <p class="total">
-        💰 Total pagado: <strong>{{ order.paid_amount|floatformat:0 }} CLP</strong>
-      </p>
-
-      <h3>📍 Dirección de entrega:</h3>
-      <p>{{ order.address }}, {{ order.place }} ({{ order.zipcode }})</p>
-
-      <p><strong>Teléfono de contacto:</strong> {{ order.phone }}</p>
+      <div class="footer">
+        <p>Este es un comprobante automático de tu transacción en Web Podcasters.</p>
+      </div>
     </div>
 
   </div>

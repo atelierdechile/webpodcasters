@@ -1,131 +1,132 @@
 {% extends "core/base.html" %}
 
+{% block title %}Publicaciones de {{ vendor.name }} - Admin{% endblock title %}
+
 {% block content %}
 <section class="section">
-  <div class="container">
+  <div class="container" style="max-width: 1200px; padding: 0 1.5rem;">
 
-    <!-- Breadcrumb Bulma -->
-    <nav class="breadcrumb mb-5" aria-label="breadcrumbs">
+    <!-- 🗺️ MIGA DE PAN / BREADCRUMB BULMA -->
+    <nav class="breadcrumb mb-5" aria-label="breadcrumbs" style="font-size: 0.9rem;">
       <ul>
-        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
-        <li><a href="{% url 'superadmin_panel:vendor_list' %}">Vendedores</a></li>
-        <li class="is-active"><a aria-current="page">{{ vendor.name }}</a></li>
+        <li><a href="{% url 'core:admin_landing' %}" style="color: #6344ff;">Admin</a></li>
+        <li><a href="{% url 'superadmin_panel:vendor_list' %}" style="color: #6344ff;">Creadores</a></li>
+        <li class="is-active"><a aria-current="page" class="has-text-grey">{{ vendor.name }}</a></li>
       </ul>
     </nav>
 
-    <!-- Header -->
+    <!-- HEADER DE FICHA MAESTRA -->
     <div class="columns is-vcentered mb-5">
       <div class="column">
-        <h1 class="title is-4 mb-2">{{ vendor.name }}</h1>
+        <h1 class="title is-3 mb-2" style="color: #1a1c29; font-weight: 700;">{{ vendor.name }}</h1>
 
-        <p class="has-text-grey">
-          Usuario: <strong>@{{ vendor.created_by.username }}</strong> ·  
+        <p class="has-text-grey is-size-6">
+          Canal / Usuario: <strong style="color: #1a1c29;">@{{ vendor.created_by.username }}</strong> ·  
           País: {{ vendor.country.name|default:"-" }}
         </p>
       </div>
 
-      <div class="column is-narrow has-text-right">
-        <p class="is-size-7 has-text-grey">
-          <strong>ID:</strong> {{ vendor.id }} <br>
-          <strong>Creado:</strong> {{ vendor.created_at|date:"d/m/Y H:i" }}
+      <div class="column is-narrow has-text-right has-text-left-mobile mt-2-mobile">
+        <p class="is-size-7 has-text-grey" style="line-height: 1.5;">
+          <strong>ID Creador:</strong> {{ vendor.id }} <br>
+          <strong>Fecha de Alta:</strong> {{ vendor.created_at|date:"d/m/Y H:i" }}
         </p>
       </div>
     </div>
 
-    <!-- Tabs Bulma -->
+    <!-- 📊 PESTAÑAS / TABS BULMA ASOCIADAS -->
     <div class="tabs is-boxed mb-4">
       <ul>
         <li class="is-active">
           <a>
-            <span>Productos</span>
-            <span class="tag is-primary is-light ml-2">{{ products|length }}</span>
+            <span>Elementos / Catálogo</span>
+            <!-- 🎙️ Cambiado de verde is-primary a morado is-link -->
+            <span class="tag is-link is-light ml-2" style="font-weight: 700; color: #6344ff;">{{ products|length }}</span>
           </a>
         </li>
   
         <li>
-          <a href="{% url 'superadmin_panel:weekly_menu_list' %}?vendor={{ vendor.id }}">
-            Menú semanal
+          <a href="{% url 'superadmin_panel:weekly_menu_list' %}?vendor={{ vendor.id }}" style="color: #4a5568;">
+            <span>Vitrina Semanal</span>
           </a>
         </li>
       </ul>
     </div>
 
-    <!-- Contenido -->
-    <div class="box" style="box-shadow:0 10px 30px rgba(0,0,0,0.04);">
+    <!-- CONTENEDOR DE CONTROL PRINCIPAL -->
+    <div class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; box-shadow: none; background: #ffffff; padding: 2rem;">
 
-      <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
-        <h2 class="title is-5 mb-0">Productos del vendedor</h2>
-        <span class="has-text-grey is-size-7">
-          Total: {{ products|length }} productos
+      <div class="is-flex is-justify-content-space-between is-align-items-center mb-5 flex-wrap-mobile">
+        <h2 class="title is-4 mb-0" style="color: #1a1c29; font-weight: 700;">Publicaciones Indexadas</h2>
+        <span class="has-text-grey is-size-7 mt-1-mobile">
+          Volumen total: {{ products|length }} elementos en catálogo
         </span>
       </div>
 
-      <!-- TABLE DESKTOP -->
+      <!-- TABLE DESKTOP / TABLET -->
       <div class="table-container is-hidden-mobile">
         <table class="table is-fullwidth is-striped is-hoverable">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Imagen</th>
-              <th>Título</th>
-              <th>Categoría</th>
-              <th>Precio base</th>
-              <th>Oferta</th>
-              <th>Creado</th>
-              <th class="has-text-right">Acciones</th>
+              <th style="width: 80px; text-align: center;">Miniatura</th>
+              <th>Título del Elemento</th>
+              <th>Clasificación</th>
+              <th>Valor Base</th>
+              <th>Estado Promocional</th>
+              <th>Fecha Registro</th>
+              <th class="has-text-right" style="padding-right: 1rem;">Acciones de Control</th>
             </tr>
           </thead>
 
           <tbody>
             {% for p in products %}
             <tr>
-              <td>#{{ p.id }}</td>
-              <td style="width:70px;">
+              <td style="vertical-align: middle;" class="has-text-grey-light">#{{ p.id }}</td>
+              <td style="vertical-align: middle; text-align: center;">
                 {% if p.thumbnail %}
-                  <img src="{{ p.get_thumbnail }}" class="image is-64x64 is-rounded" alt="{{ p.title }}">
+                  <img src="{{ p.get_thumbnail }}" class="image is-48x48" style="border-radius: 6px; object-fit: cover; border: 1px solid #e1e4e8;" alt="{{ p.title }}">
                 {% else %}
-                  <span class="has-text-grey is-size-7">Sin imagen</span>
+                  <span class="has-text-grey-light is-size-7">No image</span>
                 {% endif %}
               </td>
-              <td>{{ p.title }}</td>
-              <td>{{ p.category.title }}</td>
-              <td>${{ p.price }}</td>
+              <td style="vertical-align: middle; font-weight: 700; color: #1a1c29;">{{ p.title }}</td>
+              <td style="vertical-align: middle; color: #4a5568;">{{ p.category.title }}</td>
+              <td style="vertical-align: middle; font-weight: 600;">${{ p.price }}</td>
 
-              <td>
+              <td style="vertical-align: middle;">
                 {% if p.active_offer %}
-                  <span class="tag is-success is-light">Activa</span>
+                  <span class="tag is-link is-light" style="font-weight: 600; color: #6344ff; background-color: #eef2ff;">Promo activa</span>
                 {% else %}
-                  <span class="tag is-light">Sin oferta</span>
+                  <span class="tag is-light" style="color: #718096;">Estándar</span>
                 {% endif %}
               </td>
 
-              <td>{{ p.added_date|date:"d/m/Y" }}</td>
+              <td style="vertical-align: middle;" class="has-text-grey is-size-7">{{ p.added_date|date:"d/m/Y" }}</td>
 
-              <td class="has-text-right">
+              <td class="has-text-right" style="vertical-align: middle; padding-right: 1rem;">
                 <div class="buttons are-small is-right">
-                  <a href="{% url 'superadmin_panel:product_edit' p.id %}" class="button is-info is-light">
+                  <a href="{% url 'superadmin_panel:product_edit' p.id %}" class="button is-info is-light" style="font-weight: 600; border-radius: 4px;">
                     Editar
                   </a>
 
-                  <!-- ELIMINAR POR POST CON CONFIRM -->
-                  <form method="post"
-                        action="{% url 'superadmin_panel:product_delete' p.id %}"
-                        style="display:inline;">
+                  <!-- FORMULARIO ELIMINAR POST CON CONFIRM ABSTRACTO -->
+                  <form method="post" action="{% url 'superadmin_panel:product_delete' p.id %}" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit"
-                            class="button is-danger is-light"
-                            onclick="return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.');">
+                    <button type="submit" class="button is-danger is-light" style="font-weight: 600; border-radius: 4px;"
+                            onclick="return confirm('⚠️ ¿Confirmas la remoción permanente de este elemento del catálogo?\n\nEsta acción quitará el archivo e indexación y no se puede deshacer.');">
                       Eliminar
                     </button>
                   </form>
 
                   {% if p.offer %}
-                    <a href="{% url 'superadmin_panel:offer_edit' p.offer.id %}" class="button is-warning is-light">
-                      Editar oferta
+                    <a href="{% url 'superadmin_panel:offer_edit' p.offer.id %}" class="button is-warning is-light" style="font-weight: 600; border-radius: 4px;">
+                      Gestionar Promo
                     </a>
                   {% else %}
-                    <a href="{% url 'superadmin_panel:offer_create' %}?product={{ p.id }}" class="button is-primary is-light">
-                      Crear oferta
+                    <!-- Botón morado unificado -->
+                    <a href="{% url 'superadmin_panel:offer_create' %}?product={{ p.id }}" class="button is-link is-light" style="font-weight: 600; border-radius: 4px; color: #6344ff; background-color: #eef2ff;">
+                      Inyectar Promo
                     </a>
                   {% endif %}
                 </div>
@@ -133,8 +134,8 @@
             </tr>
             {% empty %}
             <tr>
-              <td colspan="8" class="has-text-centered has-text-grey py-5">
-                Este vendedor aún no tiene productos.
+              <td colspan="8" class="has-text-centered has-text-grey py-6 is-size-6">
+                📭 Este creador no cuenta con elementos públicos indexados en su catálogo actual.
               </td>
             </tr>
             {% endfor %}
@@ -142,69 +143,66 @@
         </table>
       </div>
 
-      <!-- MOBILE VERSION (Cards) -->
-      <div class="is-hidden-tablet mt-4">
+      <!-- VISTA MOBILE: TARJETAS COMPACTAS -->
+      <div class="is-hidden-tablet mt-2">
         {% for p in products %}
-        <div class="box mb-4" style="border-radius:10px;">
+        <div class="box mb-4" style="border-radius:12px; border: 1px solid #e1e4e8; box-shadow: none; padding: 1.25rem;">
           <div class="is-flex mb-3">
 
             <div class="mr-3">
               {% if p.thumbnail %}
-                <img src="{{ p.get_thumbnail }}" class="image is-64x64 is-rounded">
+                <img src="{{ p.get_thumbnail }}" class="image is-56x56" style="border-radius: 6px; object-fit: cover; border: 1px solid #e1e4e8;">
               {% else %}
-                <span class="has-text-grey is-size-7">Sin imagen</span>
+                <div style="width: 56px; height: 56px; background: #f8f9fa; border: 1px dashed #cbd5e1; border-radius: 6px; display: grid; place-items: center; font-size: 0.7rem; color: #9ca3af;">No img</div>
               {% endif %}
             </div>
 
             <div>
-              <p class="has-text-weight-semibold">{{ p.title }}</p>
-              <p class="is-size-7 has-text-grey">{{ p.category.title }}</p>
+              <p class="has-text-weight-bold" style="color: #1a1c29; line-height: 1.3;">{{ p.title }}</p>
+              <p class="is-size-7 has-text-grey mt-1">{{ p.category.title }}</p>
 
-              <div class="mt-1">
+              <div class="mt-2">
                 {% if p.active_offer %}
-                  <span class="tag is-success is-light is-size-7">Oferta activa</span>
+                  <span class="tag is-link is-light is-size-7" style="font-weight: 600;">Promo activa</span>
                 {% else %}
-                  <span class="tag is-light is-size-7">Sin oferta</span>
+                  <span class="tag is-light is-size-7" style="color: #718096;">Estándar</span>
                 {% endif %}
               </div>
             </div>
           </div>
 
-          <p class="is-size-7 has-text-grey mb-2">
-            <strong>Precio:</strong> ${{ p.price }} <br>
-            <strong>Creado:</strong> {{ p.added_date|date:"d/m/Y" }}
+          <p class="is-size-7 has-text-grey mb-3" style="line-height: 1.5;">
+            <strong>Valor Base:</strong> ${{ p.price }} <br>
+            <strong>Indexado:</strong> {{ p.added_date|date:"d/m/Y" }}
           </p>
 
           <div class="buttons are-small is-flex is-flex-direction-column">
-            <a href="{% url 'superadmin_panel:product_edit' p.id %}" class="button is-info is-light is-fullwidth">
-              Editar
+            <a href="{% url 'superadmin_panel:product_edit' p.id %}" class="button is-info is-light is-fullwidth" style="font-weight: 600; border-radius: 6px;">
+              Editar Parámetros
             </a>
 
-            <!-- ELIMINAR POR POST CON CONFIRM (MÓVIL) -->
-            <form method="post"
-                  action="{% url 'superadmin_panel:product_delete' p.id %}">
+            <form method="post" action="{% url 'superadmin_panel:product_delete' p.id %}" class="is-fullwidth">
               {% csrf_token %}
-              <button type="submit"
-                      class="button is-danger is-light is-fullwidth"
-                      onclick="return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.');">
-                Eliminar
+              <button type="submit" class="button is-danger is-light is-fullwidth" style="font-weight: 600; border-radius: 6px;"
+                      onclick="return confirm('⚠️ ¿Confirmas la remoción permanente de este elemento?');">
+                Eliminar Permanentemente
               </button>
             </form>
 
             {% if p.offer %}
-              <a href="{% url 'superadmin_panel:offer_edit' p.offer.id %}" class="button is-warning is-light is-fullwidth">
-                Editar oferta
+              <a href="{% url 'superadmin_panel:offer_edit' p.offer.id %}" class="button is-warning is-light is-fullwidth" style="font-weight: 600; border-radius: 6px;">
+                Gestionar Promo
               </a>
             {% else %}
-              <a href="{% url 'superadmin_panel:offer_create' %}?product={{ p.id }}" class="button is-primary is-light is-fullwidth">
-                Crear oferta
+              <a href="{% url 'superadmin_panel:offer_create' %}?product={{ p.id }}" class="button is-link is-light is-fullwidth" style="font-weight: 600; border-radius: 6px; color: #6344ff;">
+                Inyectar Promo
               </a>
             {% endif %}
           </div>
         </div>
         {% empty %}
-        <p class="has-text-centered has-text-grey py-5">
-          Este vendedor aún no tiene productos.
+        <p class="has-text-centered has-text-grey py-6 is-size-6">
+          📭 Este creador no cuenta con elementos públicos indexados en su catálogo actual.
         </p>
         {% endfor %}
       </div>
@@ -213,4 +211,21 @@
 
   </div>
 </section>
+
+<style>
+  /* Diseño e identidad formal de tablas de la consola superadmin */
+  .table th {
+      color: #718096 !important;
+      font-weight: 600 !important;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #e1e4e8 !important;
+  }
+  @media screen and (max-width: 768px) {
+      .mt-2-mobile { margin-top: 0.5rem !important; }
+      .mt-1-mobile { margin-top: 0.25rem !important; }
+      .flex-wrap-mobile { flex-wrap: wrap !important; }
+  }
+</style>
 {% endblock %}

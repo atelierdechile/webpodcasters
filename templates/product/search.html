@@ -4,44 +4,64 @@
 
 {% block content %}
 
-<div class="columns is-multiline mb-6">
+<div class="columns is-multiline mb-6 container" style="margin: 0 auto; padding: 0 1rem;">
 
-    <!-- 🔍 TÍTULO -->
+    <!-- 🔍 TÍTULO DE BÚSQUEDA -->
     <div class="column is-12 has-text-centered mt-6 mb-4">
-        <h2 class="is-size-3">Resultados para "{{ query }}"</h2>
+        <h2 class="title is-3" style="color: #1a1c29; font-weight: 700;">Resultados para "{{ query }}"</h2>
+        <hr style="width: 50px; height: 4px; background: #6344ff; margin: 1rem auto 0; border-radius: 2px;">
     </div>
 
-    <!-- 🌱 FILTRO SOLO MIS PREFERENCIAS -->
+    <!-- ⚙️ FILTRO DE PREFERENCIAS ADAPTADO -->
     {% if user.is_authenticated and user.profile.preferences.count > 0 %}
         <div class="column is-12 has-text-centered mb-5">
 
             {% if solo_pref %}
-                <a href="?query={{ query }}" class="button is-light is-rounded">
+                <!-- 🎙️ Texto abstractificado para el catálogo completo -->
+                <a href="?query={{ query }}" class="button is-link is-light is-rounded style-search-filter-btn">
                     👀 Ver todos los resultados
                 </a>
-                <p class="has-text-grey mt-2">
-                    Mostrando resultados según tus preferencias 🍃
+                <p class="has-text-grey mt-2 is-size-6">
+                    Mostrando resultados filtrados según tus preferencias configuradas ✨
                 </p>
             {% else %}
-                <a href="?query={{ query }}&solo_pref=1" class="button is-success is-light is-rounded">
-                    🌱 Ver solo mis preferencias
+                <!-- 🎙️ Cambiado de is-success (verde) a morado link de Bulma -->
+                <a href="?query={{ query }}&solo_pref=1" class="button is-link is-rounded style-search-filter-btn">
+                    🎯 Filtrar por mis intereses
                 </a>
             {% endif %}
 
         </div>
     {% endif %}
 
-    <!-- 🔎 RESULTADOS -->
+    <!-- 🔎 RENDER DE RESULTADOS -->
     {% for product in products %}
         {% include 'product/parts/list_item.html' %}
     {% empty %}
-        <div class="column is-12 has-text-centered">
-            <p class="has-text-grey">
-                No se encontraron resultados para "{{ query }}".
-            </p>
+        <div class="column is-12 has-text-centered py-6">
+            <div style="background: white; border-radius: 12px; border: 1px solid #e1e4e8; padding: 3rem; max-width: 500px; margin: 0 auto;">
+                <p class="has-text-grey is-size-5 mb-2">📭 Sin coincidencias</p>
+                <p class="has-text-grey-light is-size-6">
+                    No se encontraron elementos indexados que coincidan con la búsqueda de "{{ query }}". Intenta con otros términos.
+                </p>
+            </div>
         </div>
     {% endfor %}
 
 </div>
+
+<style>
+    /* Consistencia para los botones de filtrado rápido en búsquedas */
+    .style-search-filter-btn {
+        font-weight: 600 !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+        box-shadow: 0 4px 10px rgba(99, 68, 255, 0.15) !important;
+        transition: background 0.2s, transform 0.2s !important;
+    }
+    .style-search-filter-btn:hover {
+        transform: translateY(-1px);
+    }
+</style>
 
 {% endblock content %}

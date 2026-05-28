@@ -2,16 +2,16 @@
 {% load static %}
 
 {% block content %}
-<main class="container text-center mt-5" style="max-width: 1100px;">
-  <h1>📊 Panel Global de Actividad & Ventas</h1>
-  <p class="text-muted mb-4">Estadísticas globales de la plataforma</p>
+<main class="container text-center mt-5" style="max-width: 1100px; padding-top: 1rem;">
+  <h1 class="title is-2 has-text-dark mb-2">📊 Panel Global de Actividad & Oyentes</h1>
+  <p class="subtitle is-5 text-muted mb-5">Estadísticas globales de la plataforma Web Podcasters</p>
 
   <!-- ======================================================= -->
-  <!-- 🗺️ MAPA – VENDEDORES (CÍRCULOS) + VENTAS HISTÓRICAS (LIVE) -->
+  <!-- 🗺️ MAPA – CREADORES + VENTAS HISTÓRICAS (LIVE) -->
   <!-- ======================================================= -->
-  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2 style="color:#0d9488; font-weight:600;">Mapa de vendedores (ventas históricas)</h2>
+      <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Mapa de productos</h2>
       <small id="mapStatus" style="opacity:.7;"></small>
     </div>
 
@@ -19,11 +19,11 @@
   </div>
 
   <!-- ======================================================= -->
-  <!-- 📈 GLOBAL – VENTAS POR DÍA -->
+  <!-- 📈 GLOBAL – INGRESOS POR DÍA -->
   <!-- ======================================================= -->
-  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2 style="color:#0d9488; font-weight:600;">Ventas por día (global)</h2>
+      <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Interacciones y transacciones por día (global)</h2>
 
       <select id="ventasRango" style="padding:8px; border-radius:5px; border:1px solid #ccc;">
         <option value="today">Hoy</option>
@@ -38,11 +38,11 @@
   </div>
 
   <!-- ======================================================= -->
-  <!-- 🍕 GLOBAL – PIZZAS MÁS VENDIDAS -->
+  <!-- 🎙️ GLOBAL – SERVICIOS MÁS POPULARES -->
   <!-- ======================================================= -->
-  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2 style="color:#0d9488; font-weight:600;">Pizzas más vendidas (global)</h2>
+      <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Servicios o productos más populares (global)</h2>
 
       <select id="productosRango" style="padding:8px; border-radius:5px; border:1px solid #ccc;">
         <option value="today">Hoy</option>
@@ -59,9 +59,9 @@
   <!-- ======================================================= -->
   <!-- 📈 Usuarios por día -->
   <!-- ======================================================= -->
-  <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <h2 style="color:#0d9488; font-weight:600;">Usuarios conectados por día</h2>
+      <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Usuarios activos por día</h2>
       <div>
         <label for="rango" style="font-weight:bold; margin-right:8px;">Rango:</label>
         <select id="rango" style="padding:8px; border-radius:5px; border:1px solid #ddd;">
@@ -78,9 +78,9 @@
   <!-- ======================================================= -->
   <!-- ⏰ Actividad por hora -->
   <!-- ======================================================= -->
-  <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <h2 style="color:#0d9488; font-weight:600;">Actividad por hora del día</h2>
+      <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Horas de mayor actividad</h2>
       <div>
         <label for="periodo" style="font-weight:bold; margin-right:8px;">Periodo:</label>
         <select id="periodo" style="padding:8px; border-radius:5px; border:1px solid #ddd;">
@@ -97,17 +97,17 @@
   </div>
 
   <!-- ======================================================= -->
-  <!-- 🥧 Errores -->
+  <!-- 🥧 Errores y Eventos -->
   <!-- ======================================================= -->
-  <div class="card" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2rem; align-items:center; background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  <div class="card mb-5" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2rem; align-items:center; background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="flex:1 1 45%; min-width:350px; height:260px;">
       <canvas id="erroresChart"></canvas>
     </div>
 
     <div id="erroresInfo" style="flex:1 1 35%; min-width:260px; text-align:left; background:#f9fafb; padding:1.5rem 2rem; border-radius:10px; box-shadow:inset 0 0 5px rgba(0,0,0,0.05);">
-      <h3 style="color:#0d9488; font-weight:700; margin-bottom:1rem;">Resumen de eventos</h3>
-      <p><strong style="color:#ef4444;">❌ Errores:</strong> <span id="erroresTotal">0</span></p>
-      <p><strong style="color:#10b981;">✅ Correctos:</strong> <span id="correctosTotal">0</span></p>
+      <h3 style="color:#6344ff; font-weight:700; margin-bottom:1rem;">Resumen de eventos</h3>
+      <p><strong style="color:#ef4444;">❌ Errores de Red:</strong> <span id="erroresTotal">0</span></p>
+      <p><strong style="color:#10b981;">✅ Peticiones Correctas:</strong> <span id="correctosTotal">0</span></p>
       <hr style="margin:1rem 0; border:none; border-top:1px solid #ddd;">
       <p><strong>Porcentaje de errores:</strong> <span id="porcentajeErrores">0%</span></p>
       <p><strong>Porcentaje de eventos correctos:</strong> <span id="porcentajeCorrectos">0%</span></p>
@@ -115,24 +115,24 @@
   </div>
 
   <!-- ======================================================= -->
-  <!-- 🌿 KPI Preferencias -->
+  <!-- 🎧 KPI Intereses de Audio -->
   <!-- ======================================================= -->
-  <div class="kpi-section mt-5">
-    <h2 style="color:#0d9488; font-weight:700;">Preferencias Alimentarias</h2>
+  <div class="kpi-section mt-5 mb-6">
+    <h2 class="title is-4 mb-4" style="color:#6344ff; font-weight:700;">Preferencias de Contenido</h2>
 
-    <div class="kpi-grid" style="display:flex; gap:2rem; justify-content:center; margin-bottom:2rem;">
-      <div class="kpi-card" style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:250px;">
-        <h3 style="font-size:1.1rem; font-weight:600;">Usuarios veganos este mes</h3>
-        <p id="kpi-veganos" class="kpi-value" style="font-size:2rem; margin-top:10px;">Cargando...</p>
+    <div class="kpi-grid" style="display:flex; gap:2rem; justify-content:center; margin-bottom:2rem; flex-wrap: wrap;">
+      <div class="kpi-card" style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:280px; border: 1px solid #e1e4e8;">
+        <h3 style="font-size:1.1rem; font-weight:600; color: #4a4a4a;">Nuevas preferencias registradas este mes</h3>
+        <p id="kpi-veganos" class="kpi-value" style="font-size:2.2rem; margin-top:10px; font-weight: bold; color: #6344ff;">Cargando...</p>
       </div>
 
-      <div class="kpi-card" style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:250px;">
-        <h3 style="font-size:1.1rem; font-weight:600;">Cambios de preferencias este mes</h3>
-        <p id="kpi-cambios" class="kpi-value" style="font-size:2rem; margin-top:10px;">Cargando...</p>
+      <div class="kpi-card" style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:280px; border: 1px solid #e1e4e8;">
+        <h3 style="font-size:1.1rem; font-weight:600; color: #4a4a4a;">Actualizaciones de perfil este mes</h3>
+        <p id="kpi-cambios" class="kpi-value" style="font-size:2.2rem; margin-top:10px; font-weight: bold; color: #6344ff;">Cargando...</p>
       </div>
     </div>
 
-    <h3 style="font-size:1.3rem; font-weight:600; margin-bottom:1rem;">Preferencias más activadas</h3>
+    <h3 class="title is-5 mb-3" style="font-weight:600;">Etiquetas más buscadas</h3>
 
     <div style="height:300px; margin-bottom:2rem;">
       <canvas id="chartTopPreferencias"></canvas>
@@ -147,127 +147,121 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    console.log("✅ graficos.html scripts cargaron");
+    console.log("✅ graficos.html scripts cargaron con temática Web Podcasters");
 
     Chart.defaults.responsive = true;
     Chart.defaults.maintainAspectRatio = false;
     const animOpts = { duration: 600, easing: "easeInOutQuad" };
 
-    ///////////////////////////////////////////////////////////////
-    // 🗺️ MAPA (CÍRCULOS + TAMAÑO POR VENTAS HISTÓRICAS)
-    ///////////////////////////////////////////////////////////////
-let map = null;
-let vendorCircles = new Map();
-let mapInitialized = false;
+    let map = null;
+    let vendorCircles = new Map();
+    let mapInitialized = false;
 
-function formatCLP(n){
-  return new Intl.NumberFormat('es-CL', {
-    style:'currency',
-    currency:'CLP',
-    maximumFractionDigits:0
-  }).format(n || 0);
-}
-
-// 🎯 tamaño por tramos (centenas claras)
-function salesToRadius(total){
-  if (total < 300000) return 6;
-  if (total < 500000) return 8;
-  if (total < 700000) return 10;
-  if (total < 900000) return 12;
-  if (total < 1100000) return 14;
-  if (total < 1500000) return 17;
-  return 20;
-}
-
-// 🎨 color por nivel de ventas
-function salesToColor(total){
-  if (total < 500000) return "#22c55e";   // verde
-  if (total < 1000000) return "#eab308";  // amarillo
-  if (total < 1500000) return "#f97316";  // naranja
-  return "#ef4444";                       // rojo
-}
-
-function initMapOnce(){
-  if (mapInitialized) return;
-  mapInitialized = true;
-
-  map = L.map("vendorsMap").setView([-33.05, -71.55], 11);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(map);
-
-  setTimeout(() => map.invalidateSize(), 300);
-}
-
-async function loadVendorsMap(){
-  initMapOnce();
-  if (!map) return;
-
-  const statusEl = document.getElementById("mapStatus");
-
-  try {
-    const res = await fetch("/analytics/api/map/vendors-sales-total/");
-    if (!res.ok) throw new Error("HTTP " + res.status);
-
-    const data = await res.json();
-
-    data.forEach(v => {
-      if (v.lat == null || v.lng == null) return;
-
-      const total = Number(v.sales_total || 0);
-      const radius = salesToRadius(total);
-      const color = salesToColor(total);
-
-      const popupHtml = `
-        <b>${v.name}</b><br/>
-        ${v.comuna ? v.comuna + "<br/>" : ""}
-        Ventas históricas: <b>${formatCLP(total)}</b>
-      `;
-
-      if (vendorCircles.has(v.id)) {
-        const c = vendorCircles.get(v.id);
-        c.setLatLng([v.lat, v.lng]);
-        c.setRadius(radius);
-        c.setStyle({ color, fillColor: color });
-        c.setPopupContent(popupHtml);
-      } else {
-        const c = L.circleMarker([v.lat, v.lng], {
-          radius,
-          color,
-          fillColor: color,
-          weight: total >= 1000000 ? 3 : 1.5, // borde más fuerte desde 1M
-          fillOpacity: 0.45
-        }).addTo(map);
-
-        c.bindPopup(popupHtml);
-        vendorCircles.set(v.id, c);
-      }
-    });
-
-    if (statusEl) {
-      statusEl.textContent = `Actualizado: ${new Date().toLocaleTimeString()}`;
+    function formatCLP(n){
+      return new Intl.NumberFormat('es-CL', {
+        style:'currency',
+        currency:'CLP',
+        maximumFractionDigits:0
+      }).format(n || 0);
     }
 
-  } catch (err) {
-    console.error("❌ Error mapa:", err);
-    if (statusEl) statusEl.textContent = "Error cargando mapa";
-  }
-}
+    function salesToRadius(total){
+      if (total < 300000) return 6;
+      if (total < 500000) return 8;
+      if (total < 700000) return 10;
+      if (total < 900000) return 12;
+      if (total < 1100000) return 14;
+      if (total < 1500000) return 17;
+      return 20;
+    }
 
-    ///////////////////////////////////////////////////////////////
-    // 🔥 CHARTS: ventas + top productos (global)
-    ///////////////////////////////////////////////////////////////
+    /* Cambiados los colores del mapa a tonalidades azules y moradas */
+    function salesToColor(total){
+      if (total < 500000) return "#3e8ed0";   
+      if (total < 1000000) return "#485fc7";  
+      if (total < 1500000) return "#9b51e0";  
+      return "#6344ff";                       
+    }
+
+    function initMapOnce(){
+      if (mapInitialized) return;
+      mapInitialized = true;
+
+      map = L.map("vendorsMap").setView([-33.05, -71.55], 11);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(map);
+
+      setTimeout(() => map.invalidateSize(), 300);
+    }
+
+    async function loadVendorsMap(){
+      initMapOnce();
+      if (!map) return;
+
+      const statusEl = document.getElementById("mapStatus");
+
+      try {
+        const res = await fetch("/analytics/api/map/vendors-sales-total/");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const data = await res.json();
+
+        data.forEach(v => {
+          if (v.lat == null || v.lng == null) return;
+
+          const total = Number(v.sales_total || 0);
+          const radius = salesToRadius(total);
+          const color = salesToColor(total);
+
+          const popupHtml = `
+            <b>Canal: ${v.name}</b><br/>
+            ${v.comuna ? "Zona: " + v.comuna + "<br/>" : ""}
+            Ingresos históricos: <b>${formatCLP(total)}</b>
+          `;
+
+          if (vendorCircles.has(v.id)) {
+            const c = vendorCircles.get(v.id);
+            c.setLatLng([v.lat, v.lng]);
+            c.setRadius(radius);
+            c.setStyle({ color, fillColor: color });
+            c.setPopupContent(popupHtml);
+          } else {
+            const c = L.circleMarker([v.lat, v.lng], {
+              radius,
+              color,
+              fillColor: color,
+              weight: total >= 1000000 ? 3 : 1.5, 
+              fillOpacity: 0.5
+            }).addTo(map);
+
+            c.bindPopup(popupHtml);
+            vendorCircles.set(v.id, c);
+          }
+        });
+
+        if (statusEl) {
+          statusEl.textContent = `Sincronizado: ${new Date().toLocaleTimeString()}`;
+        }
+
+      } catch (err) {
+        console.error("❌ Error mapa:", err);
+        if (statusEl) statusEl.textContent = "Error de red en mapa";
+      }
+    }
+
+    /* Gráficos principales pintados de morado (#6344ff) */
     const ventasChart = new Chart(document.getElementById("ventasChart"), {
       type: "bar",
-      data: { labels: [], datasets: [{ label: "Pedidos", data: [], backgroundColor:"#0d9488" }] },
+      data: { labels: [], datasets: [{ label: "Interacciones/Pedidos", data: [], backgroundColor:"#6344ff" }] },
       options: { scales: { y: { beginAtZero: true } } }
     });
 
     const productosChart = new Chart(document.getElementById("productosChart"), {
       type: "bar",
-      data: { labels: [], datasets: [{ label: "Ventas", data: [], backgroundColor:"#f97316" }] },
+      data: { labels: [], datasets: [{ label: "Popularidad", data: [], backgroundColor:"#485fc7" }] },
       options: { indexAxis: "y", scales: { x: { beginAtZero: true } } }
     });
 
@@ -292,18 +286,15 @@ async function loadVendorsMap(){
     document.getElementById("ventasRango").addEventListener("change", loadVentas);
     document.getElementById("productosRango").addEventListener("change", loadProductos);
 
-    ///////////////////////////////////////////////////////////////
-    // 🔥 TUS GRÁFICOS ORIGINALES (logs)
-    ///////////////////////////////////////////////////////////////
     const usuariosChart = new Chart(document.getElementById('usuariosChart'), {
       type: 'bar',
-      data: { labels: [], datasets: [{ label: 'Usuarios por día', data: [], backgroundColor: '#0d9488', borderRadius: 6 }] },
+      data: { labels: [], datasets: [{ label: 'Usuarios conectados', data: [], backgroundColor: '#6344ff', borderRadius: 6 }] },
       options: { animation: animOpts, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
     });
 
     const horasChart = new Chart(document.getElementById('horasChart'), {
       type: 'line',
-      data: { labels: [], datasets: [{ label: 'Eventos por hora', data: [], borderColor: '#0d9488', backgroundColor: 'rgba(13,148,136,0.25)', fill: true, tension: 0.3 }] },
+      data: { labels: [], datasets: [{ label: 'Eventos de reproducción', data: [], borderColor: '#6344ff', backgroundColor: 'rgba(99, 68, 255, 0.15)', fill: true, tension: 0.3 }] },
       options: { animation: animOpts, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
     });
 
@@ -345,9 +336,6 @@ async function loadVendorsMap(){
       document.getElementById('porcentajeCorrectos').textContent = total ? ((correctos / total) * 100).toFixed(1) + "%" : "0%";
     }
 
-    ///////////////////////////////////////////////////////////////
-    // 🌿 KPI preferencias
-    ///////////////////////////////////////////////////////////////
     let chartPreferencias = null;
 
     async function loadPreferenciasKpis(){
@@ -366,30 +354,23 @@ async function loadVendorsMap(){
 
       chartPreferencias = new Chart(ctx, {
         type: "bar",
-        data: { labels: nombres, datasets: [{ label: "Activaciones", data: totales, backgroundColor: "#0d9488", borderRadius: 6 }] },
+        data: { labels: nombres, datasets: [{ label: "Interés", data: totales, backgroundColor: "#6344ff", borderRadius: 6 }] },
         options: { maintainAspectRatio: false, responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
       });
     }
 
-    ///////////////////////////////////////////////////////////////
-    // 🚀 init
-    ///////////////////////////////////////////////////////////////
     document.addEventListener("DOMContentLoaded", () => {
-      // mapa (polling)
       loadVendorsMap();
       setInterval(loadVendorsMap, 5000);
 
-      // ventas globales
       loadVentas();
       loadProductos();
 
-      // logs
       actualizarDatos();
       document.getElementById('rango').addEventListener('change', actualizarDatos);
       document.getElementById('periodo').addEventListener('change', actualizarDatos);
       setInterval(actualizarDatos, 30000);
 
-      // kpis
       loadPreferenciasKpis();
     });
   </script>

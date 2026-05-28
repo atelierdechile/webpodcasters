@@ -1,26 +1,28 @@
 {% extends "core/base.html" %}
 
-{% block title %}Advertencia de alergia{% endblock %}
+{% block title %}Advertencia de incompatibilidad{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 700px; margin-top: 40px;">
-  <div class="box" style="border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.12);">
+<div class="container" style="max-width: 700px; margin-top: 40px; margin-bottom: 40px;">
+  <div class="box" style="border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.12); border: 1px solid #e1e4e8;">
     
-    <h1 class="title is-4 has-text-danger mb-3">
-      ⚠ Posible riesgo de alergia
+    <h1 class="title is-4 has-text-warning-dark mb-3">
+      ⚠ Posible incompatibilidad de formato o sistema
     </h1>
 
-    <p class="mb-4">
-      Detectamos que la pizza <strong>{{ product.title }}</strong> contiene ingredientes asociados a tus alergias registradas.
+    <p class="mb-4 has-text-grey">
+      Detectamos que el elemento <strong>{{ product.title }}</strong> contiene especificaciones técnicas que entran en conflicto con las preferencias de compatibilidad registradas en tu perfil.
     </p>
 
     <div class="content">
+      <h3 class="title is-6 mb-2">Conflictos detectados:</h3>
       <ul>
         {% for conflict in conflicts %}
           <li>
-            <strong>{{ conflict.allergy.name }}:</strong>
+            <!-- Mantiene la variable del backend pero cambia el sentido cosmético -->
+            <strong>Filtro de {{ conflict.allergy.name }}:</strong>
             {% for ing in conflict.ingredients %}
-              {{ ing.name }}{% if not forloop.last %}, {% endif %}
+              <span class="tag is-light">{{ ing.name }}</span>{% if not forloop.last %} {% endif %}
             {% endfor %}
           </li>
         {% endfor %}
@@ -28,18 +30,19 @@
     </div>
 
     <p class="has-text-weight-semibold mb-4">
-      Por tu seguridad recomendamos <span class="has-text-danger">no consumir este producto</span>.
+      Te recomendamos revisar bien las características antes de proceder para asegurar un óptimo funcionamiento.
     </p>
 
-    <div class="columns is-mobile">
+    <div class="columns is-mobile mt-5">
       <div class="column">
-        <a href="{% url 'cart:cart' %}" class="button is-light is-fullwidth">
+        <a href="{% url 'cart:cart' %}" class="button is-light is-fullwidth" style="font-weight: 600;">
           Volver al carrito
         </a>
       </div>
       <div class="column">
+        <!-- Django sigue procesando la URL con sus parámetros originales de bypass -->
         <a href="{% url 'cart:cart' %}?add_product={{ product.id }}&ignore_allergy_warning=1"
-           class="button is-danger is-fullwidth">
+           class="button is-link is-fullwidth" style="font-weight: 600; background-color: #6344ff;">
           Agregar de todos modos
         </a>
       </div>

@@ -1,15 +1,39 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>📊 Dashboard de Actividad</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'analytics/css/dashboard.css' %}">
-</head>
-<body>
-  <h1>📊 Dashboard de Actividad de Usuarios</h1>
+{% extends 'core/base.html' %}
+{% load static %}
 
-  <!-- Contadores -->
+{% block title %}📊 Dashboard de Actividad{% endblock title %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'analytics/css/dashboard.css' %}">
+
+<style>
+  /* Pequeños parches para que combine con la estética morada de la web */
+  .stats { display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .stats .card { flex: 1; min-width: 200px; padding: 1.5rem; border-radius: 12px; border: 1px solid #e1e4e8; text-align: center; background: white; }
+  .stat-value { font-size: 2rem; font-weight: bold; color: #6344ff; }
+  .stat-value.error { color: #ff3860; }
+  
+  /* Filtros estilizados estilo barra */
+  .filters { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #e1e4e8; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+  .filters label { font-weight: bold; color: #4a4a4a; }
+  .filters select, .filters input { padding: 0.5rem; border-radius: 6px; border: 1px solid #ccc; }
+  .filters button { background: #6344ff; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+  .filters button:hover { background: #492bdf; }
+
+  /* Tabla moderna */
+  table { width: 100%; background: white; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid #e1e4e8; margin-top: 1.5rem; }
+  th { background: #1a1c29; color: white; padding: 1rem; text-align: left; }
+  td { padding: 1rem; border-bottom: 1px solid #e1e4e8; }
+  
+  /* Filas con colores suaves */
+  .row-error { background-color: #fff5f5; }
+  .row-bot { background-color: #f5f3ff; }
+</style>
+
+<div class="container mt-4">
+  <h1 class="title is-2 has-text-dark mb-5">📊 Dashboard de Actividad de Usuarios</h1>
+
   <div class="stats">
     <div class="card">
       <h3>Total acciones</h3>
@@ -25,19 +49,17 @@
     </div>
   </div>
 
-  <!-- Acciones más comunes -->
-  <div class="card top-actions">
-    <h3>Acciones más comunes</h3>
-    <ul>
+  <div class="card top-actions p-5 mb-5" style="background: white; border-radius: 12px; border: 1px solid #e1e4e8;">
+    <h3 class="title is-5 mb-3">⚡ Acciones más comunes</h3>
+    <ul class="ml-4" style="list-style-type: disk;">
       {% for a in mas_comunes %}
-        <li>{{ a.action }} — <strong>{{ a.total }}</strong> veces</li>
+        <li class="mb-1">{{ a.action }} — <strong>{{ a.total }}</strong> veces</li>
       {% empty %}
         <li>No hay registros suficientes aún.</li>
       {% endfor %}
     </ul>
   </div>
 
-  <!-- Filtros -->
   <form method="get" class="filters">
     <label>Tipo:</label>
     <select name="tipo">
@@ -48,7 +70,7 @@
     </select>
 
     <label>Usuario:</label>
-    <input type="text" name="usuario" value="{{ usuario_filtro }}" placeholder="nombre de usuario">
+    <input type="text" name="usuario" value="{{ usuario_filtro }}" placeholder="Nombre de usuario">
 
     <label>Origen:</label>
     <select name="page">
@@ -60,7 +82,7 @@
     <label>Sección:</label>
     <select name="section">
       <option value="">Todas</option>
-      <option value="productos" {% if section == 'productos' %}selected{% endif %}>🍕 Productos</option>
+      <option value="productos" {% if section == 'productos' %}selected{% endif %}>🎙️ Shows / Servicios</option>
       <option value="categorias" {% if section == 'categorias' %}selected{% endif %}>📂 Categorías</option>
       <option value="carrito" {% if section == 'carrito' %}selected{% endif %}>🛒 Carrito</option>
       <option value="checkout" {% if section == 'checkout' %}selected{% endif %}>💳 Checkout</option>
@@ -78,61 +100,61 @@
     <button type="submit">Filtrar</button>
   </form>
 
-  <!-- Tabla -->
-  <table>
-    <thead>
-      <tr>
-        <th>Fecha y hora</th>
-        <th>Usuario</th>
-        <th>Acción</th>
-        <th>Origen</th>
-        <th>Sección</th>
-        <th>ID Producto</th>
-        <th>Detalles</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for log in logs %}
-        <tr class="
-          {% if log.row_class == 'row-bot' %}row-bot
-          {% elif log.row_class == 'row-error' %}row-error
-          {% else %}row-web{% endif %}
-        ">
-          <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
-          <td>
-            {% if log.user %}
-              {{ log.user.username }}
-            {% elif log.user_name %}
-              {{ log.user_name }}
-            {% else %}
-              Anónimo
-            {% endif %}
-          </td>
-          <td>{{ log.action }}</td>
-          <td>{{ log.page|default:"-" }}</td>
-          <td>
-            {% if log.section %}
-              <span class="tag tag-{{ log.section|lower }}">{{ log.section }}</span>
-            {% else %}
-              <span class="tag tag-default">-</span>
-            {% endif %}
-          </td>
-          <td>{{ log.product_id|default:"-" }}</td>
-          <td>
-            {% if log.extra_data %}
-              <div class="json-box">{{ log.extra_data|safe }}</div>
-            {% else %}
-              -
-            {% endif %}
-          </td>
-        </tr>
-      {% empty %}
+  <div style="overflow-x: auto;">
+    <table>
+      <thead>
         <tr>
-          <td colspan="7" style="text-align:center;">No hay registros que coincidan con los filtros.</td>
+          <th>Fecha y hora</th>
+          <th>Usuario</th>
+          <th>Acción</th>
+          <th>Origen</th>
+          <th>Sección</th>
+          <th>ID Elemento</th> <th>Detalles</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr class="
+            {% if log.row_class == 'row-bot' %}row-bot
+            {% elif log.row_class == 'row-error' %}row-error
+            {% else %}row-web{% endif %}
+          ">
+            <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+            <td>
+              {% if log.user %}
+                {{ log.user.username }}
+              {% elif log.user_name %}
+                {{ log.user_name }}
+              {% else %}
+                Anónimo
+              {% endif %}
+            </td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.page|default:"-" }}</td>
+            <td>
+              {% if log.section %}
+                <span class="tag tag-{{ log.section|lower }}">{{ log.section }}</span>
+              {% else %}
+                <span class="tag tag-default">-</span>
+              {% endif %}
+            </td>
+            <td>{{ log.product_id|default:"-" }}</td>
+            <td>
+              {% if log.extra_data %}
+                <div class="json-box" style="background: #f4f5f7; padding: 0.5rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;">{{ log.extra_data|safe }}</div>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" style="text-align:center;">No hay registros que coincidan con los filtros.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-</body>
-</html>
+{% endblock content %}

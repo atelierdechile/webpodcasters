@@ -3,102 +3,138 @@
 {% block content %}
 
 <style>
+  body {
+    background: #f8f9fa;
+  }
+
   .history-page {
     max-width: 1100px;
     margin: 0 auto;
+    padding: 0 1.5rem;
   }
 
   .history-header {
-    margin-bottom: 18px;
+    margin-bottom: 24px;
   }
 
   .history-subtitle {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.5;
   }
 
   .history-card {
     background: #ffffff;
     border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
-    padding: 14px 16px;
+    border: 1px solid #e1e4e8;
+    box-shadow: 0 4px 12px rgba(99, 68, 255, 0.02);
+    padding: 24px;
   }
 
   .history-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-    font-size: 0.85rem;
+    gap: 16px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
     flex-wrap: wrap;
   }
 
   .history-link {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    color: #6344ff !important;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+  .history-link:hover {
+    color: #492bdf !important;
+    text-decoration: underline;
   }
 
   .history-filter-form {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
     flex-wrap: wrap;
   }
 
   .history-filter-form label {
-    font-size: 0.8rem;
-    color: #4b5563;
+    font-size: 0.85rem;
+    color: #4a5568;
+    font-weight: 500;
   }
 
   .history-filter-form input[type="date"] {
     font-size: 0.85rem;
-    padding: 3px 6px;
+    padding: 5px 8px;
     border-radius: 6px;
-    border: 1px solid #d1d5db;
+    border: 1px solid #cbd5e1;
+    font-family: inherit;
+    color: #1a1c29;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .history-filter-form input[type="date"]:focus {
+    outline: none;
+    border-color: #6344ff;
+    box-shadow: 0 0 0 3px rgba(99, 68, 255, 0.15);
   }
 
   .btn-small {
-    font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 999px;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
   }
 
+  /* 🎙️ Adaptado al morado Web Podcasters */
   .btn-small-primary {
-    background: #4f46e5;
+    background: #6344ff;
     color: #fff;
-    border-color: #4f46e5;
+    border-color: #492bdf;
+  }
+  .btn-small-primary:hover {
+    background: #492bdf;
   }
 
   .btn-small-ghost {
     background: #ffffff;
+    color: #4a5568;
+  }
+  .btn-small-ghost:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
   }
 
   .history-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
   }
 
   .history-table thead {
-    background: #f9fafb;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e1e4e8;
   }
 
   .history-table th,
   .history-table td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e1e4e8;
     text-align: left;
     vertical-align: middle;
   }
 
   .history-table th {
     font-weight: 600;
-    color: #4b5563;
-    font-size: 0.85rem;
+    color: #718096;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .history-table tr:last-child td {
@@ -107,104 +143,115 @@
 
   .history-date {
     white-space: nowrap;
-    font-weight: 600;
+    font-weight: 700;
+    color: #1a1c29;
   }
 
   .history-dow {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: #718096;
+    text-transform: capitalize;
   }
 
   .history-product {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
 
   .history-thumb {
-    width: 56px;
-    height: 40px;
-    border-radius: 8px;
+    width: 60px;
+    height: 44px;
+    border-radius: 6px;
     object-fit: cover;
-    background: #f3f4f6;
+    background: #f5f6fa;
     flex-shrink: 0;
+    border: 1px solid #e1e4e8;
   }
 
   .history-thumb-placeholder {
-    width: 56px;
-    height: 40px;
-    border-radius: 8px;
-    background: #f3f4f6;
+    width: 60px;
+    height: 44px;
+    border-radius: 6px;
+    background: #f5f6fa;
+    border: 1px dashed #cbd5e1;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: #9ca3af;
     flex-shrink: 0;
   }
 
   .history-product-title {
     margin: 0;
-    font-weight: 600;
+    font-weight: 700;
+    color: #1a1c29;
   }
 
   .history-product-price {
     margin: 0;
-    font-size: 0.8rem;
-    color: #6b7280;
+    font-size: 0.82rem;
+    color: #6344ff;
+    font-weight: 600;
   }
 
   .history-empty {
     text-align: center;
-    padding: 24px 0;
+    padding: 40px 0;
     color: #9ca3af;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .pagination {
     display: flex;
     justify-content: flex-end;
-    gap: 6px;
-    margin-top: 10px;
-    font-size: 0.8rem;
+    gap: 8px;
+    margin-top: 20px;
+    font-size: 0.85rem;
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .pagination span,
   .pagination a {
-    padding: 4px 8px;
-    border-radius: 999px;
-    border: 1px solid #e5e7eb;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #e1e4e8;
+    font-weight: 600;
   }
 
   .pagination .current {
-    background: #4f46e5;
-    color: #fff;
-    border-color: #4f46e5;
+    background: #eef2ff;
+    color: #6344ff;
+    border-color: #cbd5e1;
   }
 
   .pagination a {
     text-decoration: none;
-    color: #374151;
+    color: #4a5568;
+    background: #ffffff;
+    transition: all 0.2s;
   }
 
   .pagination a:hover {
-    background: #f3f4f6;
+    background: #f1f5f9;
+    border-color: #94a3b8;
   }
 </style>
 
 <div class="history-page">
 
-  <div class="history-header">
-    <h2 class="mb-1">Histórico de menú semanal</h2>
+  <div class="history-header mt-5">
+    <h2 class="title is-3 mb-1" style="color: #1a1c29; font-weight: 700;">📋 Historial de Rotaciones en Vitrina</h2>
     <div class="history-subtitle">
-      Revisa qué pizza fue "pizza del día" en cada fecha. Puedes filtrar por rango de fechas.
+      Monitorea qué publicaciones contaron con prioridad destacada en cada fecha del calendario. Puedes aplicar filtros por rango cronológico.
     </div>
   </div>
 
   <div class="history-actions">
     <a href="{% url 'vendor:weekly_menu_edit' %}" class="history-link">
-      ← Volver al menú de los próximos 7 días
+      ← Volver al panel de vitrina semanal
     </a>
 
     <form method="get" class="history-filter-form">
@@ -219,7 +266,7 @@
                value="{{ to_date|date:'Y-m-d' }}">
       </label>
       <button type="submit" class="btn-small btn-small-primary">
-        Filtrar
+        Filtrar Rango
       </button>
       <a href="{% url 'vendor:weekly_menu_history' %}" class="btn-small btn-small-ghost">
         Últimos 30 días
@@ -232,8 +279,8 @@
       <table class="history-table">
         <thead>
           <tr>
-            <th style="width: 140px;">Fecha</th>
-            <th>Producto asignado</th>
+            <th style="width: 150px;">Fecha de Registro</th>
+            <th>Elemento / Servicio Destacado</th>
           </tr>
         </thead>
         <tbody>
@@ -244,7 +291,7 @@
                   {{ m.date|date:"d/m/Y" }}
                 </div>
                 <div class="history-dow">
-                  {{ m.date|date:"D" }}
+                  {{ m.date|date:"l" }}
                 </div>
               </td>
               <td>
@@ -267,9 +314,9 @@
                     <p class="history-product-title">{{ m.product.title }}</p>
                     <p class="history-product-price mb-0">
                       {% if m.product.price %}
-                        ${{ m.product.price|floatformat:0 }}
+                        ${{ m.product.price|floatformat:0 }} Base
                       {% else %}
-                        Precio no definido
+                        Valor no parametrizado
                       {% endif %}
                     </p>
                   </div>
@@ -295,8 +342,8 @@
       </div>
     {% else %}
       <div class="history-empty">
-        No hay registros en el rango seleccionado.  
-        Prueba con otro rango o vuelve a los últimos 30 días.
+        No se registran rotaciones en el rango seleccionado.<br>
+        <span class="is-size-7 has-text-grey-light">Prueba configurando otro intervalo de fechas o restablece a los últimos 30 días.</span>
       </div>
     {% endif %}
   </div>

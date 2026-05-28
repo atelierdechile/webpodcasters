@@ -2,192 +2,181 @@
 {% load widget_tweaks %}
 
 {% block title %}
-  {% if offer %}Editar Oferta{% else %}Crear Oferta{% endif %}
+  {% if offer %}Editar Promoción{% else %}Crear Promoción{% endif %}
 {% endblock title %}
 
 {% block content %}
-<div class="container mt-6">
-  <div class="column is-half is-offset-one-quarter">
-    <div class="box">
+<div class="container mt-6 mb-6" style="padding: 0 1.5rem;">
+  <div class="columns is-centered">
+    <div class="column is-10-tablet is-6-desktop">
+      <div class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; padding: 2.5rem; background: #ffffff;">
 
-      {# TÍTULO #}
-      <h1 class="title has-text-centered mb-5">
-        🔥
-        {% if hide_product_field and product_from_url %}
-          Oferta para <span class="has-text-info">{{ product_from_url.title }}</span>
-        {% elif offer %}
-          Oferta para <span class="has-text-info">{{ offer.product.title }}</span>
-        {% else %}
-          {% if offer %}Editar oferta{% else %}Crear oferta{% endif %}
-        {% endif %}
-      </h1>
-
-      {# ERRORES GENERALES #}
-      {% if form.non_field_errors %}
-        <div class="notification is-danger is-light">
-          {{ form.non_field_errors }}
-        </div>
-      {% endif %}
-
-      {# INFO DEL PRODUCTO (precio normal y oferta actual) SI TENEMOS PRODUCTO DEFINIDO #}
-      {% if hide_product_field and product_from_url %}
-        {% with product_obj=product_from_url %}
-          <div class="notification is-light">
-            <strong>Producto:</strong> {{ product_obj.title }}<br>
-            <strong>Vendedor:</strong> {{ product_obj.vendor.name }}<br>
-            <strong>Precio normal:</strong> ${{ product_obj.price }} <br>
-
-            {% if product_obj.active_offer %}
-              <strong>Precio actual con oferta:</strong>
-              <span class="has-text-danger has-text-weight-bold">
-                ${{ product_obj.final_price }}
-              </span>
-              <span class="tag is-success is-light ml-2">Oferta activa</span>
-            {% else %}
-              <span class="tag is-light">Sin oferta activa</span>
-            {% endif %}
-          </div>
-        {% endwith %}
-      {% elif offer %}
-        {% with product_obj=offer.product %}
-          <div class="notification is-light">
-            <strong>Producto:</strong> {{ product_obj.title }}<br>
-            <strong>Vendedor:</strong> {{ product_obj.vendor.name }}<br>
-            <strong>Precio normal:</strong> ${{ product_obj.price }} <br>
-
-            {% if product_obj.active_offer %}
-              <strong>Precio actual con oferta:</strong>
-              <span class="has-text-danger has-text-weight-bold">
-                ${{ product_obj.final_price }}
-              </span>
-              <span class="tag is-success is-light ml-2">Oferta activa</span>
-            {% else %}
-              <span class="tag is-light">Sin oferta activa</span>
-            {% endif %}
-          </div>
-        {% endwith %}
-      {% endif %}
-
-      <form method="post">
-        {% csrf_token %}
-
-        {# PRODUCTO: fijado o seleccionable #}
-        {% if hide_product_field and product_from_url %}
-          <div class="field">
-            <label class="label">Producto</label>
-            <p><strong>{{ product_from_url.title }}</strong></p>
-            <p class="help">Vendedor: {{ product_from_url.vendor.name }}</p>
-            {{ form.product.as_hidden }}
-          </div>
-        {% else %}
-          <div class="field">
-            <label class="label">Producto</label>
-            <div class="control">
-              {{ form.product|add_class:"input" }}
-            </div>
-            {% if form.product.errors %}
-              <p class="help is-danger">{{ form.product.errors }}</p>
-            {% endif %}
-          </div>
-        {% endif %}
-
-        {# Campos del formulario #}
-        {% for field in form %}
-          {% if field.name != "product" %}
-
-            <div class="field mt-4">
-
-              {% if field.name == "discount_percentage" %}
-                <label class="label">% de descuento</label>
-                <div class="control">
-                  {{ field|add_class:"input" }}
-                </div>
-                <p class="help">Ej: 20 para un 20%.</p>
-
-              {% elif field.name == "discount_price" %}
-                <label class="label">Precio con descuento</label>
-                <div class="control">
-                  {{ field|add_class:"input" }}
-                </div>
-                <p class="help">Si se usa este valor, tiene prioridad sobre el %.</p>
-
-              {% elif field.name == "is_2x1" %}
-                <label class="checkbox">
-                  {{ field }} Oferta 2x1
-                </label>
-
-              {% elif field.name == "start_date" %}
-                  <label class="label">Fecha/hora inicio</label>
-                  <div class="control">
-                      {{ field|add_class:"input"|attr:"type:datetime-local" }}
-                  </div>
-
-              {% elif field.name == "end_date" %}
-                  <label class="label">Fecha/hora término</label>
-                  <div class="control">
-                      {{ field|add_class:"input"|attr:"type:datetime-local" }}
-                  </div>
-
-              {% elif field.name == "is_active" %}
-                <label class="checkbox">
-                  {{ field }} Activa
-                </label>
-
-              {% else %}
-                <label class="label">{{ field.label }}</label>
-                <div class="control">
-                  {{ field|add_class:"input" }}
-                </div>
-              {% endif %}
-
-              {% if field.errors %}
-                <p class="help is-danger">{{ field.errors }}</p>
-              {% endif %}
-
-            </div>
+        {# 🎙️ TÍTULO REFORMULADO #}
+        <h1 class="title is-3 has-text-centered mb-5" style="color: #6344ff; font-weight: 700;">
+          ✨
+          {% if hide_product_field and product_from_url %}
+            Promoción para <span style="color: #485fc7;">{{ product_from_url.title }}</span>
+          {% elif offer %}
+            Promoción para <span style="color: #485fc7;">{{ offer.product.title }}</span>
+          {% else %}
+            {% if offer %}Editar promoción{% else %}Crear promoción{% endif %}
           {% endif %}
-        {% endfor %}
+        </h1>
 
-        {# PREVIEW: solo si tenemos un producto (vía product_from_url o offer) #}
+        {# ERRORES GENERALES #}
+        {% if form.non_field_errors %}
+          <div class="notification is-danger is-light" style="border-radius: 8px;">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        {# INFO DEL ELEMENTO / PANEL INFORMATIVO MAESTRO #}
         {% if hide_product_field and product_from_url %}
           {% with product_obj=product_from_url %}
-            <div class="box mt-5 has-background-info-light">
-              <h2 class="subtitle mb-2">💰 Vista previa del precio final</h2>
+            <div class="notification is-light" style="border-radius: 8px; border-left: 4px solid #6344ff;">
+              <p class="mb-1"><strong>Elemento:</strong> {{ product_obj.title }}</p>
+              <p class="mb-1"><strong>Creador:</strong> {{ product_obj.vendor.name }}</p>
+              <p class="mb-1"><strong>Valor base estándar:</strong> ${{ product_obj.price }}</p>
 
-              <p><strong>Precio normal:</strong> ${{ product_obj.price }}</p>
-
-              <p><strong>Precio final estimado:</strong>
-                <span id="preview-final" class="has-text-weight-bold">$—</span>
-              </p>
+              {% if product_obj.active_offer %}
+                <p class="mb-0">
+                  <strong>Valor actual promocionado:</strong>
+                  <span style="color: #6344ff; font-weight: 700;">${{ product_obj.final_price }}</span>
+                  <span class="tag is-link is-light ml-2" style="font-weight: 600;">Promoción activa</span>
+                </p>
+              {% else %}
+                <p class="mb-0"><span class="tag is-light" style="font-weight: 500;">Sin promoción activa</span></p>
+              {% endif %}
             </div>
           {% endwith %}
         {% elif offer %}
           {% with product_obj=offer.product %}
-            <div class="box mt-5 has-background-info-light">
-              <h2 class="subtitle mb-2">💰 Vista previa del precio final</h2>
+            <div class="notification is-light" style="border-radius: 8px; border-left: 4px solid #6344ff;">
+              <p class="mb-1"><strong>Elemento:</strong> {{ product_obj.title }}</p>
+              <p class="mb-1"><strong>Creador:</strong> {{ product_obj.vendor.name }}</p>
+              <p class="mb-1"><strong>Valor base estándar:</strong> ${{ product_obj.price }}</p>
 
-              <p><strong>Precio normal:</strong> ${{ product_obj.price }}</p>
-
-              <p><strong>Precio final estimado:</strong>
-                <span id="preview-final" class="has-text-weight-bold">$—</span>
-              </p>
+              {% if product_obj.active_offer %}
+                <p class="mb-0">
+                  <strong>Valor actual promocionado:</strong>
+                  <span style="color: #6344ff; font-weight: 700;">${{ product_obj.final_price }}</span>
+                  <span class="tag is-link is-light ml-2" style="font-weight: 600;">Promoción activa</span>
+                </p>
+              {% else %}
+                <p class="mb-0"><span class="tag is-light" style="font-weight: 500;">Sin promoción activa</span></p>
+              {% endif %}
             </div>
           {% endwith %}
         {% endif %}
 
-        <!-- Botones -->
-        <div class="field mt-6">
-          <button class="button is-primary is-medium is-fullwidth">
-            Guardar oferta
-          </button>
-        </div>
+        <form method="post" class="mt-4">
+          {% csrf_token %}
 
-        <a href="{{ back_url }}" class="button is-light is-fullwidth mt-2">
-          ← Volver
-        </a>
+          {# ELEMENTO ASOCIADO #}
+          {% if hide_product_field and product_from_url %}
+            <div class="field mb-4">
+              <label class="label">Elemento seleccionado</label>
+              <p class="is-size-5" style="color: #1a1c29; font-weight: 600;">{{ product_from_url.title }}</p>
+              <p class="help">Canal/Creador: {{ product_from_url.vendor.name }}</p>
+              {{ form.product.as_hidden }}
+            </div>
+          {% else %}
+            <div class="field mb-4">
+              <label class="label">Elemento / Servicio</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  {{ form.product }}
+                </div>
+              </div>
+              {% if form.product.errors %}
+                <p class="help is-danger">{{ form.product.errors|join:", " }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
 
-      </form>
+          {# CAMPOS INTERMEDIOS DEL FORMULARIO #}
+          {% for field in form %}
+            {% if field.name != "product" %}
 
+              <div class="field mb-4">
+
+                {% if field.name == "discount_percentage" %}
+                  <label class="label">Porcentaje de descuento (%)</label>
+                  <div class="control">
+                    {{ field|add_class:"input" }}
+                  </div>
+                  <p class="help">Ej: ingresar 20 para parametrizar un 20% de rebaja.</p>
+
+                {% elif field.name == "discount_price" %}
+                  <label class="label">Valor final rebajado</label>
+                  <div class="control">
+                    {{ field|add_class:"input" }}
+                  </div>
+                  <p class="help">Si se define este monto, tendrá prioridad de cálculo por sobre el porcentaje.</p>
+
+                {% elif field.name == "is_2x1" %}
+                  <label class="checkbox" style="font-weight: 600; color: #4a4a4a;">
+                    {{ field }} Habilitar Promoción Duplicada (2x1)
+                  </label>
+
+                {% elif field.name == "start_date" %}
+                  <label class="label">Fecha y hora de inicio</label>
+                  <div class="control">
+                    {{ field|add_class:"input"|attr:"type:datetime-local" }}
+                  </div>
+
+                {% elif field.name == "end_date" %}
+                  <label class="label">Fecha y hora de término</label>
+                  <div class="control">
+                    {{ field|add_class:"input"|attr:"type:datetime-local" }}
+                  </div>
+
+                {% elif field.name == "is_active" %}
+                  <label class="checkbox" style="font-weight: 600; color: #4a4a4a;">
+                    {{ field }} Habilitar visibilidad pública de la promoción
+                  </label>
+
+                {% else %}
+                  <label class="label">{{ field.label }}</label>
+                  <div class="control">
+                    {{ field|add_class:"input" }}
+                  </div>
+                {% endif %}
+
+                {% if field.errors %}
+                  <p class="help is-danger">{{ field.errors|join:", " }}</p>
+                {% endif %}
+
+              </div>
+            {% endif %}
+          {% endfor %}
+
+          {# BOX DE PREVISUALIZACIÓN DE COSTOS #}
+          {% if hide_product_field and product_from_url or offer %}
+            {% with product_obj=offer.product|default:product_from_url %}
+              <div class="box mt-5" style="background-color: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 10px; padding: 1.25rem;">
+                <h2 class="subtitle is-6 mb-2" style="color: #1a1c29; font-weight: 700;">💰 Parámetros de Costo Estimado</h2>
+                <p class="mb-1">Valor base estándar: ${{ product_obj.price }}</p>
+                <p class="is-size-5 mb-0" style="color: #6344ff;"><strong>Valor final estimado:</strong>
+                  <span id="preview-final" style="font-weight: 800;">$--</span>
+                </p>
+              </div>
+            {% endwith %}
+          {% endif %}
+
+          <div class="field mt-5">
+            <button class="button is-link is-medium is-fullwidth" style="background-color: #6344ff; font-weight: 600; border-radius: 8px;">
+              Guardar configuración promocional
+            </button>
+          </div>
+
+          <a href="{{ back_url }}" class="button is-light is-fullwidth mt-2" style="font-weight: 600; border-radius: 8px; color: #718096;">
+            Cancelar y volver
+          </a>
+
+        </form>
+
+      </div>
     </div>
   </div>
 </div>
@@ -243,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     preview.textContent = isNaN(final)
-      ? "$—"
+      ? "$--"
       : "$" + final.toLocaleString();
   }
 
@@ -279,8 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const v = discountPercentage.value.replace(/\D/g, "").slice(0, 2);
       discountPercentage.value = v;
 
-      discountPercentage.style.border =
-        (v < 1 || v > 90) ? "2px solid red" : "";
+      discountPercentage.style.borderColor = (v < 1 || v > 90) ? "#f14668" : "";
 
       if (v) {
         if (is2x1) is2x1.checked = false;
@@ -298,8 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const v = discountPrice.value.replace(/\D/g, "").slice(0, 6);
       discountPrice.value = v;
 
-      discountPrice.style.border =
-        (!v || v < 1 || v >= basePrice) ? "2px solid red" : "";
+      discountPrice.style.borderColor = (!v || v < 1 || v >= basePrice) ? "#f14668" : "";
 
       if (v) {
         if (is2x1) is2x1.checked = false;
@@ -309,11 +296,13 @@ document.addEventListener("DOMContentLoaded", () => {
       updatePreview();
     });
 
-    // Botón "calcular porcentaje automáticamente"
+    // Botón "calcular porcentaje automáticamente" con look Lavanda corporativo
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.textContent = "Calcular porcentaje automáticamente";
-    btn.className = "button is-info is-fullwidth mt-2";
+    btn.textContent = "Calcular porcentaje de forma automática";
+    btn.className = "button is-link is-light is-fullwidth mt-2";
+    btn.style.fontWeight = "600";
+    btn.style.borderRadius = "6px";
 
     discountPrice.parentNode.parentNode.appendChild(btn);
 
@@ -321,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const newPrice = parseInt(discountPrice.value);
 
       if (!newPrice || newPrice < 1 || newPrice >= basePrice) {
-        alert("Ingresa un precio rebajado válido.");
+        alert("Por favor, ingresa un valor rebajado válido.");
         return;
       }
 
@@ -339,4 +328,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 {% endif %}
+
+<style>
+  .input:focus {
+      border-color: #6344ff !important;
+      box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
+  }
+</style>
 {% endblock %}

@@ -1,114 +1,110 @@
 {% extends "core/base.html" %}
 
+{% block title %}Gestión de Creadores - Panel Admin{% endblock title %}
+
 {% block content %}
 <section class="section">
-  <div class="container">
+  <div class="container" style="max-width: 1200px;">
 
-    <!-- Header -->
     <div class="level mb-5">
       <div class="level-left">
         <div>
           <div class="mb-3">
-            <h1 class="title is-4">Gestión de vendedores</h1>
+            <h1 class="title is-4" style="color: #1a1c29; font-weight: 700;">Gestión de Creadores</h1>
             <p class="subtitle is-6 has-text-grey">
-              Revisa la información de cada vendedor y accede a sus productos, ofertas y menú semanal.
+              Audita el perfil de cada creador, accede a sus elementos indexados, promociones y bitácora de rotación semanal.
             </p>
           </div>
         </div>
       </div>
       <div class="level-right">
-        <a href="{% url 'core:admin_landing' %}" class="button is-light">
+        <a href="{% url 'core:admin_landing' %}" class="button is-light" style="font-weight: 600; border-radius: 8px;">
           ← Volver al panel admin
         </a>
       </div>
     </div>
 
-    <!-- Resumen: total vendedores -->
     <div class="columns is-multiline mb-4">
       <div class="column is-12-mobile is-4-tablet is-3-desktop">
-        <div class="box" style="box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
-          <p class="has-text-grey is-uppercase is-size-7 has-text-weight-semibold">
-            Total vendedores
+        <div class="box" style="border-radius: 12px; border: 1px solid #e1e4e8; box-shadow: 0 4px 12px rgba(99, 68, 255, 0.02); padding: 1.5rem;">
+          <p class="has-text-grey is-uppercase is-size-7 has-text-weight-bold" style="letter-spacing: 0.05em;">
+            Total Creadores Activos
           </p>
-          <p class="title is-3 mb-0">
+          <p class="title is-2 mb-0 mt-1" style="color: #6344ff; font-weight: 800;">
             {{ vendors|length }}
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Card principal -->
-    <div class="card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
-      <header class="card-header">
-        <p class="card-header-title">
-          Listado de vendedores
+    <div class="card" style="border-radius: 16px; border: 1px solid #e1e4e8; box-shadow: none; overflow: hidden; background: #ffffff;">
+      <header class="card-header" style="background-color: #f8f9fa; border-bottom: 1px solid #e1e4e8; box-shadow: none;">
+        <p class="card-header-title" style="color: #1a1c29; font-weight: 700;">
+          Listado de Cuentas Indexadas
         </p>
       </header>
 
-      <div class="card-content">
+      <div class="card-content" style="padding: 2rem;">
 
-        <!-- Buscador -->
-        <div class="field mb-4">
-          <label class="label is-size-7 has-text-grey">Buscar vendedor</label>
+        <div class="field mb-5">
+          <label class="label is-size-7 has-text-grey">Buscar creador o marca</label>
           <div class="control has-icons-left">
             <input 
-              class="input" 
+              class="input style-search-input" 
               type="text" 
               id="vendorSearch" 
-              placeholder="Buscar por nombre o usuario…">
+              placeholder="Escribe el nombre de la marca o el usuario para filtrar…">
             <span class="icon is-small is-left">
-              <i class="fas fa-search"></i>
+              <i class="fas fa-search" style="color: #a0aec0;"></i>
             </span>
           </div>
-          <p class="help is-size-7">
-            Escribe parte del nombre o del usuario para filtrar rápidamente.
+          <p class="help has-text-grey-light">
+            El filtro se aplica de forma dinámica sobre el nombre público o el tag de usuario del creador.
           </p>
         </div>
 
-        <!-- VISTA DESKTOP / TABLET: tabla -->
         <div class="table-container is-hidden-mobile">
           <table class="table is-fullwidth is-striped is-hoverable" id="vendorTable">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Usuario</th>
-                <th>País</th>
-                <th>Creado</th>
-                <th class="has-text-right">Acciones</th>
+                <th>Nombre del Creador / Marca</th>
+                <th>Usuario Administrador</th>
+                <th>País de Operación</th>
+                <th>Fecha de Alta</th>
+                <th class="has-text-right" style="padding-right: 1.5rem;">Acciones Administrativas</th>
               </tr>
             </thead>
             <tbody>
               {% for v in vendors %}
                 <tr>
-                  <td class="has-text-weight-semibold">
+                  <td style="vertical-align: middle; font-weight: 700; color: #1a1c29;">
                     {{ v.name }}
                   </td>
-                  <td class="has-text-grey">
+                  <td style="vertical-align: middle; color: #4a5568;">
                     @{{ v.created_by.username }}
                   </td>
-                  <td>
+                  <td style="vertical-align: middle;">
                     {{ v.country.name|default:"-" }}
                   </td>
-                  <td class="has-text-grey is-size-7">
+                  <td style="vertical-align: middle;" class="has-text-grey is-size-7">
                     {{ v.created_at|date:"d/m/Y H:i" }}
                   </td>
-                  <td class="has-text-right">
+                  <td class="has-text-right" style="vertical-align: middle; padding-right: 1.5rem;">
                     <div class="buttons are-small is-right">
-                      <a href="{% url 'superadmin_panel:vendor_products' v.id %}" class="button is-primary is-light">
+                      <a href="{% url 'superadmin_panel:vendor_products' v.id %}" class="button is-link is-light" style="font-weight: 600; border-radius: 6px;">
                         Ver detalle
                       </a>
-                      <a href="{% url 'superadmin_panel:vendor_edit' v.id %}" class="button is-info is-light">
+                      <a href="{% url 'superadmin_panel:vendor_edit' v.id %}" class="button is-info is-light" style="font-weight: 600; border-radius: 6px;">
                         Editar
                       </a>
-
-                      {# Eliminar por POST, con confirm, sin salir de la página #}
                       <form method="post"
                             action="{% url 'superadmin_panel:vendor_delete' v.id %}"
                             style="display:inline;">
                         {% csrf_token %}
                         <button type="submit"
                                 class="button is-danger is-light"
-                                onclick="return confirm('¿Seguro que quieres eliminar este vendedor? Esta acción no se puede deshacer.');">
+                                style="font-weight: 600; border-radius: 6px;"
+                                onclick="return confirm('⚠️ ¿Confirmas la eliminación permanente de este creador?\n\nEsta acción quitará el acceso y sus elementos relacionados.');">
                           Eliminar
                         </button>
                       </form>
@@ -117,8 +113,8 @@
                 </tr>
               {% empty %}
                 <tr>
-                  <td colspan="5" class="has-text-centered has-text-grey py-5">
-                    No hay vendedores registrados por el momento.
+                  <td colspan="5" class="has-text-centered has-text-grey py-5 is-size-6">
+                    📭 No se registran cuentas de creadores dadas de alta por el momento.
                   </td>
                 </tr>
               {% endfor %}
@@ -126,46 +122,45 @@
           </table>
         </div>
 
-        <!-- VISTA MOBILE: tarjetas -->
         <div class="is-hidden-tablet" id="vendorCards">
           {% for v in vendors %}
             <div 
               class="box vendor-card" 
               data-name="{{ v.name|lower }}" 
               data-user="{{ v.created_by.username|lower }}"
+              style="border-radius: 12px; border: 1px solid #e1e4e8; box-shadow: none;"
             >
               <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
                 <div>
-                  <p class="has-text-weight-semibold">{{ v.name }}</p>
+                  <p class="has-text-weight-bold" style="color: #1a1c29; font-size: 1.05rem;">{{ v.name }}</p>
                   <p class="has-text-grey is-size-7">@{{ v.created_by.username }}</p>
                 </div>
               </div>
-              <div class="is-size-7 has-text-grey mb-3">
+              <div class="is-size-7 has-text-grey mb-3" style="line-height: 1.5;">
                 <span><strong>País:</strong> {{ v.country.name|default:"-" }}</span><br>
-                <span><strong>Creado:</strong> {{ v.created_at|date:"d/m/Y H:i" }}</span>
+                <span><strong>Alta:</strong> {{ v.created_at|date:"d/m/Y H:i" }}</span>
               </div>
-              <div class="buttons are-small is-flex is-flex-direction-column">
-                <a href="{% url 'superadmin_panel:vendor_products' v.id %}" class="button is-primary is-fullwidth">
+              <div class="buttons are-small">
+                <a href="{% url 'superadmin_panel:vendor_products' v.id %}" class="button is-link is-light is-fullwidth" style="font-weight: 600; border-radius: 6px;">
                   Ver detalle
                 </a>
-                <a href="{% url 'superadmin_panel:vendor_edit' v.id %}" class="button is-info is-fullwidth">
+                <a href="{% url 'superadmin_panel:vendor_edit' v.id %}" class="button is-info is-light is-fullwidth" style="font-weight: 600; border-radius: 6px;">
                   Editar
                 </a>
-
-                <form method="post"
-                      action="{% url 'superadmin_panel:vendor_delete' v.id %}">
+                <form method="post" action="{% url 'superadmin_panel:vendor_delete' v.id %}" class="is-fullwidth">
                   {% csrf_token %}
                   <button type="submit"
-                          class="button is-danger is-fullwidth"
-                          onclick="return confirm('¿Seguro que quieres eliminar este vendedor? Esta acción no se puede deshacer.');">
+                          class="button is-danger is-light is-fullwidth"
+                          style="font-weight: 600; border-radius: 6px;"
+                          onclick="return confirm('⚠️ ¿Confirmas la eliminación permanente de este creador?');">
                     Eliminar
                   </button>
                 </form>
               </div>
             </div>
           {% empty %}
-            <p class="has-text-centered has-text-grey py-5">
-              No hay vendedores registrados por el momento.
+            <p class="has-text-centered has-text-grey py-5 is-size-6">
+              📭 No se registran creadores por el momento.
             </p>
           {% endfor %}
         </div>
@@ -175,6 +170,21 @@
 
   </div>
 </section>
+
+<style>
+  .table th {
+      color: #718096 !important;
+      font-weight: 600 !important;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #e1e4e8 !important;
+  }
+  .style-search-input:focus {
+      border-color: #6344ff !important;
+      box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
+  }
+</style>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -188,7 +198,7 @@
 
       // Filtrar filas de la tabla (desktop/tablet)
       rows.forEach(row => {
-        if (row.querySelector("td[colspan]")) return; // fila de "empty"
+        if (row.querySelector("td[colspan]")) return; 
         const name = row.children[0].innerText.toLowerCase();
         const user = row.children[1].innerText.toLowerCase();
         const match = name.includes(q) || user.includes(q);

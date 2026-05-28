@@ -1,15 +1,32 @@
 {% extends 'core/base.html' %}
 
-{% block title %}{{vendor.name}}{% endblock title %}
+{% block title %}{{ vendor.name }} - Catálogo de Creador{% endblock title %}
 
 {% block content %}
-    <div class="columns is-multiline mb-6">
-        <div class="column is-12 has-test-centered mt-6 mb-6">
-            <h2 class="is-size-3">{{vendor.name}}</h2>
+<div class="container mb-6" style="padding: 0 1.5rem;">
+    <div class="columns is-multiline">
+        
+        <!-- 🔍 ENCABEZADO PÚBLICO DEL CREADOR (Corregido 'has-text-centered') -->
+        <div class="column is-12 has-text-centered mt-6 mb-5">
+            <h1 class="title is-2 is-capitalized" style="color: #1a1c29; font-weight: 700;">{{ vendor.name }}</h1>
+            <p class="subtitle is-6 has-text-grey mt-2">Explora el catálogo completo y los elementos indexados por este perfil</p>
+            <hr style="width: 60px; height: 4px; background: #6344ff; margin: 1.5rem auto 0; border-radius: 2px;">
         </div>
 
+        <!-- LISTADO DE ELEMENTOS ASOCIADOS -->
         {% for product in vendor.products.all %}
             {% include 'product/parts/list_item.html' %}
+        {% empty %}
+            <div class="column is-12 has-text-centered py-6">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e1e4e8; padding: 3rem; max-width: 500px; margin: 0 auto;">
+                    <p class="has-text-grey is-size-5 mb-2">📭 Vitrina vacía</p>
+                    <p class="has-text-grey-light is-size-6">
+                        Este creador aún no dispone de elementos públicos indexados en su catálogo actual.
+                    </p>
+                </div>
+            </div>
         {% endfor %}
+
     </div>
+</div>
 {% endblock content %}

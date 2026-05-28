@@ -5,93 +5,101 @@
 
 {% block content %}
 
-<div class="container mt-6">
-    <div class="column is-half is-offset-one-quarter">
-        <div class="box">
+<div class="container mt-6 mb-6" style="padding: 0 1.5rem;">
+    <div class="columns is-centered">
+        <div class="column is-10-tablet is-6-desktop">
+            <div class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; padding: 2.5rem; background: #ffffff;">
 
-            <h1 class="title has-text-centered mb-5">
-                🔥 Oferta para <span class="has-text-info">{{ product.title }}</span>
-            </h1>
+                <!-- 🎙️ Título principal adaptado -->
+                <h1 class="title is-3 has-text-centered mb-5" style="color: #6344ff; font-weight: 700;">
+                    ✨ Gestionar Promoción para <span style="color: #485fc7;">{{ product.title }}</span>
+                </h1>
 
-            <!-- Info del producto -->
-            <div class="notification is-light">
-                <strong>Precio normal:</strong> ${{ product.price }} <br>
+                <!-- Info actual del producto -->
+                <div class="notification is-light" style="border-radius: 8px; font-size: 1rem; border-left: 4px solid #6344ff;">
+                    <p class="mb-1"><strong>Precio estándar base:</strong> ${{ product.price }}</p>
 
-                {% if product.active_offer %}
-                    <strong>Precio actual con oferta:</strong>
-                    <span class="has-text-danger has-text-weight-bold">
-                        ${{ product.final_price }}
-                    </span>
-                    <span class="tag is-success is-light ml-2">Oferta activa</span>
-                {% else %}
-                    <span class="tag is-light">Sin oferta activa</span>
-                {% endif %}
-            </div>
+                    {% if product.active_offer %}
+                        <p class="mb-0">
+                            <strong>Valor actual en promoción:</strong>
+                            <span style="color: #6344ff; font-weight: bold;">
+                                ${{ product.final_price }}
+                            </span>
+                            <span class="tag is-link is-light ml-2" style="font-weight: 600;">Promoción activa</span>
+                        </p>
+                    {% else %}
+                        <p class="mb-0"><span class="tag is-light" style="font-weight: 500;">Sin promoción activa</span></p>
+                    {% endif %}
+                </div>
 
-            <form method="post">
-                {% csrf_token %}
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
 
-                {% for field in form %}
-                    <div class="field mt-4">
+                    {% for field in form %}
+                        <div class="field mt-4">
 
-                        {% if field.name == "discount_percentage" %}
-                            <label class="label">Porcentaje de descuento</label>
-                            {{ field|add_class:"input" }}
+                            {% if field.name == "discount_percentage" %}
+                                <label class="label">Porcentaje de descuento (%)</label>
+                                {{ field|add_class:"input" }}
 
-                        {% elif field.name == "discount_price" %}
-                            <label class="label">Precio con descuento</label>
-                            {{ field|add_class:"input" }}
+                            {% elif field.name == "discount_price" %}
+                                <label class="label">Precio final rebajado</label>
+                                {{ field|add_class:"input" }}
 
-                        {% elif field.name == "is_2x1" %}
-                            <label class="checkbox">{{ field }} Oferta 2x1</label>
+                            {% elif field.name == "is_2x1" %}
+                                <!-- 🎙️ Cambiado de "Oferta 2x1 🍕" a "Promoción Duplicada" -->
+                                <label class="checkbox" style="font-weight: 600; color: #4a4a4a;">
+                                    {{ field }} Habilitar Promoción Duplicada (2x1)
+                                </label>
 
-                        {% elif field.name == "start_date" %}
-                            <label class="label">Fecha de inicio</label>
-                            {{ field|add_class:"input" }}
+                            {% elif field.name == "start_date" %}
+                                <label class="label">Fecha y hora de inicio</label>
+                                {{ field|add_class:"input" }}
 
-                        {% elif field.name == "end_date" %}
-                            <label class="label">Fecha de término</label>
-                            {{ field|add_class:"input" }}
+                            {% elif field.name == "end_date" %}
+                                <label class="label">Fecha y hora de término</label>
+                                {{ field|add_class:"input" }}
 
-                        {% elif field.name == "is_active" %}
-                            <label class="checkbox">{{ field }} Activar oferta</label>
+                            {% elif field.name == "is_active" %}
+                                <label class="checkbox" style="font-weight: 600; color: #4a4a4a;">
+                                    {{ field }} Activar visibilidad de la oferta
+                                </label>
 
-                        {% else %}
-                            <label class="label">{{ field.label }}</label>
-                            {{ field|add_class:"input" }}
-                        {% endif %}
+                            {% else %}
+                                <label class="label">{{ field.label }}</label>
+                                {{ field|add_class:"input" }}
+                            {% endif %}
 
-                        {% if field.errors %}
-                            <p class="help is-danger">{{ field.errors }}</p>
-                        {% endif %}
+                            {% if field.errors %}
+                                <p class="help is-danger" style="font-weight: 500;">{{ field.errors|join:", " }}</p>
+                            {% endif %}
 
+                        </div>
+                    {% endfor %}
+
+                    <!-- Preview Estimado (Estilizado en gama Lavanda/Morada) -->
+                    <div class="box mt-5" style="background-color: #f5f6fa; border: 1px solid #e1e4e8; border-radius: 10px; padding: 1.25rem;">
+                        <h2 class="subtitle is-6 mb-2" style="color: #1a1c29; font-weight: 700;">💰 Vista previa del valor final</h2>
+                        <p class="is-size-6 mb-1">Precio base: ${{ product.price }}</p>
+                        <p class="is-size-5 mb-0" style="color: #6344ff;"><strong>Valor estimado:</strong>
+                            <span id="preview-final" style="font-weight: 800;">$--</span>
+                        </p>
                     </div>
-                {% endfor %}
 
-                <!-- Preview -->
-                <div class="box mt-5 has-background-info-light">
-                    <h2 class="subtitle mb-2">💰 Vista previa del precio final</h2>
+                    <!-- Botonera adaptada -->
+                    <div class="field mt-5">
+                        <button class="button is-link is-medium is-fullwidth" style="background-color: #6344ff; font-weight: 600; border-radius: 8px;">
+                            Guardar configuración
+                        </button>
+                    </div>
 
-                    <p><strong>Precio normal:</strong> ${{ product.price }}</p>
+                    <a href="{% url 'vendor:vendor-admin' %}" class="button is-light is-fullwidth mt-2" style="font-weight: 600; border-radius: 8px;">
+                        Volver al panel principal
+                    </a>
 
-                    <p><strong>Precio final estimado:</strong>
-                        <span id="preview-final" class="has-text-weight-bold">$—</span>
-                    </p>
-                </div>
+                </form>
 
-                <!-- Botones -->
-                <div class="field mt-6">
-                    <button class="button is-primary is-medium is-fullwidth">
-                        Guardar oferta
-                    </button>
-                </div>
-
-                <a href="{% url 'vendor:vendor-admin' %}" class="button is-light is-fullwidth mt-2">
-                    Volver
-                </a>
-
-            </form>
-
+            </div>
         </div>
     </div>
 </div>
@@ -146,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         preview.textContent = isNaN(final)
-            ? "$—"
+            ? "$--"
             : "$" + final.toLocaleString();
     }
 
@@ -182,8 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const v = discountPercentage.value.replace(/\D/g, "").slice(0, 2);
             discountPercentage.value = v;
 
-            discountPercentage.style.border =
-                (v < 1 || v > 90) ? "2px solid red" : "";
+            discountPercentage.style.borderColor = (v < 1 || v > 90) ? "#f14668" : "";
 
             if (v) {
                 if (is2x1) is2x1.checked = false;
@@ -201,8 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const v = discountPrice.value.replace(/\D/g, "").slice(0, 6);
             discountPrice.value = v;
 
-            discountPrice.style.border =
-                (!v || v < 1 || v >= basePrice) ? "2px solid red" : "";
+            discountPrice.style.borderColor = (!v || v < 1 || v >= basePrice) ? "#f14668" : "";
 
             if (v) {
                 if (is2x1) is2x1.checked = false;
@@ -216,8 +222,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (discountPrice) {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.textContent = "Calcular porcentaje automáticamente";
-        btn.className = "button is-info is-fullwidth mt-2";
+        btn.textContent = "Calcular porcentaje de forma automática";
+        // Convertido a botón de estilo link pastel acorde al flujo de Web Podcasters
+        btn.className = "button is-link is-light is-fullwidth mt-2";
+        btn.style.fontWeight = "600";
+        btn.style.borderRadius = "6px";
 
         discountPrice.parentNode.parentNode.appendChild(btn);
 
@@ -225,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const newPrice = parseInt(discountPrice.value);
 
             if (!newPrice || newPrice < 1 || newPrice >= basePrice) {
-                alert("Ingresa un precio rebajado válido.");
+                alert("Por favor, ingresa un precio rebajado válido.");
                 return;
             }
 
@@ -242,4 +251,12 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePreview();
 });
 </script>
+
+<style>
+  /* Sintonía fina para foco de inputs */
+  .input:focus {
+      border-color: #6344ff !important;
+      box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
+  }
+</style>
 {% endblock %}

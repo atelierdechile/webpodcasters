@@ -4,23 +4,52 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel del Vendedor – POS</title>
+    <title>Consola de Gestión – Web Podcasters</title>
 
     <!-- Bulma -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- FontAwesome para íconos profesionales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body {
-            background: #f5f5f5;
+            background: #f8f9fa;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         .sidebar {
             height: 100vh;
             overflow-y: auto;
-            border-right: 1px solid #ddd;
+            border-right: 1px solid #e1e4e8;
+            background: #ffffff;
+        }
+        .order-item {
+            border-radius: 10px !important;
+            border: 1px solid #e1e4e8 !important;
+            box-shadow: none !important;
+            transition: all 0.2s ease;
         }
         .order-item:hover {
-            background: #f0f0f0;
+            background: #f7f5ff !important;
+            border-color: #6344ff !important;
             cursor: pointer;
+        }
+        .order-item.is-active-panel {
+            background: #eef2ff !important;
+            border-color: #6344ff !important;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        .table th {
+            color: #718096 !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
         }
     </style>
 </head>
@@ -29,137 +58,153 @@
 
 <div class="columns m-0">
 
-    <!-- SIDEBAR IZQUIERDA -->
+    <!-- SIDEBAR IZQUIERDA: FLUJO DE SOLICITUDES -->
     <div class="column is-3 sidebar p-4">
 
-        <h1 class="title is-4">🧾 Órdenes</h1>
+        <div class="is-flex is-align-items-center mb-4 px-2" style="gap: 0.5rem;">
+            <span style="font-size: 1.4rem; color: #6344ff;">📋</span>
+            <h1 class="title is-4 mb-0" style="color: #1a1c29; font-weight: 700;">Solicitudes</h1>
+        </div>
 
         <div class="menu">
-
             <ul class="menu-list">
                 {% for order in orders %}
                 <li>
-                    <a href="?order={{ order.id }}" class="order-item box mb-3">
+                    <!-- Marcamos visualmente si coincide con la orden seleccionada en los parámetros GET -->
+                    <a href="?order={{ order.id }}" class="order-item box mb-3 {% if selected_order and selected_order.id == order.id %}is-active-panel{% endif %}">
 
                         <div class="is-flex is-justify-content-space-between">
-                            <span class="has-text-weight-semibold">#{{ order.id }}</span>
-                            <small class="has-text-grey">
+                            <span class="has-text-weight-bold" style="color: #1a1c29;">#{{ order.id }}</span>
+                            <small class="has-text-grey font-weight-normal">
                                 {{ order.created_at|date:'d/m H:i' }}
                             </small>
                         </div>
 
-                        <p class="mt-1">Total: ${{ order.paid_amount }}</p>
+                        <p class="mt-1 has-text-weight-semibold" style="color: #6344ff; font-size: 0.95rem;">Total: ${{ order.paid_amount }}</p>
 
-                        {% if order.status == 'pending' %}
-                            <span class="tag is-warning is-light mt-2">Pendiente</span>
-                        {% elif order.status == 'accepted' %}
-                            <span class="tag is-info is-light mt-2">Aceptada</span>
-                        {% elif order.status == 'preparing' %}
-                            <span class="tag is-link is-light mt-2">Preparando</span>
-                        {% elif order.status == 'ready' %}
-                            <span class="tag is-success is-light mt-2">Lista</span>
-                        {% elif order.status == 'delivered' %}
-                            <span class="tag is-dark is-light mt-2">Entregada</span>
-                        {% elif order.status == 'rejected' %}
-                            <span class="tag is-danger is-light mt-2">Rechazada</span>
-                        {% endif %}
+                        <!-- Mapeo de estados adaptado -->
+                        <div class="mt-2">
+                            {% if order.status == 'pending' %}
+                                <span class="tag is-warning is-light" style="font-weight: 600;">Pendiente</span>
+                            {% elif order.status == 'accepted' %}
+                                <span class="tag is-info is-light" style="font-weight: 600;">Aceptada</span>
+                            {% elif order.status == 'preparing' %}
+                                <span class="tag is-link is-light" style="font-weight: 600; background-color: #eef2ff; color: #6344ff;">En Desarrollo</span>
+                            {% elif order.status == 'ready' %}
+                                <span class="tag is-success is-light" style="font-weight: 600;">Listo para Entrega</span>
+                            {% elif order.status == 'delivered' %}
+                                <span class="tag is-dark is-light" style="font-weight: 600;">Completada</span>
+                            {% elif order.status == 'rejected' %}
+                                <span class="tag is-danger is-light" style="font-weight: 600;">Cancelada</span>
+                            {% endif %}
+                        </div>
                     </a>
                 </li>
+                {% empty %}
+                <div class="has-text-centered py-5">
+                    <p class="has-text-grey is-size-6">No hay registros entrantes.</p>
+                </div>
                 {% endfor %}
             </ul>
-
         </div>
 
     </div>
 
 
-    <!-- PANEL DERECHO -->
-    <div class="column is-9 p-6">
+    <!-- PANEL DERECHO: DETALLE DE OPERACIÓN -->
+    <div class="column is-9 p-6" style="height: 100vh; overflow-y: auto;">
 
         {% if selected_order %}
 
-        <div class="box">
+        <div class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; padding: 2.5rem; background: #ffffff;">
 
-            <h2 class="title is-3">Orden #{{ selected_order.id }}</h2>
+            <div class="is-flex is-align-items-center mb-4" style="gap: 0.5rem; border-bottom: 2px solid #f4f5f7; padding-bottom: 0.75rem;">
+                <h2 class="title is-3 mb-0" style="color: #1a1c29; font-weight: 700;">Solicitud #{{ selected_order.id }}</h2>
+            </div>
 
-            <div class="columns">
+            <div class="columns mb-5" style="font-size: 1.05rem; line-height: 1.6;">
                 <div class="column is-6">
-                    <p><strong>Cliente:</strong> {{ selected_order.first_name }} {{ selected_order.last_name }}</p>
-                    <p><strong>Dirección:</strong> {{ selected_order.address }}</p>
-                    <p><strong>Teléfono:</strong> {{ selected_order.phone }}</p>
+                    <p><strong>Usuario / Cliente:</strong> <span class="has-text-grey-dark">{{ selected_order.first_name }} {{ selected_order.last_name }}</span></p>
+                    <p><strong>Dirección de Entrega:</strong> <span class="has-text-grey-dark">{{ selected_order.address }}</span></p>
+                    <p><strong>Teléfono de Contacto:</strong> <span class="has-text-grey-dark">{{ selected_order.phone }}</span></p>
                 </div>
 
                 <div class="column is-6">
                     <p>
-                        <strong>Total:</strong>
-                        <span class="has-text-success has-text-weight-bold">
+                        <strong>Monto Neto Procesado:</strong>
+                        <span class="is-size-4 ml-1" style="color: #6344ff; font-weight: 700;">
                             ${{ selected_order.paid_amount }}
                         </span>
                     </p>
 
                     <p class="mt-2">
-                        <strong>Estado actual:</strong><br>
+                        <strong>Estado de Flujo actual:</strong><br>
 
-                        {% if selected_order.status == 'pending' %}
-                            <span class="tag is-warning is-light is-medium">Pendiente</span>
-                        {% elif selected_order.status == 'accepted' %}
-                            <span class="tag is-info is-light is-medium">Aceptada</span>
-                        {% elif selected_order.status == 'preparing' %}
-                            <span class="tag is-link is-light is-medium">Preparando</span>
-                        {% elif selected_order.status == 'ready' %}
-                            <span class="tag is-success is-light is-medium">Lista</span>
-                        {% elif selected_order.status == 'delivered' %}
-                            <span class="tag is-dark is-light is-medium">Entregada</span>
-                        {% elif selected_order.status == 'rejected' %}
-                            <span class="tag is-danger is-light is-medium">Rechazada</span>
-                        {% endif %}
+                        <span class="mt-1 inline-block">
+                            {% if selected_order.status == 'pending' %}
+                                <span class="tag is-warning is-light is-medium" style="font-weight: 600;">Pendiente</span>
+                            {% elif selected_order.status == 'accepted' %}
+                                <span class="tag is-info is-light is-medium" style="font-weight: 600;">Aceptada</span>
+                            {% elif selected_order.status == 'preparing' %}
+                                <span class="tag is-link is-light is-medium" style="font-weight: 600; background-color: #eef2ff; color: #6344ff;">En Desarrollo</span>
+                            {% elif selected_order.status == 'ready' %}
+                                <span class="tag is-success is-light is-medium" style="font-weight: 600;">Listo para Entrega</span>
+                            {% elif selected_order.status == 'delivered' %}
+                                <span class="tag is-dark is-light is-medium" style="font-weight: 600;">Completada</span>
+                            {% elif selected_order.status == 'rejected' %}
+                                <span class="tag is-danger is-light is-medium" style="font-weight: 600;">Cancelada</span>
+                            {% endif %}
+                        </span>
                     </p>
                 </div>
             </div>
 
+            <h3 class="title is-5 mb-3" style="color: #1a1c29; font-weight: 700;">📋 Desglose de Componentes / Servicios</h3>
+            
+            <div class="table-container mb-5">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <thead>
+                      <tr>
+                        <th>Elemento Publicado</th>
+                        <th style="text-align: center; width: 120px;">Cantidad</th>
+                        <th style="text-align: right; width: 150px;">Precio Unitario</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td style="font-weight: 600; color: #4a4a4a;">{{ item.product.title }}</td>
+                        <td style="text-align: center; font-weight: 600;">{{ item.quantity }}</td>
+                        <td style="text-align: right; color: #6344ff; font-weight: 600;">${{ item.price }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-            <h3 class="title is-5 mt-5">Items</h3>
-            <table class="table is-fullwidth is-striped">
-                <thead>
-                  <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio unidad</th>
-                  </tr>
-                </thead>
-                <tbody>
-                {% for item in items %}
-                <tr>
-                    <td>{{ item.product.title }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>${{ item.price }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-
-
-            <!-- CAMBIAR ESTADO -->
-            <div class="mt-6">
-                <h3 class="title is-5">Cambiar estado</h3>
+            <!-- CAMBIAR ESTADO DE FLUJO -->
+            <div class="mt-6" style="background: #fafafa; padding: 1.5rem; border-radius: 12px; border: 1px solid #e1e4e8;">
+                <h3 class="title is-5 mb-3" style="color: #1a1c29; font-weight: 700;">⚙️ Actualizar Estado de Flujo</h3>
 
                 <form id="statusForm">
                     {% csrf_token %}
                     <div class="field is-grouped">
-                        <div class="control">
-                            <div class="select is-medium">
-                                <select name="status" id="status">
-                                    <option value="accepted">Aceptar</option>
-                                    <option value="rejected">Rechazar</option>
-                                    <option value="preparing">Preparando</option>
-                                    <option value="ready">Listo para retiro</option>
-                                    <option value="delivered">Entregado</option>
+                        <div class="control is-expanded">
+                            <div class="select is-medium is-fullwidth">
+                                <select name="status" id="status" style="border-radius: 8px;">
+                                    <option value="accepted">Aceptar Solicitud</option>
+                                    <option value="preparing">Marcar como "En Desarrollo"</option>
+                                    <option value="ready">Marcar como "Listo para Entrega / Descarga"</option>
+                                    <option value="delivered">Marcar como "Completada / Entregada"</option>
+                                    <option value="rejected">Declinar / Cancelar</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="control">
-                            <button class="button is-primary is-medium">Guardar</button>
+                            <button class="button is-link is-medium" style="background-color: #6344ff; font-weight: 600; border-radius: 8px; padding-left: 2rem; padding-right: 2rem;">
+                                Guardar Parámetro
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -167,7 +212,7 @@
 
         </div>
 
-
+        <!-- SCRIPT DINÁMICO TOTALMENTE ABSTRACTIFICADO -->
         <script>
             document.getElementById("statusForm").onsubmit = function(e) {
                 e.preventDefault();
@@ -182,17 +227,23 @@
                 })
                 .then(r => r.json())
                 .then(data => {
-                    alert("Estado actualizado a: " + data.new_status);
+                    // Mensaje neutro alineado con el nuevo modelo de negocio
+                    alert("Estado de flujo actualizado exitosamente a: " + data.new_status);
                     location.reload();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Error de comunicación con la pasarela de datos");
                 });
             };
         </script>
 
-
         {% else %}
 
-        <div class="has-text-centered mt-6">
-            <p class="title is-4 has-text-grey">Selecciona una orden en la izquierda</p>
+        <!-- ESTADO VACÍO CUANDO NO HAY SELECCIÓN -->
+        <div class="has-text-centered" style="margin-top: 20vh;">
+            <span style="font-size: 4rem; color: #cbd5e1; display: block;" class="mb-4">📥</span>
+            <p class="title is-4 has-text-grey" style="font-weight: 600;">Selecciona una solicitud del panel izquierdo para verificar sus especificaciones</p>
         </div>
 
         {% endif %}

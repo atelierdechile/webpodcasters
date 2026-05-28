@@ -3,14 +3,15 @@
 
 <style>
 .admin-history {
-  padding-top: 6rem;
+  padding-top: 4rem;
+  margin-bottom: 3rem;
 }
 
 .admin-history h1 {
   text-align: center;
   font-size: 2rem;
   font-weight: 800;
-  color: #0d9488;
+  color: #6344ff; /* 🎙️ Cambiado a morado corporativo */
   margin-bottom: .4rem;
 }
 
@@ -24,9 +25,10 @@
   max-width: 1100px;
   margin: 0 auto;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 1.6rem 1.8rem;
-  box-shadow: 0 10px 25px rgba(15,23,42,.12);
+  border: 1px solid #e1e4e8;
+  box-shadow: 0 4px 12px rgba(99, 68, 255, 0.02);
 }
 
 .history-topbar {
@@ -34,7 +36,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -48,9 +50,9 @@
   align-items: center;
   justify-content: center;
   gap: .35rem;
-  padding: .55rem 1.1rem;
-  border-radius: 999px;
-  font-weight: 800;
+  padding: .55rem 1.25rem;
+  border-radius: 8px; /* Bordes de 8px consistentes */
+  font-weight: 600;
   font-size: .92rem;
   border: 1px solid transparent;
   transition: all .2s ease;
@@ -58,23 +60,28 @@
 }
 
 .btn-primary {
-  background: #0d9488;
+  background: #6344ff;
   color: #fff;
-  box-shadow: 0 8px 18px rgba(13,148,136,.18);
+  box-shadow: 0 4px 12px rgba(99, 68, 255, 0.15);
 }
-.btn-primary:hover { background: #0b7669; transform: translateY(-1px); }
+.btn-primary:hover { 
+  background: #492bdf; 
+}
 
 .btn-ghost {
   background: #fff;
-  color: #0f172a;
-  border-color: #e5e7eb;
+  color: #4a5568;
+  border-color: #cbd5e1;
 }
-.btn-ghost:hover { background: #f9fafb; transform: translateY(-1px); }
+.btn-ghost:hover { 
+  background: #f8f9fa; 
+  border-color: #94a3b8;
+}
 
 .table-wrap {
   overflow-x: auto;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  border: 1px solid #e1e4e8;
 }
 
 table {
@@ -85,93 +92,102 @@ table {
 
 thead th {
   text-align: left;
-  font-size: .85rem;
-  letter-spacing: .02em;
+  font-size: .8rem;
+  letter-spacing: .05em;
   text-transform: uppercase;
-  color: #6b7280;
-  background: #f9fafb;
-  padding: .85rem .9rem;
-  border-bottom: 1px solid #e5e7eb;
+  color: #718096;
+  background: #f8f9fa;
+  padding: .9rem;
+  border-bottom: 2px solid #e1e4e8;
+  font-weight: 600;
 }
 
 tbody td {
-  padding: .85rem .9rem;
-  border-bottom: 1px solid #f1f5f9;
-  vertical-align: top;
-  color: #0f172a;
-  font-size: .94rem;
+  padding: 1rem .9rem;
+  border-bottom: 1px solid #e1e4e8;
+  vertical-align: middle;
+  color: #1a1c29;
+  font-size: 0.95rem;
 }
 
+/* 🎙️ Feedback visual de filas en lavanda suave */
 tbody tr:hover {
-  background: rgba(13,148,136,.04);
+  background: rgba(99, 68, 255, 0.03);
 }
 
 .badge {
   display: inline-block;
-  padding: .18rem .6rem;
-  border-radius: 999px;
-  font-size: .78rem;
-  font-weight: 800;
+  padding: .2rem .65rem;
+  border-radius: 6px;
+  font-size: .75rem;
+  font-weight: 700;
   border: 1px solid transparent;
 }
 
 .badge-all {
-  background: rgba(59,130,246,.10);
-  color: #1d4ed8;
-  border-color: rgba(59,130,246,.18);
+  background: #eef2ff;
+  color: #6344ff;
+  border-color: #cbd5e1;
 }
 
 .badge-comuna {
-  background: rgba(16,185,129,.10);
-  color: #047857;
-  border-color: rgba(16,185,129,.18);
+  background: rgba(72, 95, 199, 0.1);
+  color: #485fc7;
+  border-color: rgba(72, 95, 199, 0.15);
 }
 
 .badge-vendor {
-  background: rgba(245,158,11,.12);
-  color: #92400e;
-  border-color: rgba(245,158,11,.20);
+  background: #fff8e6;
+  color: #b7791f;
+  border-color: #fbd38d;
 }
 
 .muted {
-  color: #6b7280;
-  font-size: .9rem;
+  color: #718096;
+  font-size: .88rem;
 }
 
 .link {
-  color: #0d9488;
-  font-weight: 800;
+  color: #6344ff;
+  font-weight: 600;
   text-decoration: none;
 }
-.link:hover { text-decoration: underline; }
+.link:hover { 
+  text-decoration: underline; 
+  color: #492bdf;
+}
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: .6rem;
-  margin-top: 1.3rem;
+  margin-top: 1.5rem;
   flex-wrap: wrap;
 }
 
 .page-pill {
-  padding: .45rem .75rem;
-  border-radius: 999px;
-  border: 1px solid #e5e7eb;
+  padding: .5rem .9rem;
+  border-radius: 8px;
+  border: 1px solid #e1e4e8;
   background: #fff;
-  font-weight: 800;
-  color: #0f172a;
+  font-weight: 600;
+  color: #4a5568;
   text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.2s;
 }
 
 .page-pill:hover {
-  background: #f9fafb;
+  background: #f1f5f9;
+  border-color: #94a3b8;
 }
 
+/* Estado activo de paginación lavanda */
 .page-current {
-  background: rgba(13,148,136,.10);
-  border-color: rgba(13,148,136,.25);
-  color: #0d9488;
+  background: #eef2ff;
+  border-color: #cbd5e1;
+  color: #6344ff;
 }
 
 @media (max-width: 768px) {
@@ -183,41 +199,41 @@ tbody tr:hover {
   <div class="container">
 
     <h1>🗂 Historial de Mensajería</h1>
-    <p class="subtitle">Registro de correos enviados a vendedores (fecha, filtro, asunto, adjuntos y cantidad).</p>
+    <p class="subtitle">Registro de circulares y comunicaciones enviadas a los creadores de la red (fecha, segmentación, asunto, adjuntos y alcance).</p>
 
     <div class="history-card">
       <div class="history-topbar">
         <a href="{% url 'core:admin_landing' %}" class="btn btn-ghost">← Volver al panel</a>
-        <a href="{% url 'superadmin_panel:vendor_messaging' %}" class="btn btn-primary">+ Nuevo mensaje</a>
+        <a href="{% url 'superadmin_panel:vendor_messaging' %}" class="btn btn-primary">+ Redactar mensaje</a>
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>Tipo</th>
-              <th>Destino</th>
-              <th>Asunto</th>
-              <th>Adjunto</th>
-              <th>Enviados</th>
+              <th style="width: 130px;">Fecha / Hora</th>
+              <th style="width: 140px;">Segmentación</th>
+              <th style="width: 160px;">Destinatario</th>
+              <th>Asunto / Extracto del mensaje</th>
+              <th style="width: 120px; text-align: center;">Documento</th>
+              <th style="width: 110px; text-align: center;">Alcance</th>
             </tr>
           </thead>
           <tbody>
             {% for log in page.object_list %}
               <tr>
                 <td>
-                  <div><strong>{{ log.created_at|date:"d-m-Y" }}</strong></div>
-                  <div class="muted">{{ log.created_at|time:"H:i" }}</div>
+                  <div class="has-text-weight-bold">{{ log.created_at|date:"d-m-Y" }}</div>
+                  <div class="muted">{{ log.created_at|time:"H:i" }} hrs</div>
                 </td>
 
                 <td>
                   {% if log.target_type == "all" %}
-                    <span class="badge badge-all">Todos</span>
+                    <span class="badge badge-all">General</span>
                   {% elif log.target_type == "comuna" %}
-                    <span class="badge badge-comuna">Por comuna</span>
+                    <span class="badge badge-comuna">Por zona</span>
                   {% elif log.target_type == "vendor" %}
-                    <span class="badge badge-vendor">Vendedor</span>
+                    <span class="badge badge-vendor">Creador</span>
                   {% else %}
                     <span class="badge">{{ log.target_type }}</span>
                   {% endif %}
@@ -225,24 +241,24 @@ tbody tr:hover {
 
                 <td>
                   {% if log.target_type == "all" %}
-                    <span class="muted">Todos los vendedores</span>
+                    <span class="muted">Toda la red</span>
                   {% elif log.target_type == "comuna" %}
                     <strong>{{ log.comuna|default:"-" }}</strong>
                   {% elif log.target_type == "vendor" %}
-                    <span class="muted">Vendor ID:</span> <strong>{{ log.vendor_id|default:"-" }}</strong>
+                    <span class="muted">Creador ID:</span> <strong>{{ log.vendor_id|default:"-" }}</strong>
                   {% else %}
                     <span class="muted">-</span>
                   {% endif %}
                 </td>
 
                 <td>
-                  <strong>{{ log.subject }}</strong>
-                  <div class="muted" style="margin-top:.25rem;">
+                  <strong style="color: #1a1c29;">{{ log.subject }}</strong>
+                  <div class="muted" style="margin-top:.25rem; line-height: 1.4;">
                     {{ log.body|truncatechars:90 }}
                   </div>
                 </td>
 
-                <td>
+                <td style="text-align: center;">
                   {% if log.attachment %}
                     <a class="link" href="{{ log.attachment.url }}" target="_blank" rel="noopener">
                       Descargar
@@ -252,14 +268,14 @@ tbody tr:hover {
                   {% endif %}
                 </td>
 
-                <td>
-                  <strong>{{ log.recipients_count }}</strong>
+                <td style="text-align: center;">
+                  <strong style="color: #6344ff;">{{ log.recipients_count }} enviad.</strong>
                 </td>
               </tr>
             {% empty %}
               <tr>
-                <td colspan="6" class="muted" style="padding: 1.2rem;">
-                  No hay envíos registrados todavía.
+                <td colspan="6" class="muted has-text-centered py-5" style="font-size: 1rem;">
+                  📭 No se registran circulares ni envíos procesados en la bitácora todavía.
                 </td>
               </tr>
             {% endfor %}
@@ -267,7 +283,6 @@ tbody tr:hover {
         </table>
       </div>
 
-      <!-- Paginación -->
       {% if page.paginator.num_pages > 1 %}
         <div class="pagination">
           {% if page.has_previous %}

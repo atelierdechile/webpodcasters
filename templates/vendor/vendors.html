@@ -1,28 +1,65 @@
 {% extends 'core/base.html' %}
 
-
-{% block title %}Vendors{% endblock title %}
-
+{% block title %}Creadores - Web Podcasters{% endblock title %}
 
 {% block content %}
+<div class="container mb-6" style="padding: 0 1.5rem;">
+    
+    <!-- 🔍 ENCABEZADO DEL DIRECTORIO -->
+    <div class="column is-12 has-text-centered mt-6 mb-5">
+        <h1 class="title is-2" style="color: #1a1c29; font-weight: 700;">Directorio de Creadores</h1>
+        <p class="subtitle is-6 has-text-grey mt-2">Descubre y conecta con los profesionales e iniciativas indexadas en nuestra red</p>
+        <hr style="width: 60px; height: 4px; background: #6344ff; margin: 1.5rem auto 0; border-radius: 2px;">
+    </div>
 
-    <h1 class="title">Vendedores</h1>
-
-    <div class="columns is-multiline">
+    <!-- GRId DE PERFILES -->
+    <div class="columns is-multiline style-vendor-grid">
         {% for vendor in vendors %}
 
-            <div class="column is-3">
-                <div class="box">
-                    <h2 class="subtitle">
+            <div class="column is-3 style-vendor-item">
+                <div class="box has-text-centered" style="border-radius: 12px; border: 1px solid #e1e4e8; padding: 2rem; background: #ffffff; transition: transform 0.2s, box-shadow 0.2s;">
+                    
+                    <!-- Ícono representativo por defecto -->
+                    <div class="mb-3" style="font-size: 2.5rem; color: #6344ff;">
+                        🎙️
+                    </div>
+
+                    <h2 class="subtitle is-5 is-capitalized" style="color: #1a1c29; font-weight: 700; margin-bottom: 1.5rem;">
                         {{ vendor.name }}
                     </h2>
-                    <hr>
+                    
+                    <hr style="margin: 1rem 0; background-color: #f1f3f5;">
 
-                    <a href="{% url 'vendor:vendor' vendor.id %}" class="button is-primary ">Ver Productos</a>
+                    <!-- 🔗 Enlace abstracto cambiado de is-primary (verde) a is-link (morado) -->
+                    <a href="{% url 'vendor:vendor' vendor.id %}" class="button is-link is-light is-fullwidth style-profile-btn">
+                        Ver perfil
+                    </a>
                 </div>
             </div>
 
+        {% empty %}
+            <div class="column is-12 has-text-centered py-6">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e1e4e8; padding: 3rem; max-width: 500px; margin: 0 auto;">
+                    <p class="has-text-grey is-size-5 mb-2">📭 Sin registros</p>
+                    <p class="has-text-grey-light is-size-6">
+                        Aún no se encuentran cuentas de creadores dadas de alta en el sistema.
+                    </p>
+                </div>
+            </div>
         {% endfor %}
     </div>
+</div>
 
+<!-- 🎨 ESTILOS PARA EFECTOS VISUALES -->
+<style>
+    .style-vendor-item .box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(99, 68, 255, 0.08);
+    }
+    .style-profile-btn {
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        transition: background 0.2s !important;
+    }
+</style>
 {% endblock content %}

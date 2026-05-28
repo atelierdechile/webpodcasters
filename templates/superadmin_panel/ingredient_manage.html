@@ -20,11 +20,13 @@
         display: flex;
         align-items: center;
         gap: .5rem;
+        color: #1a1c29;
       }
 
+      /* 🎙️ Cambio de look del badge de título al morado insignia */
       .ingredients-admin .page-title span.icon {
-        background: #ecfeff;
-        color: #0d9488;
+        background: #f3f0ff;
+        color: #6344ff;
         border-radius: 999px;
         padding: .35rem;
       }
@@ -38,7 +40,8 @@
         border-radius: 12px;
         padding: 1rem 1.2rem;
         background: #ffffff;
-        box-shadow: 0 6px 18px rgba(15,23,42,.05);
+        box-shadow: 0 6px 18px rgba(99, 68, 255, 0.04);
+        border: 1px solid #e1e4e8;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -55,22 +58,23 @@
       .ingredients-admin .stat-value {
         font-size: 1.4rem;
         font-weight: 700;
-        color: #0f172a;
+        color: #1a1c29;
       }
 
+      /* 🎙️ Tags informativos en tonos lavanda */
       .ingredients-admin .stat-pill {
         font-size: .75rem;
         padding: .25rem .65rem;
         border-radius: 999px;
-        background: #ecfeff;
-        color: #0d9488;
+        background: #f3f0ff;
+        color: #6344ff;
         font-weight: 600;
       }
 
       .ingredients-admin .box-elevated {
         border-radius: 16px;
-        box-shadow: 0 10px 28px rgba(15,23,42,.06);
-        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 28px rgba(15,23,42,.04);
+        border: 1px solid #e1e4e8;
       }
 
       .ingredients-admin .box-header {
@@ -86,6 +90,7 @@
         display: flex;
         align-items: center;
         gap: .4rem;
+        color: #1a1c29;
       }
 
       .ingredients-admin .box-title .tag {
@@ -93,9 +98,10 @@
       }
 
       .ingredients-admin .hint-text {
-        font-size: .8rem;
-        color: #9ca3af;
+        font-size: .85rem;
+        color: #718096;
         margin-bottom: .75rem;
+        line-height: 1.4;
       }
 
       .ingredients-admin .category-list {
@@ -117,8 +123,9 @@
         align-items: center;
         gap: .5rem;
         padding: .45rem .6rem;
-        border-radius: 999px;
-        background: #f3f4f6;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border: 1px solid #e1e4e8;
         font-size: .85rem;
         margin-bottom: .4rem;
       }
@@ -127,11 +134,12 @@
         flex: 1;
       }
 
+      /* 🎙️ Contador dinámico en morado insignia */
       .ingredients-admin .category-row .category-count {
         font-size: .75rem;
-        background: #0d9488;
+        background: #6344ff;
         color: #fff;
-        border-radius: 999px;
+        border-radius: 6px;
         padding: .15rem .55rem;
         font-weight: 600;
         white-space: nowrap;
@@ -150,11 +158,11 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: linear-gradient(90deg,#f9fafb,#f3f4f6);
+        background: linear-gradient(90deg,#f8f9fa,#f1f3f5);
       }
 
       .ingredients-admin .group-name {
-        font-size: .9rem;
+        font-size: .85rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: .05em;
@@ -186,6 +194,11 @@
         padding: .25rem .5rem;
       }
 
+      .input:focus, .select select:focus {
+        border-color: #6344ff !important;
+        box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
+      }
+
       @media (max-width: 768px) {
         .ingredients-admin {
           padding-top: 3.5rem;
@@ -193,54 +206,51 @@
       }
     </style>
 
-    <!-- BREADCRUMB -->
-    <nav class="breadcrumb mb-4" aria-label="breadcrumbs">
+    <nav class="breadcrumb mb-4" aria-label="breadcrumbs" style="font-size: 0.9rem;">
       <ul>
-        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
-        <li class="is-active"><a aria-current="page">Gestor de ingredientes</a></li>
+        <li><a href="{% url 'core:admin_landing' %}" style="color: #6344ff;">Admin</a></li>
+        <li class="is-active"><a aria-current="page" class="has-text-grey">Gestor de Parámetros</a></li>
       </ul>
     </nav>
 
-    <!-- HEADER -->
     <div class="page-header">
       <div class="level">
         <div class="level-left">
           <div>
             <h1 class="page-title">
               <span class="icon">
-                <i class="fas fa-carrot"></i>
+                <i class="fas fa-sliders-h"></i>
               </span>
-              Gestor de ingredientes
+              Gestor de Parámetros Técnicos
             </h1>
             <p class="page-subtitle">
-              Mantén actualizada la biblioteca de categorías e ingredientes que los vendedores usan en sus pizzas.
+              Mantén actualizada la biblioteca global de agrupaciones y especificaciones de compatibilidad que los creadores asignan a sus elementos.
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- STATS -->
     <div class="columns is-multiline mb-4">
       <div class="column is-12-mobile is-4-tablet is-3-desktop">
         <div class="stat-card">
           <div>
-            <p class="stat-label">Categorías</p>
+            <p class="stat-label">Grupos Base</p>
             <p class="stat-value">{{ categories|length }}</p>
           </div>
           <span class="stat-pill">
-            <i class="fas fa-layer-group"></i>&nbsp; Agrupadores
+            <i class="fas fa-folder-open"></i>&nbsp; Categorías
           </span>
         </div>
       </div>
       <div class="column is-12-mobile is-4-tablet is-3-desktop">
         <div class="stat-card">
           <div>
-            <p class="stat-label">Ingredientes</p>
+            <p class="stat-label">Especificaciones</p>
             <p class="stat-value">{{ ingredients|length }}</p>
           </div>
           <span class="stat-pill">
-            <i class="fas fa-pizza-slice"></i>&nbsp; Disponibles
+            <i class="fas fa-microchip"></i>&nbsp; Parámetros
           </span>
         </div>
       </div>
@@ -248,26 +258,25 @@
 
     {% if messages %}
       {% for message in messages %}
-        <div class="notification is-{{ message.tags }} is-light">
+        <div class="notification is-{{ message.tags }} is-light" style="border-radius: 8px;">
           {{ message }}
         </div>
       {% endfor %}
     {% endif %}
 
-    <!-- MAIN FORMS -->
     <div class="columns is-variable is-5">
-      <!-- COL 1: CATEGORÍA -->
+      
       <div class="column is-5">
         <div class="box box-elevated">
           <div class="box-header">
             <div class="box-title">
-              📂 Nueva categoría
-              <span class="tag is-info is-light">Para agrupar ingredientes</span>
+              📁 Nueva Categoría Base
+              <span class="tag is-link is-light" style="font-weight: 600;">Estructura</span>
             </div>
           </div>
 
           <p class="hint-text">
-            Usa categorías amplias como <strong>Carnes</strong>, <strong>Quesos</strong>, <strong>Salsas</strong>, <strong>Vegetales</strong>, etc.
+            Configura agrupadores amplios de sistema (ej: <strong>Sistemas Operativos</strong>, <strong>Formatos de Audio</strong>, <strong>Formatos de Video</strong>, <strong>Licencias</strong>).
           </p>
 
           <form method="post" class="mb-4">
@@ -276,9 +285,9 @@
             {{ cat_form.non_field_errors }}
 
             <div class="field">
-              <label class="label is-size-7 has-text-grey">Nombre de la categoría</label>
+              <label class="label is-size-7 has-text-grey">Nombre del agrupador</label>
               <div class="control">
-                {% render_field cat_form.name class+="input" %}
+                {% render_field cat_form.name class+="input" placeholder="Ej: Extensiones de Archivo" %}
               </div>
               {% if cat_form.name.errors %}
                 <p class="help is-danger">{{ cat_form.name.errors|join:", " }}</p>
@@ -287,30 +296,30 @@
 
             <div class="field">
               <label class="label is-size-7 has-text-grey">
-                Posición en la lista
-                <span class="tag is-light is-info is-rounded is-size-7">
-                  1 = aparece arriba
+                Posición de ordenamiento
+                <span class="tag is-light is-link is-rounded is-size-7" style="font-weight: 600;">
+                  1 = Superior
                 </span>
               </label>
               <div class="control">
                 {% render_field cat_form.ordering class+="input" %}
               </div>
-              <p class="help is-size-7">
-                Deja el valor sugerido si no quieres ordenar nada: se colocará al final automáticamente.
+              <p class="help is-size-7 has-text-grey-light">
+                Deja el valor por defecto si deseas indexarlo al final del listado automático.
               </p>
               {% if cat_form.ordering.errors %}
                 <p class="help is-danger">{{ cat_form.ordering.errors|join:", " }}</p>
               {% endif %}
             </div>
 
-            <div class="field mt-3">
-              <button type="submit" class="button is-link is-fullwidth">
-                ➕ Agregar categoría
+            <div class="field mt-4">
+              <button type="submit" class="button is-link is-fullwidth" style="background-color: #6344ff; font-weight: 600; border-radius: 8px;">
+                ➕ Indexar Agrupador
               </button>
             </div>
           </form>
 
-          <h3 class="subtitle is-6 has-text-grey">Categorías existentes</h3>
+          <h3 class="subtitle is-6 has-text-weight-bold has-text-grey mb-3">Agrupadores dados de alta</h3>
           <div class="category-list">
             {% for c in categories %}
               {% with count=c.ingredients.count %}
@@ -325,11 +334,12 @@
                     name="name"
                     value="{{ c.name }}"
                     class="input is-small"
-                    placeholder="Nombre de la categoría">
+                    style="border-radius: 4px;"
+                    placeholder="Nombre del agrupador">
                 </div>
 
                 <span class="category-count">
-                  {{ count }} ing.
+                  {{ count }} parám.
                 </span>
 
                 <div class="buttons are-small">
@@ -337,41 +347,42 @@
                     type="submit"
                     name="submit_type"
                     value="update"
-                    class="button is-link is-light">
-                    Guardar
+                    class="button is-link is-light"
+                    style="font-weight: 600;">
+                    Opciones
                   </button>
                   <button 
                     type="submit"
                     name="submit_type"
                     value="delete"
                     class="button is-danger is-light"
-                    onclick="return confirm('¿Seguro que quieres eliminar esta categoría? Los ingredientes quedarán sin categoría.');">
+                    style="font-weight: 600;"
+                    onclick="return confirm('¿Confirmas la eliminación de esta categoría? Las especificaciones dependientes quedarán huérfanas temporalmente.');">
                     Eliminar
                   </button>
                 </div>
               </form>
               {% endwith %}
             {% empty %}
-              <p class="has-text-grey is-size-7">
-                Aún no hay categorías creadas.
+              <p class="has-text-grey is-size-7 text-center py-3">
+                No se encuentran categorías base indexadas.
               </p>
             {% endfor %}
           </div>
         </div>
       </div>
 
-      <!-- COL 2: INGREDIENTE -->
       <div class="column is-7">
         <div class="box box-elevated">
           <div class="box-header">
             <div class="box-title">
-              🧀 Nuevo ingrediente
-              <span class="tag is-primary is-light">Usado en las pizzas</span>
+              ⚙️ Nueva Especificación Técnica
+              <span class="tag is-link is-light" style="font-weight: 600; background-color: #eef2ff; color: #6344ff;">Variables</span>
             </div>
           </div>
 
           <p class="hint-text">
-            Primero elige la categoría y luego escribe el nombre del ingrediente.
+            Asocia un parámetro específico a su respectivo agrupador maestro para habilitar los filtros del catálogo.
           </p>
 
           <form method="post" class="mb-4">
@@ -380,9 +391,11 @@
             {{ ing_form.non_field_errors }}
 
             <div class="field">
-              <label class="label is-size-7 has-text-grey">Categoría</label>
+              <label class="label is-size-7 has-text-grey">Agrupador Maestro</label>
               <div class="control">
-                {% render_field ing_form.category class+="select" %}
+                <div class="select is-fullwidth">
+                  {% render_field ing_form.category %}
+                </div>
               </div>
               {% if ing_form.category.errors %}
                 <p class="help is-danger">{{ ing_form.category.errors|join:", " }}</p>
@@ -390,23 +403,23 @@
             </div>
 
             <div class="field">
-              <label class="label is-size-7 has-text-grey">Nombre del ingrediente</label>
+              <label class="label is-size-7 has-text-grey">Nombre del Parámetro / Especificación</label>
               <div class="control">
-                {% render_field ing_form.name class+="input" %}
+                {% render_field ing_form.name class+="input" placeholder="Ej: Windows 11, WAV 24-bit, Licencia Comercial" %}
               </div>
               {% if ing_form.name.errors %}
                 <p class="help is-danger">{{ ing_form.name.errors|join:", " }}</p>
               {% endif %}
             </div>
 
-            <div class="field mt-3">
-              <button type="submit" class="button is-primary is-fullwidth">
-                ➕ Agregar ingrediente
+            <div class="field mt-4">
+              <button type="submit" class="button is-link is-fullwidth" style="background-color: #485fc7; font-weight: 600; border-radius: 8px;">
+                ➕ Registrar Parámetro
               </button>
             </div>
           </form>
 
-          <h3 class="subtitle is-6 has-text-grey mb-2">Ingredientes por categoría</h3>
+          <h3 class="subtitle is-6 has-text-weight-bold has-text-grey mb-3">Especificaciones ordenadas por Agrupador</h3>
 
           {% regroup ingredients by category as ingredient_groups %}
 
@@ -418,11 +431,11 @@
                     {% if group.grouper %}
                       {{ group.grouper.name }}
                     {% else %}
-                      Sin categoría
+                      Sin clasificación asignada
                     {% endif %}
                   </div>
-                  <span class="tag is-light">
-                    {{ group.list|length }} ingrediente{{ group.list|length|pluralize:"s" }}
+                  <span class="tag is-link is-light" style="font-weight: 600;">
+                    {{ group.list|length }} parámetro{{ group.list|length|pluralize:"s" }}
                   </span>
                 </div>
                 <div class="group-body">
@@ -438,7 +451,8 @@
                           name="name"
                           value="{{ ing.name }}"
                           class="input is-small"
-                          placeholder="Nombre del ingrediente">
+                          style="border-radius: 4px;"
+                          placeholder="Nombre de la especificación">
                       </div>
 
                       <div class="buttons are-small">
@@ -446,7 +460,8 @@
                           type="submit"
                           name="submit_type"
                           value="update"
-                          class="button is-link is-light">
+                          class="button is-link is-light"
+                          style="font-weight: 600;">
                           Guardar
                         </button>
                         <button
@@ -454,7 +469,8 @@
                           name="submit_type"
                           value="delete"
                           class="button is-danger is-light"
-                          onclick="return confirm('¿Seguro que quieres eliminar este ingrediente?');">
+                          style="font-weight: 600;"
+                          onclick="return confirm('¿Confirmas la eliminación de este parámetro del sistema global?');">
                           Eliminar
                         </button>
                       </div>
@@ -464,9 +480,11 @@
               </div>
             {% endfor %}
           {% else %}
-            <p class="has-text-grey is-size-7">
-              Aún no hay ingredientes registrados.
-            </p>
+            <div class="has-text-centered py-4">
+              <p class="has-text-grey is-size-7">
+                No se registran parámetros de especificación en el sistema.
+              </p>
+            </div>
           {% endif %}
         </div>
       </div>

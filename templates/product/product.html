@@ -4,111 +4,113 @@
 
 {% block content %}
 
-<div class="columns is-centered">
+<div class="columns is-centered container" style="margin: 0 auto; padding: 2rem 1rem;">
   <div class="column is-8">
 
-    <!-- 📸 Imagen -->
+    <!-- 📸 Imagen de Elemento -->
     {% if product.image %}
-      <figure class="image mb-5" style="max-width: 420px;">
-        <img src="{{ product.image.url }}" alt="{{ product.title }}" style="border-radius: 12px;">
+      <figure class="image mb-5" style="max-width: 420px; background-color: #f5f6fa; border-radius: 12px; overflow: hidden; border: 1px solid #e1e4e8;">
+        <img src="{{ product.image.url }}" alt="{{ product.title }}" style="width: 100%; object-fit: cover;">
       </figure>
     {% endif %}
 
-    <!-- 🧀 Título -->
-    <h1 class="title mb-2">{{ product.title }}</h1>
+    <!-- 🎙️ Título Principal -->
+    <h1 class="title is-2 mb-2" style="color: #1a1c29; font-weight: 700;">{{ product.title }}</h1>
 
-    <!-- 🔥 PRECIO -->
-    <p class="is-size-5 has-text-weight-semibold mb-3">
+    <!-- 🔥 FLUJO DE PRECIOS ADAPTADO -->
+    <p class="is-size-4 has-text-weight-bold mb-4" style="color: #6344ff;">
 
       {% if product.active_offer %}
 
         {% if product.active_offer.is_2x1 %}
-          <!-- 💥 OFERTA 2×1 -->
-          <span class="has-text-grey-light" style="text-decoration: line-through;">
+          <!-- OFERTA 2×1 -->
+          <span class="has-text-grey-light" style="text-decoration: line-through; font-size: 1.1rem; font-weight: normal;">
             {{ currency_symbol }}{{ product.price }}
           </span>
 
-          <span class="has-text-danger ml-2">
+          <span class="ml-2" style="color: #6344ff;">
             {{ currency_symbol }}{{ product.get_final_price }} c/u
           </span>
 
-          <span class="is-size-6 has-text-grey ml-1">{{ currency_code }}</span>
+          <span class="is-size-6 has-text-grey font-weight-normal ml-1">{{ currency_code }}</span>
 
-          <span class="tag is-danger is-light ml-2">
-            🔥 2×1 activo
+          <span class="tag is-link is-light ml-2" style="font-weight: 600;">
+            ✨ Beneficio duplicado activo
           </span>
 
-          <p class="is-size-6 has-text-success mt-1">Llévate 2, paga 1 🍕</p>
+          <p class="is-size-6 has-text-link mt-1" style="font-weight: 600;">Promoción especial activa para este elemento ✨</p>
 
         {% else %}
-          <!-- 💸 OFERTA NORMAL -->
-          <span class="has-text-grey-light" style="text-decoration: line-through;">
+          <!-- OFERTA NORMAL PORCENTUAL -->
+          <span class="has-text-grey-light" style="text-decoration: line-through; font-size: 1.1rem; font-weight: normal;">
             {{ currency_symbol }}{{ product.price }}
           </span>
 
-          <span class="has-text-danger ml-2">
+          <span class="ml-2" style="color: #6344ff;">
             {{ currency_symbol }}{{ product.get_final_price }}
           </span>
 
-          <span class="is-size-6 has-text-grey ml-1">{{ currency_code }}</span>
+          <span class="is-size-6 has-text-grey font-weight-normal ml-1">{{ currency_code }}</span>
 
-          <span class="tag is-danger is-light ml-2">
-            🔥 Oferta activa -{{ product.get_offer_percentage }}%
+          <span class="tag is-link ml-2" style="font-weight: 600; background-color: #485fc7; color: white;">
+            💥 Promo -{{ product.get_offer_percentage }}%
           </span>
         {% endif %}
 
       {% else %}
-        <!-- Precio normal -->
-        {{ currency_symbol }}{{ product.price }}
-        <span class="is-size-6 has-text-grey ml-1">{{ currency_code }}</span>
+        <!-- Precio normal sin descuento -->
+        <span style="color: #4a4a4a;">{{ currency_symbol }}{{ product.price }}</span>
+        <span class="is-size-6 has-text-grey font-weight-normal ml-1">{{ currency_code }}</span>
       {% endif %}
 
     </p>
 
-    <!-- 🏷 Vendedor + preferencias -->
-    <p class="mb-3">
-      <span class="tag is-dark">{{ product.vendor.name }}</span>
+    <!-- 🏷️ Vendedor / Perfil + Etiquetas Técnicas -->
+    <div class="tags mb-4">
+      <span class="tag is-dark" style="font-weight: 600; border-radius: 6px;">{{ product.vendor.name }}</span>
 
       {% for pref in product.preferences.all %}
-        <span class="tag is-success is-light ml-1">
+        <span class="tag is-link is-light ml-1 style-pref-tag">
           {% if pref.name|lower == "vegana" %}
-            🌱 {{ pref.name }}
+            💻 {{ pref.name }}
           {% elif pref.name|lower == "sin gluten" %}
-            🌾 {{ pref.name }}
+            ⚙️ {{ pref.name }}
           {% else %}
-            🍕 {{ pref.name }}
+            📦 {{ pref.name }}
           {% endif %}
         </span>
       {% endfor %}
+    </div>
+
+    <!-- Descripción técnica -->
+    <p class="content has-text-grey-dark mb-5" style="line-height: 1.6; font-size: 1.05rem;">
+      {{ product.description }}
     </p>
 
-    <p class="mb-5">{{ product.description }}</p>
+    <hr style="background-color: #e1e4e8;">
 
-    <hr>
-
-    {# ⚠️ BLOQUE DE ALERTA DE ALERGIA EN LA MISMA PÁGINA #}
+    {# ⚙️ CAMUFLAJE: BLOQUE DE ALERTA DE ALERGIA TRATADO COMO INCOMPATIBILIDAD #}
     {% if allergy_warning %}
-      <div class="notification is-danger is-light" style="border-radius: 12px; padding: 20px;">
-        <h3 class="title is-5 mb-2">⚠️ Posible alergia detectada</h3>
+      <div class="notification is-warning is-light" style="border-radius: 12px; padding: 24px; border: 1px solid #ffe08a;">
+        <h3 class="title is-5 mb-2" style="color: #8a6d00;">⚠️ Advertencia de compatibilidad detectada</h3>
 
         <p class="mb-3">
-          La pizza <strong>{{ product.title }}</strong> contiene ingredientes asociados
-          a tus alergias registradas:
+          El elemento <strong>{{ product.title }}</strong> contiene especificaciones o requerimientos asociados a filtros de exclusión en tu perfil:
         </p>
 
-        <ul class="mb-4" style="margin-left: 1rem;">
+        <ul class="mb-4" style="margin-left: 1.5rem; list-style-type: square;">
           {% for c in conflicts %}
             <li>
-              <strong>{{ c.allergy.name }}</strong>:
+              <strong>Filtro de {{ c.allergy.name }}</strong>:
               {% for ing in c.ingredients %}
-                {{ ing.name }}{% if not forloop.last %}, {% endif %}
+                <span class="tag is-white" style="border: 1px solid #ccc; border-radius: 4px;">{{ ing.name }}</span>{% if not forloop.last %} {% endif %}
               {% endfor %}
             </li>
           {% endfor %}
         </ul>
 
-        <p class="mb-4">
-          Si no estás seguro, te recomendamos <strong>no continuar</strong> con esta pizza.
+        <p class="mb-4 is-size-6">
+          Te sugerimos verificar las características para asegurar que se acople de forma óptima a tu entorno técnico.
         </p>
 
         <form method="post" class="mt-2">
@@ -117,20 +119,20 @@
           <input type="hidden" name="ignore_allergy_warning" value="1">
 
           <div class="buttons">
-            <a href="" class="button">
-              Cancelar
+            <a href="" class="button is-light" style="font-weight: 600; border-radius: 8px;">
+              Revisar opciones
             </a>
-            <button class="button is-danger">
-              Agregar igual 🛒
+            <button class="button is-warning" style="font-weight: 600; border-radius: 8px; color: #534000;">
+              Ignorar y agregar 🛒
             </button>
           </div>
         </form>
       </div>
-      <hr>
+      <hr style="background-color: #e1e4e8;">
     {% endif %}
 
     <!-- 🛒 Agregar al carrito -->
-    <form method="post">
+    <form method="post" class="mt-4">
       {% csrf_token %}
       <div class="field has-addons">
         <div class="control">
@@ -138,23 +140,24 @@
             type="number" 
             name="quantity" 
             value="{{ quantity|default:1 }}" 
-            class="input" 
-            min="1">
+            class="input style-qty-input" 
+            min="1"
+            style="max-width: 80px; font-weight: 600; text-align: center; border-radius: 8px 0 0 8px;">
         </div>
         <div class="control">
-          <button class="button is-dark is-uppercase">
+          <button class="button is-link style-cart-btn">
             Agregar al carrito 🛒
           </button>
         </div>
       </div>
     </form>
 
-    <hr>
+    <hr style="background-color: #e1e4e8; margin: 3rem 0;">
 
-    <!-- 🧩 Productos Similares -->
+    <!-- 🧩 Elementos Similares -->
     {% if similar_products %}
       <div class="mt-6">
-        <h2 class="subtitle mb-4">Productos Similares 🍕</h2>
+        <h2 class="title is-4 mb-4" style="color: #1a1c29; font-weight: 700;">Elementos Similares ✨</h2>
         <div class="columns is-multiline">
           {% for product in similar_products %}
             {% include 'product/parts/list_item.html' %}
@@ -163,10 +166,10 @@
       </div>
     {% endif %}
 
-    <!-- 💚 Recomendaciones -->
+    <!-- 💜 Recomendaciones Personalizadas -->
     {% if recommended_products %}
       <div class="mt-6">
-        <h2 class="subtitle mb-4">Recomendaciones para ti 💚</h2>
+        <h2 class="title is-4 mb-4" style="color: #6344ff; font-weight: 700;">Recomendaciones para ti ⚡</h2>
         <div class="columns is-multiline">
           {% for rec in recommended_products %}
             {% include 'product/parts/list_item.html' with product=rec %}
@@ -179,12 +182,26 @@
 </div>
 
 <style>
-  .tag.is-success.is-light {
-    font-size: .9rem;
-    border-radius: 10px;
+  /* Estilos específicos de consistencia visual */
+  .style-pref-tag {
+    font-size: .9rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
   }
-  .button.is-dark:hover {
-    background-color: #222;
+  .style-cart-btn {
+    background-color: #6344ff !important;
+    font-weight: 600 !important;
+    border-radius: 0 8px 8px 0 !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    transition: background 0.2s !important;
+  }
+  .style-cart-btn:hover {
+    background-color: #492bdf !important;
+  }
+  .style-qty-input:focus, .style-qty-input:active {
+    border-color: #6344ff !important;
+    box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
   }
 </style>
 

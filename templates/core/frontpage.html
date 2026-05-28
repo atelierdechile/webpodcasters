@@ -1,23 +1,22 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Pizza Marketplace 🍕{% endblock title %}
+{% block title %}Web Podcasters 🎙️{% endblock title %}
 
 {% block content %}
 
-<!-- 🔥 HERO -->
-<section class="hero is-small" style="background: linear-gradient(120deg, #ff914d 0%, #ff4d4d 100%);">
+<section class="hero is-small" style="background: linear-gradient(120deg, #1a1c29 0%, #6344ff 100%);">
   <div class="hero-body py-5">
     <div class="container has-text-centered" style="margin-top: -20px;">
       <h1 class="title is-2 has-text-white has-text-weight-bold mb-2">
-        🍕 Bienvenido al Marketplace de Pizzas
+        🎙️ Bienvenido al Marketplace de Podcasts
       </h1>
       <p class="subtitle is-5 has-text-light mb-3 mt-1">
-        Descubre las mejores pizzas artesanales de tu país
+        Descubre los mejores servicios de edición y equipo de audio de tu país
       </p>
 
       {% if not user.is_authenticated %}
       <div class="box p-4 has-text-centered"
-           style="border-radius: 16px; max-width: 450px; margin: 0 auto;">
+           style="border-radius: 16px; max-width: 450px; margin: 0 auto; background-color: #ffffff;">
         <h2 class="title is-5 mb-3">Selecciona tu país para comenzar 🌎</h2>
 
         <form method="get" class="is-inline-block">
@@ -43,29 +42,27 @@
 </section>
 
 
-<!--PRODUCTOS RECIENTES -->
-<section class="section" style="background-color: #fdfdfd; margin-top: -60px;">
+<section class="section" style="background-color: #f5f6fa; margin-top: -60px;">
   <div class="container">
 
     <div class="has-text-centered mb-6">
-      <h2 class="title is-2 has-text-dark mb-2">🔥 Últimos productos</h2>
+      <h2 class="title is-2 has-text-dark mb-2">✨ Últimos lanzamientos</h2>
       <p class="subtitle is-5 has-text-grey mt-1">
-        Pizzas recién salidas del horno
+        Servicios y productos recién agregados a la red
       </p>
-      <hr class="is-centered" style="width: 80px; border: 2px solid #ff914d;">
+      <hr class="is-centered" style="width: 80px; border: 2px solid #6344ff;">
     </div>
 
-    <!-- 🧠 FILTRO DE PREFERENCIAS -->
     {% if user.is_authenticated and user.profile.preferences.count > 0 %}
     <div class="has-text-centered mb-5">
       {% if solo_pref %}
         <a href="?" class="button is-light is-rounded">
-          👀 Ver todas las pizzas
+          👀 Ver todo el catálogo
         </a>
-        <p class="has-text-grey mt-2">Mostrando solo pizzas según tus preferencias 🍃</p>
+        <p class="has-text-grey mt-2">Mostrando contenido según tus preferencias de audio 🎧</p>
       {% else %}
-        <a href="?solo_pref=1" class="button is-success is-light is-rounded">
-          🌱 Ver solo mis preferencias
+        <a href="?solo_pref=1" class="button is-link is-light is-rounded">
+          🎵 Ver solo mis intereses
         </a>
       {% endif %}
     </div>
@@ -75,7 +72,7 @@
       <div class="columns is-multiline">
         {% for product in newest_products %}
         <div class="column is-3-desktop is-6-tablet">
-          <div class="card product-card" style="border-radius: 16px; overflow: hidden;">
+          <div class="card product-card" style="border-radius: 16px; overflow: hidden; background: white;">
 
             <div class="card-image" style="position: relative;">
               <figure class="image is-4by3">
@@ -84,14 +81,14 @@
 
               {% if product.active_offer %}
                 {% if product.active_offer.is_2x1 %}
-                  <span class="tag is-danger is-medium" 
-                        style="position:absolute; top:10px; left:10px;">
-                    🔥 2×1
+                  <span class="tag is-link is-medium" 
+                        style="position:absolute; top:10px; left:10px; background-color: #6344ff;">
+                    📢 2×1 Promo
                   </span>
                 {% else %}
-                  <span class="tag is-danger is-medium" 
+                  <span class="tag is-info is-medium" 
                         style="position:absolute; top:10px; left:10px;">
-                    🔥 Oferta
+                    💎 Especial
                   </span>
                 {% endif %}
               {% endif %}
@@ -100,7 +97,6 @@
             <div class="card-content has-text-centered">
               <h3 class="title is-5 mb-2">{{ product.title }}</h3>
 
-              <!-- 🔥 PRECIOS -->
               {% if product.active_offer %}
 
                 {% if product.active_offer.is_2x1 %}
@@ -109,7 +105,7 @@
                       {{ product.price }}
                     </span>
                     <br>
-                    <span class="has-text-danger has-text-weight-bold is-size-5">
+                    <span class="has-text-link has-text-weight-bold is-size-5">
                       {{ product.get_final_price }} c/u (2×1)
                     </span>
                   </p>
@@ -120,7 +116,7 @@
                       {{ product.price }}
                     </span>
                     <br>
-                    <span class="has-text-danger has-text-weight-bold is-size-5">
+                    <span class="has-text-link has-text-weight-bold is-size-5">
                       {{ product.get_final_price }}
                     </span>
                   </p>
@@ -133,8 +129,8 @@
               {% endif %}
 
               <a href="{% url 'product:product' product.category.slug product.slug %}"
-                 class="button is-warning is-light is-small mt-3">
-                Ver pizza 🍕
+                 class="button is-link is-light is-small mt-3">
+                Ver detalles 🎧
               </a>
             </div>
 
@@ -147,37 +143,34 @@
     {% elif selected_country %}
       <div class="has-text-centered mt-6">
         <p class="has-text-grey">
-          🚫 No hay productos disponibles en este país por ahora.
+          🚫 No hay contenido disponible en este país por ahora.
         </p>
       </div>
 
     {% elif not user.is_authenticated %}
       <div class="has-text-centered mt-6">
         <p class="has-text-grey">
-          Selecciona un país para comenzar a ver pizzas.
+          Selecciona un país para explorar los creadores.
         </p>
       </div>
 
     {% else %}
       <div class="has-text-centered mt-6">
-        <p class="has-text-grey">No hay productos disponibles por el momento 🍕</p>
+        <p class="has-text-grey">No hay productos ni servicios disponibles por el momento 🎙️</p>
       </div>
     {% endif %}
   </div>
 </section>
 
 
-
-
-
-<!-- 🎨 ESTILOS -->
 <style>
   .product-card {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: 1px solid #e1e4e8;
   }
   .product-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(99, 68, 255, 0.15);
   }
 
   .hero.is-small {
@@ -205,12 +198,12 @@
 {% if user.is_authenticated %}
 
 <style>
-    /* BURBUJA */
+    /* BURBUJA CHAT (Estilo Morado) */
     #chat-bubble {
         position: fixed;
         bottom: 25px;
         right: 25px;
-        background: #ff5733;
+        background: #6344ff;
         width: 60px;
         height: 60px;
         border-radius: 50%;
@@ -221,7 +214,7 @@
         font-size: 28px;
         cursor: pointer;
         z-index: 9999;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 10px rgba(99, 68, 255, 0.3);
     }
 
     /* VENTANA DEL CHAT */
@@ -242,7 +235,7 @@
     }
 
     #chat-header {
-        background: #ff5733;
+        background: #6344ff;
         color: white;
         text-align: center;
         padding: 10px;
@@ -259,7 +252,7 @@
     .chat-user {
         text-align: right;
         margin: 6px 0;
-        background: #ffe5d0;
+        background: #e8e5ff;
         padding: 6px 10px;
         display: inline-block;
         border-radius: 8px;
@@ -316,18 +309,18 @@
 <div id="chat-bubble">💬</div>
 
 <div id="chat-window">
-    <div id="chat-header">🤖 Asistente PizzaBot</div>
+    <div id="chat-header">🤖 Asistente PodcastBot</div>
 
     <div id="quick-actions">
-        <button class="quick-btn" onclick="window.location.href='/vendor/preferences/'">🧀 Editar mis preferencias</button>
+        <button class="quick-btn" onclick="window.location.href='/vendor/preferences/'">🎙️ Editar mis preferencias</button>
         <button class="quick-btn" onclick="window.location.href='/cart/'">🛒 Ver mi carrito</button>
-        <button class="quick-btn" onclick="window.location.href='/vendor/profile/'">👤 Mi perfil</button>
+        <button class="quick-btn" onclick="window.location.href='/vendor/profile/'">👤 Mi perfil de creador</button>
     </div>
 
     <div id="chat-messages"></div>
 
     <div id="chat-input-area">
-        <input id="chat-input" placeholder="¿Qué dudas tienes sobre nuestra página?">
+        <input id="chat-input" placeholder="¿Qué dudas tienes sobre nuestra plataforma?">
         <button onclick="sendChat()">➤</button>
     </div>
 </div>
@@ -378,6 +371,4 @@ document.getElementById("chat-input").addEventListener("keypress", function(e) {
 
 {% endif %}
 
-
 {% endblock scripts %}
-

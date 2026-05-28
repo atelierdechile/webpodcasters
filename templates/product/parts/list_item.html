@@ -1,96 +1,111 @@
 <div class="column is-3 product-list-item">
-    <div class="box" style="position: relative; overflow: hidden;">
+    <div class="box" style="position: relative; overflow: hidden; border-radius: 12px; border: 1px solid #e1e4e8; transition: transform 0.2s, box-shadow 0.2s;">
 
-        <!-- 🔥 BADGE DE OFERTA -->
+        <!-- 🔥 BADGE DE PROMO/OFERTA -->
         {% if product.active_offer %}
             
             {% if product.active_offer.is_2x1 %}
-                <!-- ⭐ BADGE 2x1 -->
+                <!-- ⭐ BADGE 2x1 (Morado Destacado) -->
                 <span style="
                     position:absolute;
                     top:10px;
                     left:10px;
-                    background:#ff0000;
+                    background:#6344ff;
                     color:white;
                     padding:4px 12px;
                     font-size:0.85rem;
                     border-radius:6px;
                     font-weight:700;
                     z-index:5;">
-                    2×1 🔥
+                    2×1 ✨
                 </span>
 
             {% else %}
-                <!-- ⭐ BADGE DESCUENTO NORMAL -->
+                <!-- ⭐ BADGE DESCUENTO NORMAL (Azul Eléctrico) -->
                 <span style="
                     position:absolute;
                     top:10px;
                     left:10px;
-                    background:#ff4444;
+                    background:#485fc7;
                     color:white;
                     padding:4px 12px;
                     font-size:0.8rem;
                     border-radius:6px;
                     font-weight:600;
                     z-index:5;">
-                    🔥 Oferta -{{ product.get_offer_percentage }}%
+                    💥 Promo -{{ product.get_offer_percentage }}%
                 </span>
             {% endif %}
 
         {% endif %}
 
-        <!-- 📸 Imagen -->
-        <figure class="image is-4by3 mb-4">
-            <img src="{{ product.get_thumbnail }}" alt="{{ product.title }}">
+        <!-- 📸 Imagen de Catálogo -->
+        <figure class="image is-4by3 mb-4" style="background-color: #f5f6fa; border-radius: 8px; overflow: hidden;">
+            <img src="{{ product.get_thumbnail }}" alt="{{ product.title }}" style="object-fit: cover;">
         </figure>
 
-        <!-- 🧀 Nombre -->
-        <h2 class="subtitle">{{ product.title }}</h2>
+        <!-- 🎙️ Identificador / Título -->
+        <h2 class="subtitle has-text-weight-bold mb-2" style="font-size: 1.1rem; color: #1a1c29;">{{ product.title }}</h2>
 
-        <!-- 💰 Precio -->
+        <!-- 💰 Precio Unificado -->
         <h3 class="price is-size-6 mb-5">
 
             {% if product.active_offer %}
 
                 {% if product.active_offer.is_2x1 %}
-                    <!-- 💥 Precio normal tachado -->
-                    <span style="text-decoration: line-through; color:#999;">
+                    <!-- Precio original tachado -->
+                    <span style="text-decoration: line-through; color:#9ca3af; font-size: 0.9rem;">
                         {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.price }}
                     </span>
 
-                    <!-- 💥 Precio final por unidad -->
-                    <span style="color:#d10000; font-weight:700; margin-left:6px;">
+                    <!-- Precio final por unidad -->
+                    <span style="color:#6344ff; font-weight:700; margin-left:6px; font-size: 1.1rem;">
                         {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.get_final_price }}
                     </span>
 
                     <br>
-                    <small style="color:#555;">Llévate 2, paga 1 🍕</small>
+                    <small style="color:#6b7280; font-size: 0.8rem;">Promoción duplicada activa ✨</small>
 
                 {% else %}
-                    <!-- 💸 Oferta normal -->
-                    <span style="text-decoration: line-through; color:#999;">
+                    <!-- Oferta porcentual -->
+                    <span style="text-decoration: line-through; color:#9ca3af; font-size: 0.9rem;">
                         {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.price }}
                     </span>
 
-                    <span style="color:#d10000; font-weight:700; margin-left:6px;">
+                    <span style="color:#6344ff; font-weight:700; margin-left:6px; font-size: 1.1rem;">
                         {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.get_final_price }}
                     </span>
                 {% endif %}
 
             {% else %}
-                <!-- Precio normal -->
-                {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.price }}
+                <!-- Precio base estándar -->
+                <span style="font-weight: 600; color: #4a4a4a;">
+                    {{ product.vendor.created_by.profile.country.currency_symbol }} {{ product.price }}
+                </span>
             {% endif %}
 
         </h3>
 
-        <hr>
+        <hr style="margin: 0.75rem 0;">
 
-        <!-- 🔗 Botón -->
+        <!-- 🔗 Botón de Acción Neutro -->
         <a href="{% url 'product:product' product.category.slug product.slug %}" 
-           class="button is-dark is-uppercase">
-            Ver pizza
+           class="button is-link is-light is-fullwidth style-btn">
+            Ver detalles
         </a>
 
     </div>
 </div>
+
+<style>
+  /* Animación sutil de elevación al pasar el mouse por encima */
+  .product-list-item .box:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(99, 68, 255, 0.08);
+  }
+  .style-btn {
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+      transition: background 0.2s !important;
+  }
+</style>

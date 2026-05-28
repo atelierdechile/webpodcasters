@@ -2,68 +2,84 @@
 
 {% block content %}
 <section class="section">
-  <div class="container">
+  <div class="container" style="max-width: 1000px;">
 
-    <nav class="breadcrumb mb-4" aria-label="breadcrumbs">
+    <nav class="breadcrumb mb-4" aria-label="breadcrumbs" style="font-size: 0.9rem;">
       <ul>
-        <li><a href="{% url 'core:admin_landing' %}">Admin</a></li>
-        <li><a href="{% url 'superadmin_panel:customer_list' %}">Compradores</a></li>
-        <li class="is-active"><a aria-current="page">Listado de Compradores</a></li>
+        <li><a href="{% url 'core:admin_landing' %}" style="color: #6344ff;">Admin</a></li>
+        <li><a href="{% url 'superadmin_panel:customer_list' %}" style="color: #6344ff;">Usuarios</a></li>
+        <li class="is-active"><a aria-current="page" class="has-text-grey">Listado General</a></li>
       </ul>
     </nav>
 
-    <h1 class="title is-4 mb-4">🧑‍🤝‍🧑 Listado de Compradores</h1>
+    <h1 class="title is-4 mb-4" style="color: #1a1c29; font-weight: 700;">
+      🧑‍🤝‍🧑 Gestión de Cuentas de Usuario
+    </h1>
 
-    <div class="box">
-      <table class="table is-fullwidth is-striped is-hoverable">
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Correo electrónico</th>
-            <th style="width: 200px;">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for customer in customers %}
+    <div class="box" style="border-radius: 12px; border: 1px solid #e1e4e8; padding: 1.5rem; background: #ffffff;">
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
             <tr>
-              <td>{{ customer.username }}</td>
-              <td>{{ customer.email|default:"—" }}</td>
-              <td>
-                <div class="buttons are-small">
-                  <!-- Editar -->
-                  <a
-                    href="{% url 'superadmin_panel:customer_edit' customer.id %}"
-                    class="button is-info is-light"
-                  >
-                    ✏️ Editar
-                  </a>
+              <th>Identificador / Usuario</th>
+              <th>Correo electrónico</th>
+              <th style="width: 220px; text-align: center;">Acciones Administrativas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for customer in customers %}
+              <tr>
+                <td style="vertical-align: middle; font-weight: 600; color: #4a4a4a;">
+                  {{ customer.username }}
+                </td>
+                <td style="vertical-align: middle; color: #6b7280;">
+                  {{ customer.email|default:"—" }}
+                </td>
+                <td style="text-align: center; vertical-align: middle;">
+                  <div class="buttons is-centered are-small">
+                    
+                    <a href="{% url 'superadmin_panel:customer_edit' customer.id %}"
+                       class="button is-link is-light" style="font-weight: 600; border-radius: 6px;">
+                      ✏️ Editar
+                    </a>
 
-                  <!-- Eliminar -->
-                  <form
-                    method="post"
-                    action="{% url 'superadmin_panel:customer_delete' customer.id %}"
-                    style="display:inline;"
-                    onsubmit="return confirm('⚠️ ¿Estás seguro de que deseas eliminar este comprador?\n\nEsta acción no se puede deshacer.');"
-                  >
-                    {% csrf_token %}
-                    <button type="submit" class="button is-danger is-light">
-                      🗑️ Eliminar
-                    </button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="3" class="has-text-centered has-text-grey">
-                No hay compradores registrados.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                    <form method="post"
+                          action="{% url 'superadmin_panel:customer_delete' customer.id %}"
+                          style="display:inline;"
+                          onsubmit="return confirm('⚠️ ¿Estás seguro de que deseas eliminar este usuario del sistema?\n\nEsta acción revocará sus accesos de forma permanente.');">
+                      {% csrf_token %}
+                      <button type="submit" class="button is-danger is-light" style="font-weight: 600; border-radius: 6px;">
+                        🗑️ Eliminar
+                      </button>
+                    </form>
+
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="has-text-centered has-text-grey py-5 is-size-6">
+                  📭 No se encuentran cuentas de usuario registradas en la base de datos.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
 
   </div>
 </section>
+
+<style>
+  /* Estilo formal para cabeceras de tablas de administración */
+  .table th {
+      color: #718096 !important;
+      font-weight: 600 !important;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #e1e4e8 !important;
+  }
+</style>
 {% endblock %}

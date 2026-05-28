@@ -14,15 +14,18 @@
         background: white;
         padding: 2rem;
         border-radius: 16px;
-        margin-top: 4rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-top: 3rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #e1e4e8;
     }
 
+    /* Título principal con el morado global */
     h1 {
         font-size: 2rem;
-        color: #0d9488;
+        color: #6344ff;
         text-align: center;
         margin-bottom: 1rem;
+        font-weight: 700;
     }
 
     p.subtitle {
@@ -31,34 +34,37 @@
         margin-bottom: 2rem;
     }
 
-    /* Botón */
+    /* Botón morado */
     .generate-btn {
         display: inline-block;
-        padding: 10px 20px;
-        background: #10b981;
+        padding: 12px 24px;
+        background: #6344ff;
         color: white;
         border-radius: 10px;
         text-decoration: none;
         font-weight: 600;
         margin-bottom: 25px;
-        transition: background 0.2s;
+        transition: background 0.2s, transform 0.2s;
     }
     .generate-btn:hover {
-        background: #0a9169;
+        background: #492bdf;
+        transform: translateY(-1px);
+        color: white;
     }
 
-    /* Caja de resumen */
+    /* Caja de resumen estilizada en tonos lavanda/morado suave */
     .summary-box {
-        background: #f1fdf7;
+        background: #f5f3ff;
         padding: 1.5rem;
         border-radius: 12px;
-        border-left: 6px solid #10b981;
+        border-left: 6px solid #6344ff;
         margin-bottom: 1.5rem;
+        text-align: left;
     }
 
     .summary-title {
         font-size: 1.3rem;
-        color: #047857;
+        color: #485fc7;
         font-weight: 600;
         margin-bottom: 8px;
     }
@@ -66,6 +72,7 @@
     .small-date {
         color: #6b7280;
         font-size: 0.85rem;
+        margin-top: 8px;
     }
 
     /* Caja de texto crudo */
@@ -83,13 +90,13 @@
 
 <div class="container-summary">
 
-    <h1> Resumen Diario de Dudas de Usuarios</h1>
+    <h1>Resumen Diario de Dudas de Usuarios</h1>
     <p class="subtitle">Este panel resume las inquietudes más importantes enviadas por los usuarios hoy.</p>
 
     <div style="text-align:center;">
         <a href="{% url 'assistant:generate_daily_summary' %}"
            class="generate-btn">
-            Generar resumen del día
+            ✨ Generar resumen del día
         </a>
     </div>
 
@@ -97,11 +104,11 @@
     <div class="summary-box">
         <div class="summary-title">Resumen del día:</div>
         <p>{{ latest_summary.summary_question }}</p>
-        <p class="small-date">Generado el {{ latest_summary.date }}</p>
+        <p class="small-date">📅 Generado el {{ latest_summary.date }}</p>
     </div>
 
     {% else %}
-    <p class="empty" style="text-align:center; margin-top:20px;">
+    <p class="empty" style="text-align:center; margin-top:20px; color: #6b7280;">
         📭 Aún no se ha generado un resumen hoy.
     </p>
     {% endif %}
@@ -109,40 +116,41 @@
 </div>
 
 
-<div class="container-summary" style="margin-top: 3rem;">
+<div class="container-summary" style="margin-top: 3rem; margin-bottom: 3rem;">
 
     <h1>Buscar resúmenes anteriores</h1>
     <p class="subtitle">Selecciona un día para ver los resúmenes generados en esa fecha.</p>
 
-    <form method="GET" action="{% url 'assistant:daily_summary_panel' %}">
-        <label class="label">📆 Selecciona una fecha:</label>
-        <input type="date" name="date" class="input" style="max-width: 250px;"
-            value="{{ selected_date }}">
-        <button class="button is-primary" style="margin-top: 10px;">
-            Buscar
+    <form method="GET" action="{% url 'assistant:daily_summary_panel' %}" style="text-align: center;">
+        <div class="field" style="max-width: 300px; margin: 0 auto 15px;">
+            <label class="label text-center">📆 Selecciona una fecha:</label>
+            <div class="control">
+                <input type="date" name="date" class="input" value="{{ selected_date }}">
+            </div>
+        </div>
+        <button class="button is-link">
+            🔍 Buscar resúmenes
         </button>
     </form>
 
 
     {% if selected_date %}
-        <h2 class="title is-4" style="margin-top: 2rem;">
+        <h2 class="title is-4 has-text-centered" style="margin-top: 2.5rem; color: #1a1c29;">
             📝 Resúmenes del {{ selected_date }}
         </h2>
 
         {% if summaries_by_date %}
             {% for s in summaries_by_date %}
                 <div class="summary-box">
-                    <div class="summary-title">Resumen</div>
+                    <div class="summary-title">Resumen Guardado</div>
                     <p>{{ s.summary_question }}</p>
-                    <p class="small-date">Generado: {{ s.created_at }}</p>
-
-
+                    <p class="small-date">⏱️ Generado: {{ s.created_at }}</p>
                 </div>
             {% endfor %}
         {% else %}
-            <p class="notification is-warning" style="margin-top: 1rem;">
-                No hay resúmenes para esta fecha.
-            </p>
+            <div class="notification is-warning is-light has-text-centered" style="margin-top: 1.5rem; border-radius: 10px;">
+                No hay resúmenes guardados para esta fecha.
+            </div>
         {% endif %}
     {% endif %}
 </div>

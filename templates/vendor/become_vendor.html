@@ -1,156 +1,170 @@
 {% extends 'core/base.html' %}
-{% block title %}Registrarse como vendedor{% endblock title %}
+{% block title %}Registrarse como creador{% endblock title %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 900px;">
-  <h1 class="title has-text-centered mb-5">Crear cuenta de vendedor</h1>
-  <p class="has-text-centered mb-4">Completa tu registro para abrir tu tienda en nuestro marketplace 🎉</p>
+<div class="container mt-5 mb-6" style="max-width: 900px; padding: 0 1.5rem;">
+  
+  <div class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; padding: 2.5rem; background: #ffffff;">
+    <h1 class="title is-3 has-text-centered mb-3" style="color: #6344ff; font-weight: 700;">Crear cuenta de creador</h1>
+    <p class="has-text-centered has-text-grey mb-5 is-size-6">Regístrate para indexar tus servicios, canales o productos en nuestra red profesional ✨</p>
 
-  <form method="post" action="">
-    {% csrf_token %}
-    <div class="columns is-multiline">
+    <form method="post" action="">
+      {% csrf_token %}
+      <div class="columns is-multiline">
 
-      <!-- Datos de usuario -->
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.username.id_for_label }}" class="label">Nombre de usuario</label>
-          <div class="control">{{ form.username }}</div>
-          {{ form.username.errors }}
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.username.id_for_label }}" class="label">Nombre de usuario</label>
+            <div class="control">{{ form.username }}</div>
+            {% if form.username.errors %}<p class="help is-danger">{{ form.username.errors }}</p>{% endif %}
+          </div>
         </div>
-      </div>
 
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.email.id_for_label }}" class="label">Correo electrónico</label>
-          <div class="control">{{ form.email }}</div>
-          {{ form.email.errors }}
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.email.id_for_label }}" class="label">Correo electrónico</label>
+            <div class="control">{{ form.email }}</div>
+            {% if form.email.errors %}<p class="help is-danger">{{ form.email.errors }}</p>{% endif %}
+          </div>
         </div>
-      </div>
 
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.first_name.id_for_label }}" class="label">Nombre</label>
-          <div class="control">{{ form.first_name }}</div>
-          {{ form.first_name.errors }}
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.first_name.id_for_label }}" class="label">Nombre</label>
+            <div class="control">{{ form.first_name }}</div>
+            {% if form.first_name.errors %}<p class="help is-danger">{{ form.first_name.errors }}</p>{% endif %}
+          </div>
         </div>
-      </div>
 
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.last_name.id_for_label }}" class="label">Apellido</label>
-          <div class="control">{{ form.last_name }}</div>
-          {{ form.last_name.errors }}
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.last_name.id_for_label }}" class="label">Apellido</label>
+            <div class="control">{{ form.last_name }}</div>
+            {% if form.last_name.errors %}<p class="help is-danger">{{ form.last_name.errors }}</p>{% endif %}
+          </div>
         </div>
-      </div>
 
-      <!-- País -->
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.country.id_for_label }}" class="label">País</label>
-          <div class="control">
-            <div class="select is-fullwidth">
-              {{ form.country }}
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.country.id_for_label }}" class="label">País</label>
+            <div class="control">
+              <div class="select is-fullwidth">{{ form.country }}</div>
+            </div>
+            {% if form.country.errors %}<p class="help is-danger">{{ form.country.errors }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.phone.id_for_label }}" class="label">Teléfono</label>
+            <div class="control">{{ form.phone }}</div>
+            {% if form.phone.errors %}<p class="help is-danger">{{ form.phone.errors }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="column is-one-third">
+          <div class="field">
+            <label for="{{ form.region.id_for_label }}" class="label">Región</label>
+            <div class="control">
+              <div class="select is-fullwidth">{{ form.region }}</div>
+            </div>
+            {% if form.region.errors %}<p class="help is-danger">{{ form.region.errors }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="column is-one-third">
+          <div class="field">
+            <label for="{{ form.provincia.id_for_label }}" class="label">Provincia</label>
+            <div class="control">
+              <div class="select is-fullwidth">{{ form.provincia }}</div>
+            </div>
+            {% if form.provincia.errors %}<p class="help is-danger">{{ form.provincia.errors }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="column is-one-third">
+          <div class="field">
+            <label for="{{ form.comuna.id_for_label }}" class="label">Comuna</label>
+            <div class="control">
+              <div class="select is-fullwidth">{{ form.comuna }}</div>
+            </div>
+            {% if form.comuna.errors %}<p class="help is-danger">{{ form.comuna.errors }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.address.id_for_label }}" class="label">Dirección</label>
+            <div class="control">{{ form.address }}</div>
+            {% if form.address.errors %}<p class="help is-danger">{{ form.address.errors }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.zipcode.id_for_label }}" class="label">Código postal</label>
+            <div class="control">{{ form.zipcode }}</div>
+            {% if form.zipcode.errors %}<p class="help is-danger">{{ form.zipcode.errors }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="column is-full">
+          <div class="field">
+            <label class="label">Nombre del canal, estudio o marca (opcional)</label>
+            <div class="control">
+              <input class="input" type="text" name="store_name" placeholder="Ej: Estudios AudioPro o Canal Podcasters Unidos">
             </div>
           </div>
-          {{ form.country.errors }}
         </div>
-      </div>
 
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.phone.id_for_label }}" class="label">Teléfono</label>
-          <div class="control">{{ form.phone }}</div>
-          {{ form.phone.errors }}
-        </div>
-      </div>
-
-      <!-- Región, Provincia, Comuna -->
-      <div class="column is-one-third">
-        <div class="field">
-          <label for="{{ form.region.id_for_label }}" class="label">Región</label>
-          <div class="control">
-            <div class="select is-fullwidth">{{ form.region }}</div>
-          </div>
-          {{ form.region.errors }}
-        </div>
-      </div>
-
-      <div class="column is-one-third">
-        <div class="field">
-          <label for="{{ form.provincia.id_for_label }}" class="label">Provincia</label>
-          <div class="control">
-            <div class="select is-fullwidth">{{ form.provincia }}</div>
-          </div>
-          {{ form.provincia.errors }}
-        </div>
-      </div>
-
-      <div class="column is-one-third">
-        <div class="field">
-          <label for="{{ form.comuna.id_for_label }}" class="label">Comuna</label>
-          <div class="control">
-            <div class="select is-fullwidth">{{ form.comuna }}</div>
-          </div>
-          {{ form.comuna.errors }}
-        </div>
-      </div>
-
-            <!-- Dirección -->
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.address.id_for_label }}" class="label">Dirección</label>
-          <div class="control">{{ form.address }}</div>
-          {{ form.address.errors }}
-        </div>
-      </div>
-
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.zipcode.id_for_label }}" class="label">Código postal</label>
-          <div class="control">{{ form.zipcode }}</div>
-          {{ form.zipcode.errors }}
-        </div>
-      </div>
-
-      <!-- Nombre de la tienda -->
-      <div class="column is-full">
-        <div class="field">
-          <label class="label">Nombre de la tienda (opcional)</label>
-          <div class="control">
-            <input class="input" type="text" name="store_name" placeholder="Ej: Pizzería Don Juan">
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.password1.id_for_label }}" class="label">Contraseña</label>
+            <div class="control">{{ form.password1 }}</div>
+            {% if form.password1.errors %}<p class="help is-danger">{{ form.password1.errors }}</p>{% endif %}
           </div>
         </div>
-      </div>
 
-      <!--  Contraseñas -->
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.password1.id_for_label }}" class="label">Contraseña</label>
-          <div class="control">{{ form.password1 }}</div>
-          {{ form.password1.errors }}
+        <div class="column is-half">
+          <div class="field">
+            <label for="{{ form.password2.id_for_label }}" class="label">Confirmar contraseña</label>
+            <div class="control">{{ form.password2 }}</div>
+            {% if form.password2.errors %}<p class="help is-danger">{{ form.password2.errors }}</p>{% endif %}
+          </div>
         </div>
+
       </div>
 
-      <div class="column is-half">
-        <div class="field">
-          <label for="{{ form.password2.id_for_label }}" class="label">Confirmar contraseña</label>
-          <div class="control">{{ form.password2 }}</div>
-          {{ form.password2.errors }}
-        </div>
+      <div class="control mt-5">
+        <button type="submit" class="button is-link is-fullwidth" style="font-weight: 600; border-radius: 8px; background-color: #6344ff;">
+          Crear cuenta de creador
+        </button>
       </div>
-
-    </div>
-
-    <!--  Botón -->
-    <div class="control mt-5">
-      <button type="submit" class="button is-primary is-fullwidth">
-        Crear cuenta de vendedor
-      </button>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>
 
-<!-- Código para prefijo telefónico -->
+<style>
+  .box input {
+    width: 100%;
+    padding: calc(0.5em - 1px) calc(0.75em - 1px);
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .box input:focus, .box .select select:focus {
+    outline: none;
+    border-color: #6344ff !important;
+    box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
+  }
+  .box .help.is-danger {
+    color: #f14668;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+</style>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const countrySelect = document.getElementById('id_country');
@@ -171,7 +185,6 @@
       phoneInput.addEventListener('keydown', (e) => {
         const prefix = code + ' ';
         const selStart = phoneInput.selectionStart;
-
         if ((e.key === 'Backspace' && selStart <= prefix.length) ||
             (e.key === 'Delete' && selStart < prefix.length)) {
           e.preventDefault();
@@ -187,7 +200,6 @@
   });
 </script>
 
-<!-- AJAX para Región → Provincia → Comuna -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const regionSelect = document.getElementById('id_region');

@@ -3,14 +3,15 @@
 
 <style>
 .admin-messaging {
-  padding-top: 6rem;
+  padding-top: 4rem;
+  margin-bottom: 3rem;
 }
 
 .admin-messaging h1 {
   text-align: center;
   font-size: 2rem;
-  font-weight: 700;
-  color: #0d9488;
+  font-weight: 800;
+  color: #6344ff; /* 🎙️ Morado insignia de la plataforma */
   margin-bottom: .5rem;
 }
 
@@ -18,15 +19,17 @@
   text-align: center;
   color: #6b7280;
   margin-bottom: 2.5rem;
+  font-size: 1.05rem;
 }
 
 .messaging-card {
   max-width: 860px;
   margin: 0 auto;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 2.2rem 2.4rem;
-  box-shadow: 0 10px 25px rgba(15,23,42,.12);
+  border: 1px solid #e1e4e8;
+  box-shadow: 0 4px 12px rgba(99, 68, 255, 0.02);
 }
 
 .messaging-section {
@@ -37,23 +40,36 @@
   display: block;
   font-weight: 600;
   margin-bottom: .4rem;
-  color: #0f172a;
+  color: #1a1c29;
+  font-size: 0.95rem;
 }
 
 .messaging-section small {
-  color: #6b7280;
+  color: #718096;
   display: block;
   margin-top: .35rem;
+  font-size: 0.85rem;
 }
 
 .messaging-section input,
 .messaging-section select,
 .messaging-section textarea {
   width: 100%;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
   padding: .65rem .85rem;
   font-size: .95rem;
+  font-family: inherit;
+  color: #1a1c29;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.messaging-section input:focus,
+.messaging-section select:focus,
+.messaging-section textarea:focus {
+  outline: none;
+  border-color: #6344ff;
+  box-shadow: 0 0 0 3px rgba(99, 68, 255, 0.15);
 }
 
 .messaging-section textarea {
@@ -62,34 +78,24 @@
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.1rem;
+  gap: 1.25rem;
 }
 
 .grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 1.1rem;
+  gap: 1.25rem;
 }
 
 .divider {
   margin: 1.6rem 0 1.2rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.info-box {
-  border: 1px solid rgba(13,148,136,.20);
-  background: rgba(13,148,136,.06);
-  border-radius: 14px;
-  padding: .9rem 1rem;
-  color: #0f172a;
-  margin-bottom: 1.2rem;
-  font-size: .92rem;
+  border-top: 1px solid #e1e4e8;
 }
 
 .messaging-actions {
@@ -98,32 +104,35 @@
   align-items: center;
   gap: 1rem;
   margin-top: 2.2rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid #e5e7eb;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e1e4e8;
 }
 
 .messaging-actions a {
-  color: #6b7280;
+  color: #718096;
   text-decoration: none;
   font-weight: 600;
+  transition: color 0.2s;
+}
+.messaging-actions a:hover {
+  color: #6344ff;
 }
 
 .messaging-actions button {
-  background: #0d9488;
+  background: #6344ff;
   color: white;
   border: none;
-  border-radius: 999px;
-  padding: .75rem 1.9rem;
+  border-radius: 8px; /* Cambiado a bordes de 8px consistentes */
+  padding: .75rem 2rem;
   font-size: .95rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: all .2s ease;
-  box-shadow: 0 8px 18px rgba(13,148,136,.18);
+  transition: background 0.2s;
+  box-shadow: 0 4px 12px rgba(99, 68, 255, 0.15);
 }
 
 .messaging-actions button:hover {
-  background: #0b7669;
-  transform: translateY(-2px);
+  background: #492bdf;
 }
 
 @media (max-width: 900px) {
@@ -139,81 +148,84 @@
 <main class="admin-messaging">
   <div class="container">
 
-    <h1>📧 Mensajería a Vendedores</h1>
+    <h1>📧 Mensajería a Creadores</h1>
     <p class="subtitle">
-      Envía correos masivos o segmentados y deja registro en el sistema.
+      Envía notificaciones masivas o circulares segmentadas a las cuentas de creadores dadas de alta.
     </p>
 
     <form method="post" enctype="multipart/form-data" class="messaging-card">
       {% csrf_token %}
 
-
-      <!-- Destinatarios + adjunto -->
       <div class="grid-2">
         <div class="messaging-section">
-          <label for="id_target_type">Destinatarios</label>
-          {{ form.target_type }}
-          <small>Selecciona a quiénes se enviará el correo.</small>
+          <label for="id_target_type">Segmentación de Destinatarios</label>
+          <div class="select is-fullwidth" style="height: auto;">
+            {{ form.target_type }}
+          </div>
+          <small>Selecciona el criterio o alcance del envío.</small>
         </div>
 
         <div class="messaging-section">
-          <label for="id_attachment">Archivo adjunto (opcional)</label>
+          <label for="id_attachment">Documento adjunto (opcional)</label>
           {{ form.attachment }}
-          <small>Puedes adjuntar PDF, imagen u otro archivo.</small>
+          <small>Puedes anexar minutas en PDF, imágenes u hojas técnicas.</small>
         </div>
       </div>
 
-      <!-- Bloque Región/Provincia/Comuna (solo cuando target_type == comuna) -->
       <div class="divider hidden" id="location-divider"></div>
 
       <div class="hidden" id="location-block">
         <div class="grid-3">
           <div class="messaging-section">
-            <label for="id_region">Región</label>
-            {{ form.region }}
-            <small>Primero elige una región.</small>
+            <label for="id_region">Filtro por Región</label>
+            <div class="select is-fullwidth" style="height: auto;">
+              {{ form.region }}
+            </div>
+            <small>Filtra por región geográfica.</small>
           </div>
 
           <div class="messaging-section">
             <label for="id_provincia">Provincia</label>
-            {{ form.provincia }}
-            <small>Se carga según la región.</small>
+            <div class="select is-fullwidth" style="height: auto;">
+              {{ form.provincia }}
+            </div>
+            <small>Parámetro dependiente de la región.</small>
           </div>
 
           <div class="messaging-section">
-            <label for="id_comuna">Comuna</label>
-            {{ form.comuna }}
-            <small>Se carga según la provincia.</small>
+            <label for="id_comuna">Comuna Destino</label>
+            <div class="select is-fullwidth" style="height: auto;">
+              {{ form.comuna }}
+            </div>
+            <small>Delimita el envío a la comuna final.</small>
           </div>
         </div>
       </div>
 
-      <!-- Vendedor específico -->
       <div class="messaging-section hidden" id="vendor-field">
-        <label for="id_vendor">Vendedor</label>
-        {{ form.vendor }}
-        <small>Se enviará únicamente al vendedor seleccionado.</small>
+        <label for="id_vendor">Cuenta de Creador Específica</label>
+        <div class="select is-fullwidth" style="height: auto;">
+          {{ form.vendor }}
+        </div>
+        <small>La notificación se distribuirá únicamente al creador seleccionado.</small>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Asunto -->
       <div class="messaging-section">
-        <label for="id_subject">Asunto del correo</label>
+        <label for="id_subject">Asunto de la circular</label>
         {{ form.subject }}
       </div>
 
-      <!-- Mensaje -->
       <div class="messaging-section">
-        <label for="id_body">Mensaje</label>
+        <label for="id_body">Cuerpo del mensaje</label>
         {{ form.body }}
-        <small>Este contenido será enviado tal como se escribe.</small>
+        <small>El contenido estructurado se distribuirá por correo de forma literal.</small>
       </div>
 
-      <!-- Acciones -->
       <div class="messaging-actions">
-        <a href="{% url 'core:admin_landing' %}">← Volver al panel</a>
-        <button type="submit">Enviar mensaje</button>
+        <a href="{% url 'core:admin_landing' %}">← Volver al panel de control</a>
+        <button type="submit">Enviar notificación</button>
       </div>
     </form>
 
@@ -274,7 +286,6 @@
   }
 
   function toggleFields() {
-    // ocultar todo primero
     locationBlock.classList.add("hidden");
     locationDivider.classList.add("hidden");
     vendorField.classList.add("hidden");
@@ -289,16 +300,14 @@
     }
   }
 
-  // init selects (placeholders)
+  /* 🎙️ Marcadores de posición de JS en sintonía técnica */
   resetSelect(provSel, "Selecciona provincia...");
   resetSelect(comunaSel, "Selecciona comuna...");
 
-  // listeners
   if (targetSelect) targetSelect.addEventListener("change", toggleFields);
   if (regionSel) regionSel.addEventListener("change", (e) => loadProvincias(e.target.value));
   if (provSel) provSel.addEventListener("change", (e) => loadComunas(e.target.value));
 
-  // init state
   toggleFields();
 })();
 </script>

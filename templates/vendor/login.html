@@ -1,95 +1,107 @@
 {% extends 'core/base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}Iniciar sesión{% endblock title %}
+{% block title %}Iniciar sesión - Web Podcasters{% endblock title %}
 
 {% block content %}
-<div class="container mt-6" style="max-width: 450px;">
-    <h1 class="title has-text-centered">Iniciar sesión</h1>
-    <p class="subtitle has-text-centered mb-5">Accede a tu cuenta</p>
+<div class="container mt-6 mb-6" style="max-width: 450px; padding: 0 1.5rem;">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 class="title is-3" style="color: #6344ff; font-weight: 700;">Iniciar sesión</h1>
+        <p class="subtitle is-6 has-text-grey">Accede a tu cuenta profesional</p>
+    </div>
 
-    <!-- ✅ Bloque de mensajes -->
     {% if messages %}
       <div style="margin-bottom: 1.5rem;">
         {% for message in messages %}
           <div class="notification 
-            {% if message.tags == 'success' %}is-success{% elif message.tags == 'error' %}is-danger{% else %}is-info{% endif %}">
+            {% if message.tags == 'success' %}is-link is-light{% elif message.tags == 'error' %}is-danger is-light{% else %}is-info is-light{% endif %}"
+               style="border-radius: 10px; font-size: 0.95rem;">
             {{ message }}
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <!-- 🔒 Formulario -->
-    <form method="post" action="" class="box">
+    <form method="post" action="" class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; padding: 2.5rem; background: #ffffff;">
         {% csrf_token %}
 
-        <!-- Usuario -->
-        <div class="field">
+        <div class="field mb-4">
             <label class="label">Usuario</label>
             <div class="control has-icons-left">
-                {{ form.username|add_class:"input is-fullwidth" }}
+                {{ form.username|add_class:"input is-fullwidth style-login-input" }}
                 <span class="icon is-small is-left">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user" style="color: #a0aec0;"></i>
                 </span>
             </div>
-            <p class="help is-danger">{{ form.username.errors }}</p>
+            {% if form.username.errors %}
+                <p class="help is-danger">{{ form.username.errors|join:", " }}</p>
+            {% endif %}
         </div>
 
-        <!-- Contraseña -->
-        <div class="field">
+        <div class="field mb-5">
             <label class="label">Contraseña</label>
             <div class="control has-icons-left">
-                {{ form.password|add_class:"input is-fullwidth" }}
+                {{ form.password|add_class:"input is-fullwidth style-login-input" }}
                 <span class="icon is-small is-left">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-lock" style="color: #a0aec0;"></i>
                 </span>
             </div>
-            <p class="help is-danger">{{ form.password.errors }}</p>
+            {% if form.password.errors %}
+                <p class="help is-danger">{{ form.password.errors|join:", " }}</p>
+            {% endif %}
 
-            <!-- ✅ Olvidé mi contraseña -->
             <p class="has-text-right mt-2">
-                <a href="{% url 'vendor:password_reset' %}" class="has-text-grey is-size-7">
-                    ¿Olvidaste tu contraseña?
+            <a href="{% url 'vendor:password_reset' %}" class="has-text-grey is-size-7 style-link-subtle">                    ¿Olvidaste tu contraseña?
                 </a>
             </p>
         </div>
 
-        <!-- Botón -->
-        <div class="field mt-4">
+        <div class="field mt-5">
             <div class="control">
-                <button type="submit" class="button is-primary is-fullwidth is-uppercase">
-                    Iniciar sesión
+                <button type="submit" class="button is-link is-fullwidth" style="background-color: #6344ff; font-weight: 600; border-radius: 8px;">
+                    Ingresar a la plataforma
                 </button>
             </div>
         </div>
     </form>
 
-    <!-- Registro -->
-    <p class="has-text-centered mt-3">
-        ¿No tienes cuenta? <br>
-        <a href="{% url 'vendor:become-customer' %}" class="has-text-primary has-text-weight-semibold">
-            Regístrate como cliente
+    <p class="has-text-centered mt-4 has-text-grey is-size-6">
+        ¿No tienes una cuenta activa? <br>
+        <a href="{% url 'vendor:become-customer' %}" class="style-reg-link">
+            Regístrate como usuario
         </a>
-        <span> o </span>
-        <a href="{% url 'vendor:become-vendor' %}" class="has-text-primary has-text-weight-semibold">
-            como vendedor
+        <span class="mx-1">o</span>
+        <a href="{% url 'vendor:become-vendor' %}" class="style-reg-link">
+            como creador
         </a>
     </p>
 </div>
 
-<!-- 🎨 Estilos -->
 <style>
-    input.input {
-        border-radius: 8px;
+    .style-login-input {
+        border-radius: 8px !important;
+        border: 1px solid #ccc !important;
+        transition: border-color 0.2s, box-shadow 0.2s !important;
     }
-
-    .notification {
-        border-radius: 8px;
-        font-size: 0.95rem;
+    .style-login-input:focus {
+        outline: none !important;
+        border-color: #6344ff !important;
+        box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
+    }
+    .style-reg-link {
+        color: #6344ff !important;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+    .style-reg-link:hover {
+        color: #492bdf !important;
+        text-decoration: underline;
+    }
+    .style-link-subtle:hover {
+        color: #6344ff !important;
     }
 </style>
 
-<!-- Íconos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock content %}

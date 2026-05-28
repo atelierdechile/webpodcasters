@@ -6,21 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body style="margin:0; padding:0; background:#f5f5f5; font-family: Arial, Helvetica, sans-serif;">
+<body style="margin:0; padding:0; background:#f5f6fa; font-family: Arial, Helvetica, sans-serif;">
 
     <table align="center" cellpadding="0" cellspacing="0" width="100%"
-           style="max-width: 520px; margin:auto; background:#ffffff; border-radius:12px; overflow:hidden;">
+           style="max-width: 520px; margin:auto; background:#ffffff; border-radius:12px; overflow:hidden; border: 1px solid #e1e4e8; margin-top: 20px; margin-bottom: 20px;">
 
-        <!-- Header -->
+        <!-- Header (Cambiado a Morado Tecnológico) -->
         <tr>
-            <td style="background:#e63946; padding:18px; text-align:center;">
-                <h1 style="color:#ffffff; margin:0; font-size:24px;">
-                    🍕 Oferta especial en {{ comuna }}
+            <td style="background:#6344ff; padding:20px; text-align:center;">
+                <h1 style="color:#ffffff; margin:0; font-size:22px; font-weight: bold;">
+                    ✨ Lanzamiento especial en {{ comuna }}
                 </h1>
             </td>
         </tr>
 
-        <!-- Imagen del producto -->
+        <!-- Imagen del producto/servicio -->
         <tr>
             <td style="padding:0;">
                 {% if image_url %}
@@ -31,73 +31,74 @@
             </td>
         </tr>
 
-        <!-- Contenido -->
+        <!-- Contenido (Adaptación Abstracta) -->
         <tr>
-            <td style="padding:20px;">
+            <td style="padding:24px;">
 
-                <p style="font-size:16px; color:#333; margin:0 0 14px 0;">
-                    Hola <strong>{{ user.first_name|default:user.username }}</strong>, encontramos una pizza
-                    <strong>perfecta para ti</strong> según tu comuna
-                    {% if preferences.exists %} y tus preferencias alimentarias{% endif %}.
+                <p style="font-size:16px; color:#333; margin:0 0 16px 0; line-height: 1.4;">
+                    Hola <strong>{{ user.first_name|default:user.username }}</strong>, encontramos un elemento
+                    <strong>perfecto para ti</strong> en tu zona geográfica
+                    {% if preferences.exists %} según tus preferencias configuradas{% endif %}.
                 </p>
 
                 <!-- Nombre -->
-                <h2 style="font-size:22px; margin:6px 0; color:#222;">
+                <h2 style="font-size:22px; margin:6px 0; color:#1a1c29; font-weight: bold;">
                     {{ producto.title }}
                 </h2>
 
-                <!-- Badge de oferta -->
+                <!-- Badges de promoción (Tonos morados/azules destacados) -->
                 {% if es_2x1 %}
-                    <p style="font-size:16px; color:#d62828; margin:6px 0;">
-                        🔥 <strong>Oferta 2x1</strong> — Llevas 2, pagas 1
+                    <p style="font-size:16px; color:#6344ff; margin:6px 0;">
+                        📢 <strong>Promoción especial 2x1</strong> — Duplicas tu beneficio
                     </p>
                 {% elif porcentaje %}
-                    <p style="font-size:16px; color:#d62828; margin:6px 0;">
-                        🔥 <strong>{{ porcentaje }}% de descuento</strong>
+                    <p style="font-size:16px; color:#6344ff; margin:6px 0;">
+                        💥 <strong>{{ porcentaje }}% de descuento</strong> disponible
                     </p>
                 {% else %}
-                    <p style="font-size:16px; color:#d62828; margin:6px 0;">
-                        🔥 <strong>Precio especial</strong>
+                    <p style="font-size:16px; color:#485fc7; margin:6px 0;">
+                        ✨ <strong>Precio preferencial</strong>
                     </p>
                 {% endif %}
 
                 <!-- Precios -->
-                <p style="margin:10px 0; font-size:20px; line-height:1.3;">
+                <p style="margin:14px 0; font-size:20px; line-height:1.3;">
 
                     {% if price_original != price_final %}
                         <!-- Precio original -->
-                        <span style="color:#999; text-decoration: line-through; font-size:18px;">
+                        <span style="color:#9ca3af; text-decoration: line-through; font-size:16px;">
                             ${{ price_original }}
                         </span><br>
 
                         <!-- Precio oferta -->
-                        <span style="color:#2a9d8f; font-weight:bold; font-size:28px;">
+                        <span style="color:#6344ff; font-weight:bold; font-size:28px;">
                             ${{ price_final }}
                         </span>
                     {% else %}
                         <!-- Precio normal sin oferta -->
-                        <span style="color:#2a9d8f; font-weight:bold; font-size:28px;">
+                        <span style="color:#1a1c29; font-weight:bold; font-size:28px;">
                             ${{ price_original }}
                         </span>
                     {% endif %}
 
                 </p>
 
-                <!-- CTA -->
-                <div style="text-align:center; margin-top:20px;">
+                <!-- CTA (Cambiado a Morado y texto neutro) -->
+                <div style="text-align:center; margin-top:24px;">
                     <a href="{{ site_url }}/product/{{ producto.category.slug }}/{{ producto.slug }}/"
-                       style="background:#e63946; color:white; padding:14px 22px;
-                              text-decoration:none; font-size:16px; border-radius:8px; display:inline-block;">
-                        🔥 Ordenar ahora
+                       style="background:#6344ff; color:white; padding:14px 26px;
+                              text-decoration:none; font-size:16px; border-radius:8px; display:inline-block; font-weight: bold;">
+                        🔎 Ver detalles completos
                     </a>
                 </div>
 
             </td>
         </tr>
 
+        <!-- Footer -->
         <tr>
-            <td style="padding:20px; text-align:center; font-size:13px; color:#888;">
-                Recibes este correo porque eres parte de la comunidad Marketplace Pizzas 🍕.
+            <td style="padding:20px; text-align:center; font-size:13px; color:#8a8d9f; background-color: #fafafa; border-top: 1px solid #e1e4e8;">
+                Recibes este correo informativo automatizado porque formas parte de la red Web Podcasters.
             </td>
         </tr>
 
