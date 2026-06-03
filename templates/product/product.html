@@ -7,23 +7,19 @@
 <div class="columns is-centered container" style="margin: 0 auto; padding: 2rem 1rem;">
   <div class="column is-8">
 
-    <!-- 📸 Imagen de Elemento -->
     {% if product.image %}
       <figure class="image mb-5" style="max-width: 420px; background-color: #f5f6fa; border-radius: 12px; overflow: hidden; border: 1px solid #e1e4e8;">
         <img src="{{ product.image.url }}" alt="{{ product.title }}" style="width: 100%; object-fit: cover;">
       </figure>
     {% endif %}
 
-    <!-- 🎙️ Título Principal -->
     <h1 class="title is-2 mb-2" style="color: #1a1c29; font-weight: 700;">{{ product.title }}</h1>
 
-    <!-- 🔥 FLUJO DE PRECIOS ADAPTADO -->
     <p class="is-size-4 has-text-weight-bold mb-4" style="color: #6344ff;">
 
       {% if product.active_offer %}
 
         {% if product.active_offer.is_2x1 %}
-          <!-- OFERTA 2×1 -->
           <span class="has-text-grey-light" style="text-decoration: line-through; font-size: 1.1rem; font-weight: normal;">
             {{ currency_symbol }}{{ product.price }}
           </span>
@@ -41,7 +37,6 @@
           <p class="is-size-6 has-text-link mt-1" style="font-weight: 600;">Promoción especial activa para este elemento ✨</p>
 
         {% else %}
-          <!-- OFERTA NORMAL PORCENTUAL -->
           <span class="has-text-grey-light" style="text-decoration: line-through; font-size: 1.1rem; font-weight: normal;">
             {{ currency_symbol }}{{ product.price }}
           </span>
@@ -58,80 +53,28 @@
         {% endif %}
 
       {% else %}
-        <!-- Precio normal sin descuento -->
         <span style="color: #4a4a4a;">{{ currency_symbol }}{{ product.price }}</span>
         <span class="is-size-6 has-text-grey font-weight-normal ml-1">{{ currency_code }}</span>
       {% endif %}
 
     </p>
 
-    <!-- 🏷️ Vendedor / Perfil + Etiquetas Técnicas -->
     <div class="tags mb-4">
       <span class="tag is-dark" style="font-weight: 600; border-radius: 6px;">{{ product.vendor.name }}</span>
 
       {% for pref in product.preferences.all %}
         <span class="tag is-link is-light ml-1 style-pref-tag">
-          {% if pref.name|lower == "vegana" %}
-            💻 {{ pref.name }}
-          {% elif pref.name|lower == "sin gluten" %}
-            ⚙️ {{ pref.name }}
-          {% else %}
-            📦 {{ pref.name }}
-          {% endif %}
+          🎙️ {{ pref.name }}
         </span>
       {% endfor %}
     </div>
 
-    <!-- Descripción técnica -->
     <p class="content has-text-grey-dark mb-5" style="line-height: 1.6; font-size: 1.05rem;">
       {{ product.description }}
     </p>
 
     <hr style="background-color: #e1e4e8;">
 
-    {# ⚙️ CAMUFLAJE: BLOQUE DE ALERTA DE ALERGIA TRATADO COMO INCOMPATIBILIDAD #}
-    {% if allergy_warning %}
-      <div class="notification is-warning is-light" style="border-radius: 12px; padding: 24px; border: 1px solid #ffe08a;">
-        <h3 class="title is-5 mb-2" style="color: #8a6d00;">⚠️ Advertencia de compatibilidad detectada</h3>
-
-        <p class="mb-3">
-          El elemento <strong>{{ product.title }}</strong> contiene especificaciones o requerimientos asociados a filtros de exclusión en tu perfil:
-        </p>
-
-        <ul class="mb-4" style="margin-left: 1.5rem; list-style-type: square;">
-          {% for c in conflicts %}
-            <li>
-              <strong>Filtro de {{ c.allergy.name }}</strong>:
-              {% for ing in c.ingredients %}
-                <span class="tag is-white" style="border: 1px solid #ccc; border-radius: 4px;">{{ ing.name }}</span>{% if not forloop.last %} {% endif %}
-              {% endfor %}
-            </li>
-          {% endfor %}
-        </ul>
-
-        <p class="mb-4 is-size-6">
-          Te sugerimos verificar las características para asegurar que se acople de forma óptima a tu entorno técnico.
-        </p>
-
-        <form method="post" class="mt-2">
-          {% csrf_token %}
-          <input type="hidden" name="quantity" value="{{ quantity|default:1 }}">
-          <input type="hidden" name="ignore_allergy_warning" value="1">
-
-          <div class="buttons">
-            <a href="" class="button is-light" style="font-weight: 600; border-radius: 8px;">
-              Revisar opciones
-            </a>
-            <button class="button is-warning" style="font-weight: 600; border-radius: 8px; color: #534000;">
-              Ignorar y agregar 🛒
-            </button>
-          </div>
-        </form>
-      </div>
-      <hr style="background-color: #e1e4e8;">
-    {% endif %}
-
-    <!-- 🛒 Agregar al carrito -->
     <form method="post" class="mt-4">
       {% csrf_token %}
       <div class="field has-addons">
@@ -154,7 +97,6 @@
 
     <hr style="background-color: #e1e4e8; margin: 3rem 0;">
 
-    <!-- 🧩 Elementos Similares -->
     {% if similar_products %}
       <div class="mt-6">
         <h2 class="title is-4 mb-4" style="color: #1a1c29; font-weight: 700;">Elementos Similares ✨</h2>
@@ -166,10 +108,9 @@
       </div>
     {% endif %}
 
-    <!-- 💜 Recomendaciones Personalizadas -->
     {% if recommended_products %}
       <div class="mt-6">
-        <h2 class="title is-4 mb-4" style="color: #6344ff; font-weight: 700;">Recomendaciones para ti ⚡</h2>
+        <h2 class="title is-4 mb-4" style="color: #6344ff; font-weight: 700;">Recomendaciones para ti</h2>
         <div class="columns is-multiline">
           {% for rec in recommended_products %}
             {% include 'product/parts/list_item.html' with product=rec %}

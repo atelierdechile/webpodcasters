@@ -6,7 +6,6 @@
 <section class="section">
   <div class="container" style="max-width: 1200px; padding: 0 1.5rem;">
 
-    <!-- 🗺️ MIGA DE PAN / BREADCRUMB BULMA -->
     <nav class="breadcrumb mb-5" aria-label="breadcrumbs" style="font-size: 0.9rem;">
       <ul>
         <li><a href="{% url 'core:admin_landing' %}" style="color: #6344ff;">Admin</a></li>
@@ -15,7 +14,6 @@
       </ul>
     </nav>
 
-    <!-- HEADER DE FICHA MAESTRA -->
     <div class="columns is-vcentered mb-5">
       <div class="column">
         <h1 class="title is-3 mb-2" style="color: #1a1c29; font-weight: 700;">{{ vendor.name }}</h1>
@@ -34,26 +32,17 @@
       </div>
     </div>
 
-    <!-- 📊 PESTAÑAS / TABS BULMA ASOCIADAS -->
     <div class="tabs is-boxed mb-4">
       <ul>
         <li class="is-active">
           <a>
             <span>Elementos / Catálogo</span>
-            <!-- 🎙️ Cambiado de verde is-primary a morado is-link -->
             <span class="tag is-link is-light ml-2" style="font-weight: 700; color: #6344ff;">{{ products|length }}</span>
-          </a>
-        </li>
-  
-        <li>
-          <a href="{% url 'superadmin_panel:weekly_menu_list' %}?vendor={{ vendor.id }}" style="color: #4a5568;">
-            <span>Vitrina Semanal</span>
           </a>
         </li>
       </ul>
     </div>
 
-    <!-- CONTENEDOR DE CONTROL PRINCIPAL -->
     <div class="box" style="border-radius: 16px; border: 1px solid #e1e4e8; box-shadow: none; background: #ffffff; padding: 2rem;">
 
       <div class="is-flex is-justify-content-space-between is-align-items-center mb-5 flex-wrap-mobile">
@@ -63,7 +52,6 @@
         </span>
       </div>
 
-      <!-- TABLE DESKTOP / TABLET -->
       <div class="table-container is-hidden-mobile">
         <table class="table is-fullwidth is-striped is-hoverable">
           <thead>
@@ -110,7 +98,6 @@
                     Editar
                   </a>
 
-                  <!-- FORMULARIO ELIMINAR POST CON CONFIRM ABSTRACTO -->
                   <form method="post" action="{% url 'superadmin_panel:product_delete' p.id %}" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="button is-danger is-light" style="font-weight: 600; border-radius: 4px;"
@@ -124,7 +111,6 @@
                       Gestionar Promo
                     </a>
                   {% else %}
-                    <!-- Botón morado unificado -->
                     <a href="{% url 'superadmin_panel:offer_create' %}?product={{ p.id }}" class="button is-link is-light" style="font-weight: 600; border-radius: 4px; color: #6344ff; background-color: #eef2ff;">
                       Inyectar Promo
                     </a>
@@ -143,7 +129,6 @@
         </table>
       </div>
 
-      <!-- VISTA MOBILE: TARJETAS COMPACTAS -->
       <div class="is-hidden-tablet mt-2">
         {% for p in products %}
         <div class="box mb-4" style="border-radius:12px; border: 1px solid #e1e4e8; box-shadow: none; padding: 1.25rem;">

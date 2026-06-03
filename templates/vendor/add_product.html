@@ -203,9 +203,6 @@
                     }
                     </style>
 
-                    <!-- ========================== -->
-                    <!-- 1. DATOS BÁSICOS DEL PROD. -->
-                    <!-- ========================== -->
                     <div class="section-card">
                         <div class="section-card-header">
                             <div class="section-card-title">
@@ -237,9 +234,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- ========================== -->
-                    <!-- 2. CONFIGURACIÓN DE FILTROS -->
-                    <!-- ========================== -->
                     <div class="section-card">
                         <div class="section-card-header">
                             <div class="section-card-title">
@@ -262,13 +256,7 @@
                                 >
                                     <span class="check">✓</span>
 
-                                    {% if pref.name|lower == "vegana" %}
-                                        💻 {{ pref.name }}
-                                    {% elif pref.name|lower == "sin gluten" %}
-                                        ⚙️ {{ pref.name }}
-                                    {% else %}
-                                        📦 {{ pref.name }}
-                                    {% endif %}
+                                    🎙️ {{ pref.name }}
 
                                     <input 
                                         type="checkbox"
@@ -288,9 +276,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- ========================== -->
-                    <!-- 3. ESPECIFICACIONES TÉCNICAS -->
-                    <!-- ========================== -->
                     <div class="section-card">
                         <div class="section-card-header">
                             <div class="section-card-title">
@@ -308,7 +293,7 @@
                                         placeholder="Buscar requerimiento o característica (ej: Windows, WAV, VST)...">
                                 </div>
                                 <div class="control">
-                                    <button type="button" class="button is-light" id="ingredient-clear" style="font-weight: 600;">
+                                    <button type="button" class="button is-link is-light" id="ingredient-clear" style="font-weight: 600;">
                                         Limpiar
                                     </button>
                                 </div>
@@ -324,10 +309,7 @@
                                     {% for ing in ingredients %}
                                         {% ifchanged ing.category_id %}
                                             {% if not forloop.first %}
-                                                    </div> <!-- .ing-grid -->
-                                                </div> <!-- .ing-card-body -->
-                                            </div> <!-- .ing-card -->
-                                            {% endif %}
+                                                    </div> </div> </div> {% endif %}
                                             <div class="ing-card" data-category-id="{{ ing.category.id|default:'0' }}">
                                                 <div class="ing-card-header" tabindex="0" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
                                                     <div class="ing-card-title">
@@ -366,10 +348,7 @@
                                         {% endwith %}
 
                                         {% if forloop.last %}
-                                                    </div> <!-- .ing-grid -->
-                                                </div> <!-- .ing-card-body -->
-                                            </div> <!-- .ing-card -->
-                                        {% endif %}
+                                                    </div> </div> </div> {% endif %}
                                     {% endfor %}
                                 {% else %}
                                     <div class="py-4 has-text-centered">
@@ -386,9 +365,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- ===================== -->
-                    <!--     BOTONES DEL FORM   -->
-                    <!-- ===================== -->
                     <div class="field mt-5">
                         <div class="columns is-variable is-2 is-mobile is-centered is-multiline">
                             <div class="column is-full-mobile is-half-tablet is-one-third-desktop">
@@ -416,7 +392,6 @@
     </div>
 </div>
 
-<!-- JS para interactividad intacto -->
 <script>
 function setupChipToggle(selector, hiddenClass) {
     document.querySelectorAll(selector).forEach(chip => {

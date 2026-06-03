@@ -204,9 +204,6 @@
                     }
                     </style>
 
-                    <!-- ========================== -->
-                    <!-- 1. DATOS BÁSICOS DEL ELEM. -->
-                    <!-- ========================== -->
                     <div class="section-card">
                         <div class="section-card-header">
                             <div class="section-card-title">
@@ -232,7 +229,7 @@
                                                 {{ field }}
                                             </label>
                                         </div>
-                                    {% else %}
+                                    {%   else %}
                                         {{ field|add_class:"input" }}
                                     {% endif %}
                                 </div>
@@ -245,9 +242,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- ========================== -->
-                    <!-- 2. FILTROS DE INTERÉS      -->
-                    <!-- ========================== -->
                     <div class="section-card">
                         <div class="section-card-header">
                             <div class="section-card-title">
@@ -270,13 +264,7 @@
                                 >
                                     <span class="check">✓</span>
 
-                                    {% if pref.name|lower == "vegana" %}
-                                        💻 {{ pref.name }}
-                                    {% elif pref.name|lower == "sin gluten" %}
-                                        ⚙️ {{ pref.name }}
-                                    {% else %}
-                                        📦 {{ pref.name }}
-                                    {% endif %}
+                                    🎙️ {{ pref.name }}
 
                                     <input 
                                         type="checkbox"
@@ -296,9 +284,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- ========================== -->
-                    <!-- 3. PARAMETROS DE SISTEMA   -->
-                    <!-- ========================== -->
                     <div class="section-card">
                         <div class="section-card-header">
                             <div class="section-card-title">
@@ -332,10 +317,7 @@
                                     {% for ing in ingredients %}
                                         {% ifchanged ing.category_id %}
                                             {% if not forloop.first %}
-                                                    </div> <!-- .ing-grid -->
-                                                </div> <!-- .ing-card-body -->
-                                            </div> <!-- .ing-card -->
-                                            {% endif %}
+                                                    </div> </div> </div> {% endif %}
                                             <div class="ing-card" data-category-id="{{ ing.category.id|default:'0' }}">
                                                 <div class="ing-card-header" tabindex="0" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
                                                     <div class="ing-card-title">
@@ -374,10 +356,7 @@
                                         {% endwith %}
 
                                         {% if forloop.last %}
-                                                    </div> <!-- .ing-grid -->
-                                                </div> <!-- .ing-card-body -->
-                                            </div> <!-- .ing-card -->
-                                        {% endif %}
+                                                    </div> </div> </div> {% endif %}
                                     {% endfor %}
                                 {% else %}
                                     <p class="has-text-grey is-size-6 py-3 text-center">
@@ -392,9 +371,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- ===================== -->
-                    <!--    BOTONES DEL FORM   -->
-                    <!-- ===================== -->
                     <div class="field mt-5">
                         <div class="columns is-variable is-2 is-mobile is-centered is-multiline">
                             <div class="column is-full-mobile is-half-tablet is-one-third-desktop">
@@ -422,7 +398,6 @@
     </div>
 </div>
 
-<!-- JS para interactividad (Preservado e Intacto) -->
 <script>
 function setupChipToggle(selector, hiddenClass) {
     document.querySelectorAll(selector).forEach(chip => {
@@ -485,7 +460,7 @@ if (searchInput) {
                 if (match) visibleCount++;
             });
 
-            card.style.display = visibleCount > 0 ? "" : "none";
+                card.style.display = visibleCount > 0 ? "" : "none";
         });
     };
 

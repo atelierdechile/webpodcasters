@@ -121,7 +121,7 @@ def vendor_admin(request):
         context['is_vendor'] = False
         context['username'] = request.user.username
 
-    return render(request, 'vendor/vendor_admin.html', context)
+    return render(request, 'vendor/vendor_profile.html', context)
 
 
 # --- AGREGAR PRODUCTO O SERVICIO ---
