@@ -2,7 +2,7 @@ from django.db.models import Count, Case, When, IntegerField, Q
 
 def aplicar_preferencias(user, queryset, solo_pref=False):
     """
-    🍕 Aplica preferencias del usuario a un queryset de productos.
+    Aplica preferencias del usuario a un queryset de productos.
 
     - Si el usuario no está autenticado → devuelve queryset sin cambios.
     - Si no tiene preferencias → devuelve queryset sin cambios.
@@ -13,7 +13,7 @@ def aplicar_preferencias(user, queryset, solo_pref=False):
     Compatible con todas las vistas (home, categoría, búsqueda).
     """
 
-    # 🧱 1. Validaciones iniciales
+    # 1. Validaciones iniciales
     if not user.is_authenticated:
         return queryset
 
@@ -23,7 +23,7 @@ def aplicar_preferencias(user, queryset, solo_pref=False):
 
     prefs = profile.preferences.all()
 
-    # 🌱 2. Modo filtrado estricto
+    # 2. Modo filtrado estricto
     if solo_pref:
         return (
             queryset.filter(preferences__in=prefs)
@@ -39,7 +39,7 @@ def aplicar_preferencias(user, queryset, solo_pref=False):
             .order_by("-match_pref", "-id")
         )
 
-    # 🌾 3. Modo orden inteligente (todas las pizzas, preferidas arriba)
+    # 3. Modo orden inteligente
     return (
         queryset
         .annotate(

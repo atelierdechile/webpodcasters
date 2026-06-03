@@ -5,10 +5,10 @@
 /* Encapsulamos todo en .admin-landing para no romper otras vistas */
 .admin-landing {
   width: 100%;
-  padding-top: 2rem; /* Ajustado para que no flote tan abajo si el navbar ya tiene padding */
+  padding-top: 2rem; 
 }
 
-/* Títulos con el nuevo tono morado */
+/* Títulos con el tono morado */
 .admin-landing h1.admin-title {
   color: #6344ff;
   margin-bottom: 1.2rem;
@@ -146,7 +146,7 @@
     {% if request.user.is_superuser %}
     <div class="section-title">Panel de Súper Admin</div>
     <p class="section-subtitle">
-      Gestión avanzada de creadores, usuarios, especificaciones técnicas, destacados y comunicación.
+      Gestión avanzada de creadores, usuarios, especificaciones técnicas y comunicación regional.
     </p>
 
     <div class="cards">
@@ -185,16 +185,8 @@
       <div class="admin-card">
         <h3>Categorías y Tags</h3>
         <p>Administra las especificaciones técnicas, categorías y etiquetas globales del sistema.</p>
-        <a href="{% url 'superadmin_panel:ingredient_manage' %}" class="admin-card-cta">
+        <a href="/admin/product/category/" class="admin-card-cta">
           Gestionar categorías →
-        </a>
-      </div>
-
-      <div class="admin-card">
-        <h3>Destacados Semanales</h3>
-        <p>Define qué shows o servicios se promocionan cada día en la cartelera principal.</p>
-        <a href="{% url 'superadmin_panel:weekly_menu_list' %}" class="admin-card-cta">
-          Gestionar destacados →
         </a>
       </div>
     </div>

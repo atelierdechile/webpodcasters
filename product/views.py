@@ -8,7 +8,6 @@ from .models import Category
 from .forms import AddToCartForm
 from cart.cart import Cart
 from core.models import Country
-from order.utilities import get_allergy_conflicts
 
 from product.utils import aplicar_preferencias
 
@@ -17,7 +16,6 @@ from product.utils import aplicar_preferencias
 #   FUNCIÓN CENTRAL PARA OBTENER LA COMUNA ACTIVA
 # ===========================================================
 def get_active_comuna(request):
-
     # 1) Comuna temporal establecida en la homepage
     temp = request.session.get("temp_comuna")
     if temp:
@@ -42,22 +40,22 @@ def product(request, category_slug, product_slug):
     cart = Cart(request)
     product = get_object_or_404(Product, category__slug=category_slug, slug=product_slug)
 
-    # PAÍS
+    # DISPONIBILIDAD POR PAÍS
     if request.user.is_authenticated and hasattr(request.user, "profile") and request.user.profile.country:
         if product.vendor.country != request.user.profile.country:
-            messages.warning(request, "🚫 Esta pizza no está disponible en tu país.")
+            messages.warning(request, "🚫 Este producto o servicio no está disponible en tu país.")
             return redirect("product:category", category_slug=category_slug)
 
-    # COMUNA
+    # DISPONIBILIDAD POR COMUNA (COBERTURA)
     comuna_activa = get_active_comuna(request)
     vendor_comuna = getattr(product.vendor.created_by.profile.comuna, "nombre", None)
 
     if comuna_activa and vendor_comuna and comuna_activa.lower() != vendor_comuna.lower():
-        messages.warning(request, f"🚫 Esta pizza no está disponible en tu comuna ({comuna_activa}).")
+        messages.warning(request, f"🚫 Este elemento no está disponible para tu comuna actual ({comuna_activa}).")
         return redirect("product:category", category_slug=category_slug)
 
     # ============================
-    # PRODUCTOS SIMILARES
+    # ELEMENTOS SIMILARES
     # ============================
     similar_qs = Product.objects.filter(category=product.category).exclude(id=product.id)
 
@@ -91,38 +89,17 @@ def product(request, category_slug, product_slug):
     # POST → AGREGAR AL CARRITO
     # ============================
     if request.method == "POST":
-
         if not request.user.is_authenticated:
-            messages.error(request, "Debes iniciar sesión para agregar productos al carrito.")
+            messages.error(request, "Debes iniciar sesión para agregar elementos al carrito.")
             return redirect("product:product", category_slug=category_slug, product_slug=product_slug)
 
         form = AddToCartForm(request.POST)
 
         if form.is_valid():
             quantity = form.cleaned_data["quantity"]
-
-            # 🔥 CHEQUEO DE ALERGIAS EN LA MISMA PÁGINA
-            if hasattr(request.user, "profile"):
-                ignore_warning = request.POST.get("ignore_allergy_warning") == "1"
-                conflicts = get_allergy_conflicts(request.user.profile, product)
-
-                # Mostrar advertencia en la MISMA página
-                if conflicts and not ignore_warning:
-                    return render(request, "product/product.html", {
-                        "product": product,
-                        "form": form,
-                        "quantity": quantity,
-                        "conflicts": conflicts,
-                        "allergy_warning": True,
-                        "similar_products": similar,
-                        "currency_symbol": product.vendor.country.currency_symbol,
-                        "currency_code": product.vendor.country.currency,
-                        "comuna": comuna_activa,
-                    })
-
-            # Si no hay conflictos o ya aceptó → agregar al carrito
+            
             cart.add(product_id=product.id, quantity=quantity, update_quantity=False)
-            messages.success(request, "Producto agregado al carrito.")
+            messages.success(request, "Añadido al carrito con éxito.")
 
             log_event(
                 request,
@@ -184,7 +161,7 @@ def category(request, category_slug):
             vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
         )
 
-    # PREFERENCIAS
+    # PREFERENCIAS E INTERESES
     solo_pref = request.GET.get("solo_pref") == "1"
     products = aplicar_preferencias(request.user, products, solo_pref)
 

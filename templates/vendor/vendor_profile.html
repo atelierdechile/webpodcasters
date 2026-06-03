@@ -26,20 +26,15 @@
         <div class="level">
             <div class="level-left">
                 <div>
-                    <p class="title is-5 mb-1" style="color: #1a1c29;">✨ Elementos destacados en vitrina</p>
-                    <p class="subtitle is-7 has-text-grey">Configura la rotación de tus productos o servicios promocionados.</p>
+                    <p class="title is-5 mb-1" style="color: #1a1c29;">🎙️ Control de Vitrina Comercial</p>
+                    <p class="subtitle is-7 has-text-grey">Promociona tus equipos de audio o servicios de edición destacados en la página principal.</p>
                 </div>
             </div>
             <div class="level-right mt-3-mobile">
                 <div class="buttons">
-                    <a href="{% url 'vendor:weekly_menu_edit' %}"
-                       class="button is-link is-light" style="font-weight: 600; border-radius: 8px;">
-                        📆 Configurar destaques semanales
-                    </a>
-                    <a href="{% url 'vendor:weekly_menu_history' %}"
-                       class="button is-light" style="font-weight: 600; border-radius: 8px; color: #4a4a4a;">
-                        📚 Historial de rotaciones
-                    </a>
+                    <button class="button is-link is-light" style="font-weight: 600; border-radius: 8px;" disabled>
+                        ✨ Gestionar Destacados
+                    </button>
                 </div>
             </div>
         </div>
@@ -105,12 +100,12 @@
                                 <div class="buttons is-centered">
                                     <a href="{% url 'vendor:edit-offer' product.id %}"
                                        class="button is-link is-light is-small" style="font-weight: 600; border-radius: 6px;">
-                                        Gestionar Promo
+                                         Gestionar Promo
                                     </a>
                                     <a href="{% url 'vendor:delete-product' product.pk %}"
                                        class="button is-danger is-light is-small" style="font-weight: 600; border-radius: 6px;"
                                        onclick="return confirm('¿Confirmas la eliminación permanente de este elemento?');">
-                                        Eliminar
+                                         Eliminar
                                     </a>
                                 </div>
                             </td>
@@ -164,7 +159,6 @@ function loadDashboard(range) {
     loadSalesData(range);
     loadTopProducts(range);
     
-    // Feedback visual simple para los botones de rango activo
     const buttons = document.querySelectorAll('.style-range-btn');
     buttons.forEach(btn => {
         if(btn.textContent.toLowerCase().includes(range === 'today' ? 'hoy' : range === '7days' ? '7' : '30')) {
@@ -196,7 +190,6 @@ function renderSalesChart(data) {
             datasets: [{
                 label: "Monto total (CLP)",
                 data: data.map(d => d.total),
-                // 🎙️ Cambiado a paleta Morada / Lavanda
                 backgroundColor: "rgba(99, 68, 255, 0.6)",
                 borderColor: "rgba(99, 68, 255, 1)",
                 borderWidth: 2,
@@ -236,7 +229,6 @@ function renderTopProductsChart(data) {
             datasets: [{
                 label: "Unidades",
                 data: data.map(d => d.total),
-                // 🎙️ Cambiado a azul de soporte tecnológico
                 backgroundColor: "rgba(72, 95, 199, 0.6)",
                 borderColor: "rgba(72, 95, 199, 1)",
                 borderWidth: 2,
@@ -256,7 +248,6 @@ document.addEventListener("DOMContentLoaded", () => loadDashboard("7days"));
 </script>
 
 <style>
-  /* Alineaciones de grilla responsive para la tabla */
   @media screen and (max-width: 768px) {
       .mt-3-mobile { margin-top: 0.75rem !important; }
   }

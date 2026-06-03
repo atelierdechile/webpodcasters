@@ -1,30 +1,15 @@
 from django import forms
-from vendor.models import VendorWeeklyMenu, Vendor
+from django.contrib.auth import get_user_model
+from vendor.models import Vendor, Profile
 from product.models import Product
 from offers.models import Offer
-from django.db.models import Max 
-from product.models import Product, Ingredient, IngredientCategory
 from location.models import Region, Provincia, Comuna
+from vendor.geocoding import geocode_address
+
+User = get_user_model()
 
 
-class VendorWeeklyMenuForm(forms.ModelForm):
-    class Meta:
-        model = VendorWeeklyMenu
-        fields = ["vendor", "date", "product"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Sólo por orden, no es obligatorio
-        self.fields["vendor"].queryset = Vendor.objects.order_by("name")
-        self.fields["product"].queryset = Product.objects.order_by("vendor__name", "title")
-
-
-
-
-
-
-
+# --- GESTIÓN DE OFERTAS ---
 class OfferForm(forms.ModelForm):
     class Meta:
         model = Offer
@@ -40,36 +25,20 @@ class OfferForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Ordenar productos por vendor y nombre
+        # Ordenar productos/servicios por creador y nombre
         self.fields["product"].queryset = Product.objects.select_related("vendor").order_by(
             "vendor__name", "title"
         )
 
 
-# superadmin_panel/forms.py
-from django import forms
-from django.contrib.auth import get_user_model
-from vendor.models import Vendor
-
-User = get_user_model()
-
-
-from django import forms
-from django.contrib.auth.models import User
-
-from vendor.models import Vendor, Profile
-from vendor.geocoding import geocode_address  # si lo creaste, si no, lo comentas
-
+# --- EDICIÓN DE VENDEDOR / CREADOR ---
 class VendorEditForm(forms.ModelForm):
-    # ====== USER ======
     username = forms.CharField(label="Usuario", max_length=150)
     email = forms.EmailField(label="Correo electrónico", required=False)
 
     new_password1 = forms.CharField(label="Nueva contraseña", widget=forms.PasswordInput, required=False)
     new_password2 = forms.CharField(label="Repetir nueva contraseña", widget=forms.PasswordInput, required=False)
 
-    # ====== PROFILE (local) ======
     country = forms.ModelChoiceField(queryset=None, required=False, label="País")
     region = forms.ModelChoiceField(queryset=None, required=False, label="Región")
     provincia = forms.ModelChoiceField(queryset=None, required=False, label="Provincia")
@@ -81,7 +50,7 @@ class VendorEditForm(forms.ModelForm):
 
     class Meta:
         model = Vendor
-        fields = []  # no editamos campos directos de Vendor en este form
+        fields = []  
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -97,9 +66,7 @@ class VendorEditForm(forms.ModelForm):
         from core.models import Country
         from location.models import Region, Provincia, Comuna
 
-        # Country: puede ser name o nombre según tu modelo
         self.fields["country"].queryset = Country.objects.all().order_by("name")
-
         self.fields["region"].queryset = Region.objects.all().order_by("nombre")
 
         if profile.region_id:
@@ -143,7 +110,6 @@ class VendorEditForm(forms.ModelForm):
         profile.address = self.cleaned_data.get("address") or ""
         profile.zipcode = self.cleaned_data.get("zipcode") or ""
 
-        # geocoding
         try:
             comuna_obj = profile.comuna
             region_obj = profile.region
@@ -173,75 +139,7 @@ class VendorEditForm(forms.ModelForm):
         return vendor
 
 
-class IngredientCategoryForm(forms.ModelForm):
-    # hacemos explícito el campo ordering
-    ordering = forms.IntegerField(
-        label="Posición en la lista",
-        min_value=1,
-        required=False,
-        help_text="1 = aparece primero. Si lo dejas vacío, se pondrá al final.",
-        widget=forms.NumberInput(attrs={
-            "class": "input",
-            "placeholder": "Ej: 1 para arriba, 10 para más abajo",
-        }),
-    )
-
-    class Meta:
-        model = IngredientCategory
-        fields = ["name", "ordering"]
-        labels = {
-            "name": "Nombre de la categoría",
-        }
-        widgets = {
-            "name": forms.TextInput(attrs={
-                "class": "input",
-                "placeholder": "Ej: Carnes, Quesos, Salsas…",
-            }),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Si es una categoría nueva y no viene ordering, sugerimos el último + 1
-        if not self.instance.pk and not self.initial.get("ordering"):
-            max_order = IngredientCategory.objects.aggregate(
-                m=Max("ordering")
-            )["m"] or 0
-            self.fields["ordering"].initial = max_order + 1
-
-    def clean_ordering(self):
-        value = self.cleaned_data.get("ordering")
-
-        # Si el admin no escribe nada, ponemos último + 1
-        if value in (None, ""):
-            max_order = IngredientCategory.objects.aggregate(
-                m=Max("ordering")
-            )["m"] or 0
-            return max_order + 1
-
-        return value
-
-
-class IngredientForm(forms.ModelForm):
-    class Meta:
-        model = Ingredient
-        fields = ["category", "name"]
-        labels = {
-            "category": "Categoría",
-            "name": "Nombre del ingrediente",
-        }
-        widgets = {
-            "category": forms.Select(attrs={"class": "select"}),
-            "name": forms.TextInput(attrs={
-                "class": "input",
-                "placeholder": "Ej: Queso mozzarella, Pepperoni…",
-            }),
-        }
-
-
-
-
-
+# --- MESSAGING REGIONAL ---
 class VendorMessagingForm(forms.Form):
     target_type = forms.ChoiceField(
         choices=[
@@ -289,7 +187,6 @@ class VendorMessagingForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Si ya viene región seleccionada (POST), cargamos provincias
         region_id = self.data.get("region") or None
         if region_id:
             try:
@@ -299,7 +196,6 @@ class VendorMessagingForm(forms.Form):
             except (ValueError, TypeError):
                 self.fields["provincia"].queryset = Provincia.objects.none()
 
-        # Si ya viene provincia seleccionada (POST), cargamos comunas
         provincia_id = self.data.get("provincia") or None
         if provincia_id:
             try:
@@ -310,9 +206,8 @@ class VendorMessagingForm(forms.Form):
                 self.fields["comuna"].queryset = Comuna.objects.none()
 
 
-
+# --- EDICIÓN DE CLIENTE ---
 class CustomerEditForm(forms.ModelForm):
-    # ====== USER ======
     username = forms.CharField(label="Usuario", max_length=150)
     email = forms.EmailField(label="Correo electrónico", required=False)
 
@@ -325,9 +220,7 @@ class CustomerEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         user = self.instance
-
         self.fields["username"].initial = user.username
         self.fields["email"].initial = user.email
 
@@ -352,7 +245,6 @@ class CustomerEditForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-
         user.username = self.cleaned_data["username"]
         user.email = (self.cleaned_data.get("email") or "").strip()
 
@@ -362,5 +254,4 @@ class CustomerEditForm(forms.ModelForm):
 
         if commit:
             user.save()
-
         return user

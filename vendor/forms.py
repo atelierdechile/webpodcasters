@@ -5,54 +5,45 @@ import re
 from phonenumber_field.formfields import PhoneNumberField
 from core.models import Country
 from .models import Profile
-from product.models import Product , Ingredient
-from django.forms import ModelForm
+from product.models import Product 
 from location.models import Region, Provincia, Comuna
 from .geocoding import geocode_address
 
 
-
 class ProductForm(forms.ModelForm):
-    # Campo explícito para ingredientes (ManyToMany)
-    ingredients = forms.ModelMultipleChoiceField(
-        queryset=Ingredient.objects.none(),      # se completa en __init__
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
-        label="Ingredientes",
-    )
 
     class Meta:
         model = Product
-        fields = ['title', 'category', 'description', 'price', 'image', 'preferences', 'ingredients']
+        fields = [
+            'title', 'category', 'description', 'price', 'image', 
+       #     'preferences', 'unidad_tiempo', 'fecha_inicio_arriendo', 'fecha_termino_arriendo'
+        ]
         labels = {
-            'title': 'Nombre del producto',
+            'title': 'Nombre del servicio o equipo',
             'category': 'Categoría',
             'description': 'Descripción',
-            'price': 'Precio',
-            'image': 'Imagen del producto',
-            'preferences': 'Preferencias del producto',
-            'ingredients': 'Ingredientes de la pizza',
+            'price': 'Precio base de cobro',
+            'image': 'Imagen referencial',
+            'preferences': 'Intereses / Especialidades relacionadas',
+            'unidad_tiempo': 'Métrica de cobro (Tiempo)',
+            'fecha_inicio_arriendo': 'Disponible desde',
+            'fecha_termino_arriendo': 'Disponible hasta',
         }
         widgets = {
             'preferences': forms.CheckboxSelectMultiple(),
+            # Usamos widgets de tipo datetime locales para que aparezca el selector de calendario en el navegador
+            'fecha_inicio_arriendo': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'fecha_termino_arriendo': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Ingredientes ordenados por categoría y nombre
-        self.fields['ingredients'].queryset = (
-            Ingredient.objects.select_related("category")
-            .order_by("category__ordering", "category__name", "name")
-        )
-
-        # (Opcional) agregar clases CSS a los widgets si usas Bulma/Bootstrap, etc.
+        # Agrega clases CSS automáticas a los widgets 
         for name, field in self.fields.items():
             if not isinstance(field.widget, forms.CheckboxInput) and not isinstance(field.widget, forms.CheckboxSelectMultiple):
                 existing_class = field.widget.attrs.get('class', '')
                 field.widget.attrs['class'] = (existing_class + ' input').strip()
-
-
 
 
 class SignUpForm(UserCreationForm):
@@ -60,12 +51,10 @@ class SignUpForm(UserCreationForm):
     last_name = forms.CharField(max_length=255, required=True)
     email = forms.EmailField(max_length=255, required=True)
 
-    #  Región, Provincia, Comuna
     region = forms.ModelChoiceField(queryset=Region.objects.all(), required=False, label="Región")
     provincia = forms.ModelChoiceField(queryset=Provincia.objects.none(), required=False, label="Provincia")
     comuna = forms.ModelChoiceField(queryset=Comuna.objects.none(), required=False, label="Comuna")
 
-    #  País y Teléfono
     country = forms.ModelChoiceField(
         queryset=Country.objects.none(),
         empty_label='Selecciona un país',
@@ -94,14 +83,11 @@ class SignUpForm(UserCreationForm):
             'password1', 'password2',
         )
 
-    # Inicialización del formulario
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Cargar países ordenados alfabéticamente
         self.fields['country'].queryset = Country.objects.all().order_by('name')
 
-        # Si el usuario seleccionó región/provincia filtramos los selects dependientes
         if 'region' in self.data:
             try:
                 region_id = int(self.data.get('region'))
@@ -115,16 +101,14 @@ class SignUpForm(UserCreationForm):
             except (ValueError, TypeError):
                 pass
 
-        # Agregar clases Bulma a los inputs
         for name, field in self.fields.items():
             if not isinstance(field.widget, forms.CheckboxInput):
                 existing_class = field.widget.attrs.get('class', '')
                 field.widget.attrs['class'] = (existing_class + ' input').strip()
 
-        # Placeholders amigables
         placeholders = {
             'username': 'Nombre de usuario',
-            'Primer nombre': 'Nombre',
+            'first_name': 'Nombre',
             'last_name': 'Apellido',
             'email': 'Correo electrónico',
             'phone': '+56 9 1234 5678',
@@ -137,7 +121,6 @@ class SignUpForm(UserCreationForm):
             if name in self.fields:
                 self.fields[name].widget.attrs.setdefault('placeholder', ph)
 
-    # Validaciones
     def clean_country(self):
         country = self.cleaned_data.get('country')
         if not country:
@@ -171,7 +154,6 @@ class SignUpForm(UserCreationForm):
         self.cleaned_data['phone'] = normalized_number
         return normalized_number
 
-    # Guardado del usuario
     def save(self, commit=True):
         user = super().save(commit=False)
         user.first_name = self.cleaned_data['first_name']
@@ -181,7 +163,6 @@ class SignUpForm(UserCreationForm):
         if commit:
             user.save()
 
-            # Obtener datos de la dirección y comuna
             comuna_obj = self.cleaned_data.get('comuna')
             region_obj = self.cleaned_data.get('region')
             country_obj = self.cleaned_data.get('country')
@@ -190,7 +171,6 @@ class SignUpForm(UserCreationForm):
             region_name = getattr(region_obj, "name", str(region_obj) if region_obj else "")
             country_name = getattr(country_obj, "name", "Chile")
 
-            # Obtener lat/lng usando geocoding
             lat, lng = None, None
             try:
                 lat, lng = geocode_address(
@@ -200,7 +180,7 @@ class SignUpForm(UserCreationForm):
                     country=country_name,
                 )
             except Exception:
-                pass  # No detener el registro si geocoding falla
+                pass
 
             Profile.objects.create(
                 user=user,

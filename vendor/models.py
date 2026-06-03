@@ -22,45 +22,6 @@ class Preference(models.Model):
         ordering = ["name"]
 
 
-class Allergy(models.Model):
-    """
-    Alergia alimentaria general (Gluten, Lactosa, Frutos secos, etc.)
-    Se asocia a ingredientes concretos (product.Ingredient) y a usuarios vía Profile.
-    """
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=110, unique=True, blank=True)
-    description = models.TextField(blank=True, null=True)
-
-    ingredients = models.ManyToManyField(
-        "product.Ingredient",
-        related_name="allergies",
-        blank=True,
-        verbose_name="Ingredientes relacionados",
-    )
-
-    class Meta:
-        verbose_name = "Alergia"
-        verbose_name_plural = "Alergias"
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            base_slug = slugify(self.name)
-            slug = base_slug
-            num = 1
-
-            while Allergy.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{num}"
-                num += 1
-
-            self.slug = slug
-
-        super().save(*args, **kwargs)
-
-
 class Vendor(models.Model):
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -83,7 +44,6 @@ class Vendor(models.Model):
         items = self.items.filter(vendor_paid=True, order__vendors__in=[self.id])
         return sum((item.product.price * item.quantity) for item in items)
 
-    # ✅ properties (usa Profile del usuario)
     @property
     def profile(self):
         return getattr(self.created_by, "profile", None)
@@ -117,14 +77,8 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Solo mantenemos las preferencias/intereses de contenido
     preferences = models.ManyToManyField(Preference, blank=True)
-
-    allergies = models.ManyToManyField(
-        Allergy,
-        blank=True,
-        related_name="profiles",
-        verbose_name="Alergias alimentarias",
-    )
 
     def __str__(self):
         return self.user.username
@@ -146,11 +100,9 @@ class Profile(models.Model):
     def save(self, *args, **kwargs):
         should_geocode = False
 
-        # 1) Perfil nuevo sin coords
         if not self.pk and (self.lat is None or self.lng is None):
             should_geocode = True
 
-        # 2) Perfil existente: si cambió address/comuna/region/country
         if self.pk:
             try:
                 old = Profile.objects.only(
@@ -180,7 +132,6 @@ class Profile(models.Model):
                     self.lng = lng
 
             except Exception as e:
-                # No romper el flujo de registro si la API falla
                 print("ERROR GEOCODING Profile.save:", e)
 
         super().save(*args, **kwargs)
@@ -204,23 +155,3 @@ class UserPreference(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.preference.name} - {self.action}"
-
-
-class VendorWeeklyMenu(models.Model):
-    vendor = models.ForeignKey(
-        "vendor.Vendor", on_delete=models.CASCADE, related_name="weekly_menus"
-    )
-    date = models.DateField()
-    product = models.ForeignKey(
-        "product.Product", on_delete=models.CASCADE, related_name="weekly_menus"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ("vendor", "date")
-        ordering = ["-date"]
-
-    def __str__(self):
-        return f"{self.vendor} - {self.date} - {self.product}"
