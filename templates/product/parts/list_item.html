@@ -40,8 +40,21 @@
         {% endif %}
 
         <!-- 📸 Imagen de Catálogo -->
+        {% load static %}
         <figure class="image is-4by3 mb-4" style="background-color: #f5f6fa; border-radius: 8px; overflow: hidden;">
-            <img src="{{ product.get_thumbnail }}" alt="{{ product.title }}" style="object-fit: cover;">
+          
+          {% if "microfono" in product.title|lower or "micrófono" in product.title|lower %}
+              <img src="{% static 'images/microfono.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; width: 100%; height: 100%;">
+          {% elif "camara" in product.title|lower or "cámara" in product.title|lower %}
+              <img src="{% static 'images/camara.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; width: 100%; height: 100%;">
+          {% elif "iluminacion" in product.title|lower or "iluminación" in product.title|lower %}
+              <img src="{% static 'images/iluminacion.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; width: 100%; height: 100%;">
+          {% elif "edicion" in product.title|lower or "edición" in product.title|lower %}
+              <img src="{% static 'images/edicion.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; width: 100%; height: 100%;">
+          {% else %}
+              <img src="{% static 'images/default.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; width: 100%; height: 100%;">
+          {% endif %}
+
         </figure>
 
         <!-- 🎙️ Identificador / Título -->
