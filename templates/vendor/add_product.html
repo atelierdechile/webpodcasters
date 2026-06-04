@@ -14,7 +14,6 @@
                     {% csrf_token %}
 
                     <style>
-                    /* --------- Layout general --------- */
                     .section-card {
                         margin-bottom: 2rem;
                         border-radius: 1rem;
@@ -22,7 +21,6 @@
                         padding: 1.5rem;
                         background: #ffffff;
                     }
-
                     .section-card-header {
                         display: flex;
                         align-items: center;
@@ -31,7 +29,6 @@
                         border-bottom: 2px solid #f4f5f7;
                         padding-bottom: 0.5rem;
                     }
-
                     .section-card-title {
                         font-size: 1.15rem;
                         font-weight: 600;
@@ -40,17 +37,13 @@
                         gap: .4rem;
                         color: #1a1c29;
                     }
-
-                    /* --------- Chips base --------- */
-                    .pref-grid,
-                    .ing-grid {
+                    .pref-grid {
                         display: flex;
                         flex-wrap: wrap;
                         gap: .6rem;
                         margin-bottom: 0.5rem;
                     }
-                    .pref-chip,
-                    .ing-chip {
+                    .pref-chip {
                         position: relative;
                         padding: .55rem 1rem .55rem 2.1rem;
                         border-radius: 9999px;
@@ -66,27 +59,14 @@
                         line-height: 1.2;
                         font-weight: 500;
                     }
-                    .pref-chip[data-selected="true"],
-                    .ing-chip[data-selected="true"] {
+                    .pref-chip[data-selected="true"] {
                         transform: translateY(-1px);
                         box-shadow: 0 4px 10px rgba(99, 68, 255, 0.15);
-                    }
-
-                    /* Color morado insignia para filtros de perfil */
-                    .pref-chip[data-selected="true"] {
                         background: #6344ff;
                         color: #fff;
                         border-color: #492bdf;
                     }
-                    /* Color azul corporativo para requerimientos técnicos */
-                    .ing-chip[data-selected="true"] {
-                        background: #485fc7;
-                        color: #fff;
-                        border-color: #384db0;
-                    }
-
-                    .pref-chip .check,
-                    .ing-chip .check {
+                    .pref-chip .check {
                         position: absolute;
                         left: .6rem;
                         top: 50%;
@@ -105,101 +85,8 @@
                         background: #492bdf;
                         color: #fff;
                     }
-                    .ing-chip[data-selected="true"] .check {
-                        background: #384db0;
-                        color: #fff;
-                    }
-
-                    .pref-hidden,
-                    .ing-hidden {
+                    .pref-hidden {
                         display: none !important;
-                    }
-
-                    /* --------- Acordeón de Especificaciones --------- */
-                    .ingredients-box {
-                        border-radius: 0.75rem;
-                        background: #f9fafb;
-                        padding: 0.75rem 0.75rem 0.25rem;
-                        max-height: 420px;
-                        overflow-y: auto;
-                        border: 1px solid #e5e7eb;
-                    }
-                    .ingredients-box::-webkit-scrollbar {
-                        width: 6px;
-                    }
-                    .ingredients-box::-webkit-scrollbar-thumb {
-                        background: #cbd5e1;
-                        border-radius: 9999px;
-                    }
-
-                    .ing-card {
-                        border-radius: 0.75rem;
-                        border: 1px solid #e5e7eb;
-                        margin-bottom: 0.6rem;
-                        background: #ffffff;
-                        overflow: hidden;
-                    }
-
-                    .ing-card-header {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        padding: 0.65rem 1rem;
-                        cursor: pointer;
-                        background: linear-gradient(to right, #f8f9fa, #f1f3f5);
-                        transition: background 0.2s;
-                    }
-                    .ing-card-header:hover {
-                        background: #e9ecef;
-                    }
-
-                    .ing-card-title {
-                        font-size: 0.85rem;
-                        font-weight: 700;
-                        text-transform: uppercase;
-                        letter-spacing: 0.05em;
-                        color: #475569;
-                        display: flex;
-                        align-items: center;
-                        gap: .4rem;
-                    }
-
-                    .ing-card-toggle {
-                        font-size: 0.85rem;
-                        color: #6344ff;
-                        font-weight: 600;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.35rem;
-                    }
-
-                    .ing-card-body {
-                        padding: 0.8rem 1rem 1rem;
-                        display: none;
-                    }
-                    .ing-card-body.is-open {
-                        display: block;
-                    }
-
-                    .ing-card-chevron {
-                        transition: transform .15s ease;
-                        display: inline-block;
-                    }
-                    .ing-card-header[aria-expanded="true"] .ing-card-chevron {
-                        transform: rotate(90deg);
-                    }
-
-                    /* --------- Search --------- */
-                    .ingredient-search {
-                        margin-bottom: 0.75rem;
-                    }
-                    .ingredient-search input:focus {
-                        border-color: #6344ff !important;
-                        box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
-                    }
-                    .ingredient-search .help {
-                        font-size: 0.8rem;
-                        color: #6b7280;
                     }
                     </style>
 
@@ -211,7 +98,7 @@
                         </div>
 
                         {% for field in form %}
-                            {% if field.name != "preferences" and field.name != "ingredients" %}
+                            {% if field.name != "preferences" and field.name != "status" and field.name != "unidad_tiempo" and field.name != "fecha_inicio_arriendo" and field.name != "fecha_termino_arriendo" %}
                             <div class="field mb-4">
                                 <label class="label">{{ field.label }}</label>
                                 <div class="control">
@@ -225,13 +112,86 @@
                                         {{ field|add_class:"input" }}
                                     {% endif %}
                                 </div>
-
                                 {% if field.errors %}
                                     <p class="help is-danger">{{ field.errors|join:", " }}</p>
                                 {% endif %}
                             </div>
                             {% endif %}
                         {% endfor %}
+                    </div>
+
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div class="section-card-title">
+                                <span>⏳ Modalidad de Disponibilidad</span>
+                            </div>
+                        </div>
+
+                        <p class="help mb-4" style="color: #6b7280;">
+                            Define si este elemento se transfiere como una adquisición definitiva o bajo un modelo de reserva/arriendo temporal.
+                        </p>
+
+                        <div class="columns is-multiline">
+                            {% if form.status %}
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label">{{ form.status.label }}</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            {{ form.status }}
+                                        </div>
+                                    </div>
+                                    {% if form.status.errors %}
+                                        <p class="help is-danger">{{ form.status.errors|join:", " }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if form.unidad_tiempo %}
+                            <div class="column is-6 wrapper-arriendo-field">
+                                <div class="field">
+                                    <label class="label">{{ form.unidad_tiempo.label }}</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            {{ form.unidad_tiempo }}
+                                        </div>
+                                    </div>
+                                    {% if form.unidad_tiempo.errors %}
+                                        <p class="help is-danger">{{ form.unidad_tiempo.errors|join:", " }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if form.fecha_inicio_arriendo %}
+                            <div class="column is-6 wrapper-arriendo-field">
+                                <div class="field">
+                                    <label class="label">{{ form.fecha_inicio_arriendo.label }}</label>
+                                    <div class="control">
+                                        {{ form.fecha_inicio_arriendo|add_class:"input" }}
+                                    </div>
+                                    {% if form.fecha_inicio_arriendo.errors %}
+                                        <p class="help is-danger">{{ form.fecha_inicio_arriendo.errors|join:", " }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if form.fecha_termino_arriendo %}
+                            <div class="column is-6 wrapper-arriendo-field">
+                                <div class="field">
+                                    <label class="label">{{ form.fecha_termino_arriendo.label }}</label>
+                                    <div class="control">
+                                        {{ form.fecha_termino_arriendo|add_class:"input" }}
+                                    </div>
+                                    {% if form.fecha_termino_arriendo.errors %}
+                                        <p class="help is-danger">{{ form.fecha_termino_arriendo.errors|join:", " }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <div class="section-card">
@@ -255,7 +215,6 @@
                                     data-selected="{% if selected_prefs and pref_id in selected_prefs %}true{% else %}false{% endif %}"
                                 >
                                     <span class="check">✓</span>
-
                                     🎙️ {{ pref.name }}
 
                                     <input 
@@ -273,95 +232,6 @@
 
                         {% if form.preferences.errors %}
                             <p class="help is-danger">{{ form.preferences.errors|join:", " }}</p>
-                        {% endif %}
-                    </div>
-
-                    <div class="section-card">
-                        <div class="section-card-header">
-                            <div class="section-card-title">
-                                <span>🛠️ Especificaciones técnicas y compatibilidad</span>
-                            </div>
-                        </div>
-
-                        <div class="ingredient-search">
-                            <div class="field has-addons">
-                                <div class="control is-expanded">
-                                    <input 
-                                        id="ingredient-search"
-                                        class="input"
-                                        type="search"
-                                        placeholder="Buscar requerimiento o característica (ej: Windows, WAV, VST)...">
-                                </div>
-                                <div class="control">
-                                    <button type="button" class="button is-link is-light" id="ingredient-clear" style="font-weight: 600;">
-                                        Limpiar
-                                    </button>
-                                </div>
-                            </div>
-                            <p class="help">
-                                Puedes colapsar/expandir las categorías para gestionar los parámetros de compatibilidad rápidamente.
-                            </p>
-                        </div>
-
-                        <div class="ingredients-box">
-                            {% with ingredients=form.ingredients.field.queryset selected_ings=form.ingredients.value %}
-                                {% if ingredients %}
-                                    {% for ing in ingredients %}
-                                        {% ifchanged ing.category_id %}
-                                            {% if not forloop.first %}
-                                                    </div> </div> </div> {% endif %}
-                                            <div class="ing-card" data-category-id="{{ ing.category.id|default:'0' }}">
-                                                <div class="ing-card-header" tabindex="0" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
-                                                    <div class="ing-card-title">
-                                                        {% if ing.category %}
-                                                            {{ ing.category.name }}
-                                                        {% else %}
-                                                            General / Otros
-                                                        {% endif %}
-                                                    </div>
-                                                    <div class="ing-card-toggle">
-                                                        <span class="ing-card-chevron">▶</span>
-                                                        <span class="is-hidden-mobile">Ver parámetros</span>
-                                                    </div>
-                                                </div>
-                                                <div class="ing-card-body {% if forloop.first %}is-open{% endif %}">
-                                                    <div class="ing-grid">
-                                        {% endifchanged %}
-
-                                        {% with ing_id=ing.id|stringformat:"s" %}
-                                        <label 
-                                            class="ing-chip"
-                                            tabindex="0"
-                                            data-selected="{% if selected_ings and ing_id in selected_ings %}true{% else %}false{% endif %}"
-                                        >
-                                            <span class="check">✓</span>
-                                            {{ ing.name }}
-
-                                            <input
-                                                type="checkbox"
-                                                class="ing-hidden"
-                                                name="ingredients"
-                                                value="{{ ing.id }}"
-                                                {% if selected_ings and ing_id in selected_ings %}checked{% endif %}
-                                            >
-                                        </label>
-                                        {% endwith %}
-
-                                        {% if forloop.last %}
-                                                    </div> </div> </div> {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="py-4 has-text-centered">
-                                        <p class="has-text-grey">
-                                            Aún no hay parámetros base cargados en el sistema. Puedes configurarlos desde el panel de administración.
-                                        </p>
-                                    </div>
-                                {% endif %}
-                            {% endwith %}
-                        </div>
-
-                        {% if form.ingredients.errors %}
-                            <p class="help is-danger">{{ form.ingredients.errors|join:", " }}</p>
                         {% endif %}
                     </div>
 
@@ -393,6 +263,7 @@
 </div>
 
 <script>
+// Manejo interactivo de las fichas de preferencia
 function setupChipToggle(selector, hiddenClass) {
     document.querySelectorAll(selector).forEach(chip => {
         chip.addEventListener("click", () => {
@@ -413,65 +284,41 @@ function setupChipToggle(selector, hiddenClass) {
         });
     });
 }
-
 setupChipToggle(".pref-chip", "pref-hidden");
-setupChipToggle(".ing-chip", "ing-hidden");
 
-document.querySelectorAll(".ing-card-header").forEach(header => {
-    header.addEventListener("click", () => {
-        const body = header.nextElementSibling;
-        const expanded = header.getAttribute("aria-expanded") === "true";
-        header.setAttribute("aria-expanded", String(!expanded));
-        body.classList.toggle("is-open", !expanded);
-    });
+// UX DINÁMICA: Ocultar/mostrar campos de arriendo
+const statusSelect = document.querySelector('select[name="status"]');
+const arriendoFields = document.querySelectorAll('.wrapper-arriendo-field');
 
-    header.addEventListener("keydown", e => {
-        if (e.key === " " || e.key === "Enter") {
-            e.preventDefault();
-            header.click();
-        }
-    });
-});
-
-const searchInput = document.getElementById("ingredient-search");
-const clearBtn = document.getElementById("ingredient-clear");
-
-if (searchInput) {
-    const filterIngredients = () => {
-        const term = searchInput.value.trim().toLowerCase();
-        const cards = document.querySelectorAll(".ing-card");
-
-        cards.forEach(card => {
-            const chips = card.querySelectorAll(".ing-chip");
-            let visibleCount = 0;
-
-            chips.forEach(chip => {
-                const text = chip.textContent.toLowerCase();
-                const match = text.includes(term);
-                chip.style.display = match ? "" : "none";
-                if (match) visibleCount++;
-            });
-
-            card.style.display = visibleCount > 0 ? "" : "none";
+if (statusSelect && arriendoFields.length > 0) {
+    const toggleArriendoFields = () => {
+        const isArriendo = statusSelect.value.toLowerCase().includes('arriendo');
+        
+        arriendoFields.forEach(field => {
+            if (isArriendo) {
+                field.style.display = 'block';
+            } else {
+                field.style.display = 'none';
+                const input = field.querySelector('input');
+                const select = field.querySelector('select');
+                if (input) input.value = '';
+                if (select) select.value = '';
+            }
         });
     };
 
-    searchInput.addEventListener("input", filterIngredients);
-
-    if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-            searchInput.value = "";
-            filterIngredients();
-        });
-    }
+    statusSelect.addEventListener('change', toggleArriendoFields);
+    toggleArriendoFields();
 }
 </script>
 
 <style>
-  /* Fix menor para estilos de Bulma sobre inputs generados */
   .input:focus, .select select:focus {
       border-color: #6344ff !important;
       box-shadow: 0 0 0 0.125em rgba(99, 68, 255, 0.25) !important;
+  }
+  .select, .select select {
+      width: 100% !important;
   }
 </style>
 {% endblock content %}

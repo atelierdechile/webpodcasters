@@ -7,11 +7,23 @@
 <div class="columns is-centered container" style="margin: 0 auto; padding: 2rem 1rem;">
   <div class="column is-8">
 
-    {% if product.image %}
-      <figure class="image mb-5" style="max-width: 420px; background-color: #f5f6fa; border-radius: 12px; overflow: hidden; border: 1px solid #e1e4e8;">
-        <img src="{{ product.image.url }}" alt="{{ product.title }}" style="width: 100%; object-fit: cover;">
-      </figure>
-    {% endif %}
+    {% load static %}
+
+{% if "microfono" in product.title|lower or "micrófono" in product.title|lower %}
+    <img src="{% static 'images/microfono.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; height: 250px; width: 100%;">
+
+{% elif "camara" in product.title|lower or "cámara" in product.title|lower %}
+    <img src="{% static 'images/camara.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; height: 250px; width: 100%;">
+
+{% elif "iluminacion" in product.title|lower or "iluminación" in product.title|lower %}
+    <img src="{% static 'images/iluminacion.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; height: 250px; width: 100%;">
+
+{% elif "edicion" in product.title|lower or "edición" in product.title|lower %}
+    <img src="{% static 'images/edicion.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; height: 250px; width: 100%;">
+
+{% else %}
+    <img src="{% static 'images/default.jpg' %}" alt="{{ product.title }}" style="object-fit: cover; height: 250px; width: 100%;">
+    {% endif %} 
 
     <h1 class="title is-2 mb-2" style="color: #1a1c29; font-weight: 700;">{{ product.title }}</h1>
 

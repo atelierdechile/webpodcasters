@@ -34,6 +34,19 @@ class Product(models.Model):
     # Preferencias / Intereses
     preferences = models.ManyToManyField(Preference, blank=True)
 
+    # 🛒 --- MODALIDAD DE ADQUISICIÓN (VENTA O ARRIENDO) ---
+    STATUS_CHOICES = [
+        ('VENTA', 'Venta Directa'),
+        ('ARRIENDO', 'Arriendo Temporal'),
+    ]
+    
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='VENTA', # Por defecto asumimos venta directa
+        verbose_name="Modalidad del producto/servicio"
+    )
+
     # ⏱️ --- NUEVOS ATRIBUTOS PARA ARRIENDOS DE EQUIPOS Y SERVICIOS ---
     UNIDAD_TIEMPO_CHOICES = [
         ('HORA', 'Por Hora'),
@@ -67,8 +80,9 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-    # ---------------- SLUG ----------------
+    # ---------------- SLUG & VALIDACIONES ----------------
     def save(self, *args, **kwargs):
+        # 1. Autogeneración de Slug único
         if not self.slug:
             base_slug = slugify(self.title)
             slug = base_slug
@@ -79,6 +93,12 @@ class Product(models.Model):
                 num += 1
 
             self.slug = slug
+
+        # 🧠 2. Consistencia de Datos: Si es VENTA, limpiamos campos de arriendo
+        if self.status == 'VENTA':
+            self.unidad_tiempo = None
+            self.fecha_inicio_arriendo = None
+            self.fecha_termino_arriendo = None
 
         super().save(*args, **kwargs)
 

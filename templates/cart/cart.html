@@ -24,12 +24,20 @@
                 <tr>
 
                     <!-- IMAGEN -->
+                    {% load static %}
                     <td>
-                        <img src="{{ p.get_thumbnail }}" 
-                             alt="{{ p.title }}" 
-                             style="width:64px; border-radius: 6px;">
+                        {% if "microfono" in p.title|lower or "micrófono" in p.title|lower %}
+                            <img src="{% static 'images/microfono.jpg' %}" alt="{{ p.title }}" style="width:64px; height:48px; object-fit: cover; border-radius: 6px;">
+                        {% elif "camara" in p.title|lower or "cámara" in p.title|lower %}
+                            <img src="{% static 'images/camara.jpg' %}" alt="{{ p.title }}" style="width:64px; height:48px; object-fit: cover; border-radius: 6px;">
+                        {% elif "iluminacion" in p.title|lower or "iluminación" in p.title|lower %}
+                            <img src="{% static 'images/iluminacion.jpg' %}" alt="{{ p.title }}" style="width:64px; height:48px; object-fit: cover; border-radius: 6px;">
+                        {% elif "edicion" in p.title|lower or "edición" in p.title|lower %}
+                            <img src="{% static 'images/edicion.jpg' %}" alt="{{ p.title }}" style="width:64px; height:48px; object-fit: cover; border-radius: 6px;">
+                        {% else %}
+                            <img src="{% static 'images/default.jpg' %}" alt="{{ p.title }}" style="width:64px; height:48px; object-fit: cover; border-radius: 6px;">
+                        {% endif %}
                     </td>
-
                     <!-- NOMBRE + ETIQUETA -->
                     <td>
                         <strong>{{ p.title }}</strong><br>

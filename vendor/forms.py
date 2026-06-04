@@ -15,26 +15,41 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            'title', 'category', 'description', 'price', 'image', 
-       #     'preferences', 'unidad_tiempo', 'fecha_inicio_arriendo', 'fecha_termino_arriendo'
+            'title', 
+            'category', 
+            'description', 
+            'price', 
+            'status',                  
+            'unidad_tiempo',           
+            'fecha_inicio_arriendo',    
+            'fecha_termino_arriendo',   
+            'preferences',             
         ]
         labels = {
             'title': 'Nombre del servicio o equipo',
             'category': 'Categoría',
             'description': 'Descripción',
             'price': 'Precio base de cobro',
-            'image': 'Imagen referencial',
-            'preferences': 'Intereses / Especialidades relacionadas',
+            'status': 'Modalidad de entrega', 
             'unidad_tiempo': 'Métrica de cobro (Tiempo)',
             'fecha_inicio_arriendo': 'Disponible desde',
             'fecha_termino_arriendo': 'Disponible hasta',
+            'preferences': 'Intereses / Especialidades relacionadas',
+
         }
         widgets = {
             'preferences': forms.CheckboxSelectMultiple(),
-            # Usamos widgets de tipo datetime locales para que aparezca el selector de calendario en el navegador
             'fecha_inicio_arriendo': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'fecha_termino_arriendo': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            if not isinstance(field.widget, forms.CheckboxInput) and not isinstance(field.widget, forms.CheckboxSelectMultiple):
+                existing_class = field.widget.attrs.get('class', '')
+                field.widget.attrs['class'] = (existing_class + ' input').strip()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
