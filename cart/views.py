@@ -1,5 +1,6 @@
 import json
 import random
+from urllib import response
 import mercadopago
 from django.conf import settings
 from django.contrib import messages
@@ -40,7 +41,7 @@ def get_active_comuna(request):
 
 
 # ============================================================
-# 🛒 VISTA: DETALLE DEL CARRITO (Satisface la ruta principal de urls.py)
+# 🛒 VISTA: DETALLE DEL CARRITO (Con Debug para Mercado Pago)
 # ============================================================
 @login_required
 def cart_detail(request):
@@ -78,8 +79,14 @@ def cart_detail(request):
             }
 
         if request.method == "POST":
+            # === DEBUG 1: Recibiendo datos ===
+            print("🚀 Petición POST recibida en el checkout")
+            
             form = CheckoutForm(request.POST)
             if form.is_valid():
+                # === DEBUG 2: Formulario OK ===
+                print("✅ El formulario es válido")
+                
                 total = float(cart.get_total_cost())
                 data = form.cleaned_data
 
@@ -95,6 +102,9 @@ def cart_detail(request):
                     amount=total,
                     send_email=False,
                 )
+                
+                # === DEBUG 3: Orden en Base de Datos ===
+                print(f"📦 Orden creada exitosamente: ID {order.id}")
 
                 mp = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
                 preference_data = {
@@ -102,7 +112,8 @@ def cart_detail(request):
                         {
                             "title": item["product"].title,
                             "quantity": item["effective_qty"],
-                            "unit_price": float(item["unit_price"]),
+                            # Mercado Pago CLP prefiere enteros (sin decimales)
+                            "unit_price": int(float(item["unit_price"])),
                             "currency_id": "CLP",
                         }
                         for item in cart
@@ -117,6 +128,7 @@ def cart_detail(request):
                         "failure": f"{settings.SITE_URL}/cart/failure/",
                         "pending": f"{settings.SITE_URL}/cart/pending/",
                     },
+                    "auto_return": "approved",
                     "binary_mode": True,
                     "notification_url": f"{settings.SITE_URL}/cart/webhook/",
                     "external_reference": str(order.id),
@@ -124,10 +136,20 @@ def cart_detail(request):
 
                 result = mp.preference().create(preference_data)
                 response = result.get("response", {})
-                init_point = response.get("init_point")
-
+                init_point = response.get("sandbox_init_point")
+                
+                # === DEBUG 4: Respuesta de Mercado Pago ===
                 if init_point:
+                    print(f"🔗 URL de Sandbox generada: {init_point}")
                     return redirect(init_point)
+                else:
+                    print("❌ Error: No se pudo generar la URL de Mercado Pago.")
+                    print("Respuesta completa de MP:", response)
+            else:
+                # === DEBUG 5: Errores de validación ===
+                print("❌ Formulario inválido. Errores encontrados:")
+                print(form.errors)
+
         else:
             form = CheckoutForm(initial=initial_data)
 
@@ -137,9 +159,8 @@ def cart_detail(request):
             "mp_public_key": settings.MERCADOPAGO_PUBLIC_KEY,
         })
     except Exception as e:
+        print(f"🔥 ERROR CRÍTICO EN CART_DETAIL: {str(e)}")
         raise
-
-
 # ===========================================================
 # 🎙️ VISTA: PRODUCT DETAIL (FICHA DEL ELEMENTO)
 # ===========================================================
