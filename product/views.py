@@ -32,7 +32,7 @@ def get_active_comuna(request):
 
 
 # ===========================================================
-#   PRODUCT DETAIL
+#   PRODUCT DETAIL (Adaptado para Venta y Arriendo Mensual)
 # ===========================================================
 def product(request, category_slug, product_slug):
     from analytics.utils import log_event
@@ -93,22 +93,29 @@ def product(request, category_slug, product_slug):
             messages.error(request, "Debes iniciar sesión para agregar elementos al carrito.")
             return redirect("product:product", category_slug=category_slug, product_slug=product_slug)
 
-        form = AddToCartForm(request.POST)
+        # Pasamos el product_status para validar correctamente
+        form = AddToCartForm(request.POST, product_status=product.status)
 
         if form.is_valid():
             quantity = form.cleaned_data["quantity"]
             
             cart.add(product_id=product.id, quantity=quantity, update_quantity=False)
-            messages.success(request, "Añadido al carrito con éxito.")
+            
+            # Mensaje personalizado según el caso de uso
+            if product.status == 'ARRIENDO':
+                messages.success(request, f"⏱️ Arriendo por {quantity} meses añadido al carrito.")
+            else:
+                messages.success(request, "🛒 Añadido al carrito con éxito.")
 
             log_event(
                 request,
-                action=f"🖱️ Seleccionó producto '{product.title}' (x{quantity})",
+                action=f"Muestreo '{product.title}' (x{quantity})",
                 page="product/detail",
                 product_id=product.id,
                 extra_data={
                     "precio_final": product.get_final_price(),
-                    "cantidad": quantity
+                    "cantidad": quantity,
+                    "modalidad": product.status
                 }
             )
 
@@ -116,8 +123,8 @@ def product(request, category_slug, product_slug):
             return redirect("product:product", category_slug=category_slug, product_slug=product_slug)
 
     else:
-        # GET normal
-        form = AddToCartForm()
+        # GET normal: Instanciamos pasando el status del producto
+        form = AddToCartForm(product_status=product.status)
 
     # ============================
     # RENDER FINAL
