@@ -136,7 +136,7 @@ def cart_detail(request):
 
                 result = mp.preference().create(preference_data)
                 response = result.get("response", {})
-                init_point = response.get("sandbox_init_point")
+                init_point = response.get("init_point")
                 
                 # === DEBUG 4: Respuesta de Mercado Pago ===
                 if init_point:
