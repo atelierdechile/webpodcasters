@@ -18,7 +18,7 @@ from product.utils import aplicar_preferencias
 
 # Modelos y formularios adicionales para el correcto funcionamiento del carrito
 from .forms import CheckoutForm
-from order.utilities import checkout, notify_customer, notify_vendor
+from order.utilities import checkout, notify_customer, notify_vendor, send_order_webhook
 from botapi.models import TempCart
 from order.models import Order
 
@@ -324,4 +324,52 @@ def checkout_start(request):
 
 @csrf_exempt
 def webhook(request):
+    topic = request.GET.get("topic") or request.GET.get("type")
+    resource_id = request.GET.get("id") or request.GET.get("data.id")
+
+    if topic == "payment" and resource_id:
+        print(f"🔔 Notificación de pago recibida de Mercado Pago. ID Recurso: {resource_id}")
+        
+        try:
+            mp = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+            payment_info = mp.payment().get(resource_id)
+            payment_data = payment_info.get("response", {})
+            
+            order_id = payment_data.get("external_reference")
+            status = payment_data.get("status")
+            
+            print(f"🔍 Evaluando Pago MP: Orden ID {order_id} | Estado MP: {status}")
+
+            if order_id and status == "approved":
+                try:
+                    order = Order.objects.get(id=int(order_id))
+                    
+                    if order.status != "paid":
+                        # 💰 ¡ÉXITO! Orden aprobada y actualizada
+                        order.status = "paid"
+                        order.paid = True
+                        order.save()
+                        print(f"💰 ¡ÉXITO! Orden #{order.id} actualizada internamente a estado 'PAID'")
+                        
+                        # 📧 Funciones de correo desactivadas temporalmente con '#' para evitar errores de conexión
+                        # try:
+                        #     notify_customer(order)
+                        #     notify_vendor(order)
+                        #     print("📧 Correos de confirmación enviados a cliente y vendedores.")
+                        # except Exception as email_err:
+                        #     print(f"⚠️ Error al despachar correos del webhook: {email_err}")
+                        
+                        # 🔥 DESPACHO DEL WEBHOOK EXTERNO (Para actualizar tus métricas)
+                        try:
+                            send_order_webhook(order)
+                            print("🔥 Webhook externo de auditoría enviado correctamente.")
+                        except Exception as web_err:
+                            print(f"⚠️ Error al despachar webhook externo: {web_err}")
+                            
+                except Order.DoesNotExist:
+                    print(f"❌ Error: Llegó un pago aprobado para la orden ID {order_id} pero no existe en la BD.")
+                    
+        except Exception as e:
+            print(f"🔥 Error crítico procesando el webhook de Mercado Pago: {str(e)}")
+
     return JsonResponse({"status": "ok"}, status=200)

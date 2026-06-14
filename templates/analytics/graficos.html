@@ -6,9 +6,6 @@
   <h1 class="title is-2 has-text-dark mb-2">📊 Panel Global de Actividad & Oyentes</h1>
   <p class="subtitle is-5 text-muted mb-5">Estadísticas globales de la plataforma Web Podcasters</p>
 
-  <!-- ======================================================= -->
-  <!-- 🗺️ MAPA – CREADORES + VENTAS HISTÓRICAS (LIVE) -->
-  <!-- ======================================================= -->
   <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Mapa de productos</h2>
@@ -18,9 +15,6 @@
     <div id="vendorsMap" style="height:420px; margin-top:1rem; border-radius:12px; overflow:hidden;"></div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- 📈 GLOBAL – INGRESOS POR DÍA -->
-  <!-- ======================================================= -->
   <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Interacciones y transacciones por día (global)</h2>
@@ -37,9 +31,30 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- 🎙️ GLOBAL – SERVICIOS MÁS POPULARES -->
-  <!-- ======================================================= -->
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #6344ff;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">💰 Recaudación Diaria: Ventas vs Arriendos</h2>
+      <span class="tag is-success is-light" style="font-weight:600;">Métricas de Negocio</span>
+    </div>
+    <p class="has-text-left help has-text-grey" style="margin-top: 5px;">Monto total acumulado en CLP dividido por modalidad comercial.</p>
+
+    <div style="height:300px; margin-top:1.5rem;">
+      <canvas id="ventasArriendosDiariosChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #485fc7;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🏙️ Volumen de Órdenes por Comuna</h2>
+      <span class="tag is-info is-light" style="font-weight:600;">Top 10 Zonas (Chile)</span>
+    </div>
+    <p class="has-text-left help has-text-grey" style="margin-top: 5px;">Cantidad total de productos distribuidos y servicios agendados según la ubicación registrada.</p>
+
+    <div style="height:320px; margin-top:1.5rem;">
+      <canvas id="comunasChart"></canvas>
+    </div>
+  </div>
+
   <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Servicios o productos más populares (global)</h2>
@@ -56,9 +71,6 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- 📈 Usuarios por día -->
-  <!-- ======================================================= -->
   <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
       <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Usuarios activos por día</h2>
@@ -75,9 +87,6 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- ⏰ Actividad por hora -->
-  <!-- ======================================================= -->
   <div class="card mb-4" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
       <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Horas de mayor actividad</h2>
@@ -96,9 +105,6 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- 🥧 Errores y Eventos -->
-  <!-- ======================================================= -->
   <div class="card mb-5" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2rem; align-items:center; background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="flex:1 1 45%; min-width:350px; height:260px;">
       <canvas id="erroresChart"></canvas>
@@ -114,9 +120,6 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- 🎧 KPI Intereses de Audio -->
-  <!-- ======================================================= -->
   <div class="kpi-section mt-5 mb-6">
     <h2 class="title is-4 mb-4" style="color:#6344ff; font-weight:700;">Preferencias de Contenido</h2>
 
@@ -143,7 +146,6 @@
 {% endblock %}
 
 {% block scripts %}
-  <!-- Chart.js (Leaflet ya lo tienes en base.html) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
@@ -175,12 +177,11 @@
       return 20;
     }
 
-    /* Cambiados los colores del mapa a tonalidades azules y moradas */
     function salesToColor(total){
       if (total < 500000) return "#3e8ed0";   
       if (total < 1000000) return "#485fc7";  
       if (total < 1500000) return "#9b51e0";  
-      return "#6344ff";                       
+      return "#6344ff";                      
     }
 
     function initMapOnce(){
@@ -252,7 +253,7 @@
       }
     }
 
-    /* Gráficos principales pintados de morado (#6344ff) */
+    // --- CONFIGURACIÓN DE GRÁFICOS ORIGINALES ---
     const ventasChart = new Chart(document.getElementById("ventasChart"), {
       type: "bar",
       data: { labels: [], datasets: [{ label: "Interacciones/Pedidos", data: [], backgroundColor:"#6344ff" }] },
@@ -265,13 +266,76 @@
       options: { indexAxis: "y", scales: { x: { beginAtZero: true } } }
     });
 
+    // ====================================================================
+    // 📊 NUEVOS GRÁFICOS: INSTANCIACIÓN DE PANELES DE NEGOCIO
+    // ====================================================================
+    
+    // 1. Instancia del gráfico comparativo Ventas vs Arriendos
+    const ventasArriendosDiariosChart = new Chart(document.getElementById("ventasArriendosDiariosChart"), {
+      type: "bar",
+      data: {
+        labels: [],
+        datasets: [
+          { label: "Ventas Directas ($)", data: [], backgroundColor: "#10b981", borderRadius: 4 },
+          { label: "Arriendos Temporales ($)", data: [], backgroundColor: "#3e8ed0", borderRadius: 4 }
+        ]
+      },
+      options: {
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) { return context.dataset.label + ": " + formatCLP(context.raw); }
+            }
+          }
+        },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // 2. Instancia del gráfico de Desglose por Comunas chilenas
+    const comunasChart = new Chart(document.getElementById("comunasChart"), {
+      type: "bar",
+      data: {
+        labels: [],
+        datasets: [
+          { label: "Unidades Vendidas", data: [], backgroundColor: "#10b981", borderRadius: 4 },
+          { label: "Equipos/Servicios Arrendados", data: [], backgroundColor: "#3e8ed0", borderRadius: 4 }
+        ]
+      },
+      options: {
+        indexAxis: "y",
+        scales: { x: { beginAtZero: true } }
+      }
+    });
+
+    // --- CARGADORES DE DATOS ---
+
     async function loadVentas() {
       const rango = document.getElementById("ventasRango").value;
       const res = await fetch(`/analytics/admin/sales-data/?range=${rango}`);
       const data = await res.json();
+      
+      // Actualiza gráfico original
       ventasChart.data.labels = data.map(d => d.day);
       ventasChart.data.datasets[0].data = data.map(d => d.total);
       ventasChart.update();
+
+      // 🔥 ACTUALIZA EL NUEVO GRÁFICO DIARIO SEPARADO
+      ventasArriendosDiariosChart.data.labels = data.map(d => d.day);
+      ventasArriendosDiariosChart.data.datasets[0].data = data.map(d => d.ventas);
+      ventasArriendosDiariosChart.data.datasets[1].data = data.map(d => d.arriendos);
+      ventasArriendosDiariosChart.update();
+    }
+
+    // 🔥 NUEVA FUNCIÓN ASÍNCRONA PARA EL PANEL DE COMUNAS
+    async function loadComunas() {
+      const res = await fetch("/analytics/admin/top-comunas/");
+      const data = await res.json();
+      
+      comunasChart.data.labels = data.map(d => d.comuna);
+      comunasChart.data.datasets[0].data = data.map(d => d.ventas);
+      comunasChart.data.datasets[1].data = data.map(d => d.arriendos);
+      comunasChart.update();
     }
 
     async function loadProductos() {
@@ -286,6 +350,7 @@
     document.getElementById("ventasRango").addEventListener("change", loadVentas);
     document.getElementById("productosRango").addEventListener("change", loadProductos);
 
+    // --- RESTO DE GRÁFICOS ANTIGUOS MANTENIDOS ---
     const usuariosChart = new Chart(document.getElementById('usuariosChart'), {
       type: 'bar',
       data: { labels: [], datasets: [{ label: 'Usuarios conectados', data: [], backgroundColor: '#6344ff', borderRadius: 6 }] },
@@ -320,6 +385,7 @@
       usuariosChart.data.datasets[0].data = dataDias.usuarios.map(e => e.total);
       usuariosChart.update();
 
+      hoursChart = horasChart;
       horasChart.data.labels = dataHoras.labels;
       horasChart.data.datasets[0].data = dataHoras.values;
       horasChart.update();
@@ -359,11 +425,13 @@
       });
     }
 
+    // --- INICIALIZADOR CENTRAL ---
     document.addEventListener("DOMContentLoaded", () => {
       loadVendorsMap();
       setInterval(loadVendorsMap, 5000);
 
-      loadVentas();
+      loadVentas();    // Ejecuta la recarga de transacciones por día
+      loadComunas();   // 🔥 Ejecuta la recarga de la lista de comunas
       loadProductos();
 
       actualizarDatos();
