@@ -608,3 +608,68 @@ def admin_vendedores_ranking(request):
     ranking_data.sort(key=lambda x: x["total_general"], reverse=True)
 
     return JsonResponse(ranking_data, safe=False)
+
+    # --- Agrega esto al final de tu analytics/views.py ---
+
+@login_required
+def vendor_private_metrics(request):
+    from datetime import timedelta
+    from analytics.utils import get_datetime_range
+    
+    try:
+        # Obtenemos el perfil de vendedor del usuario conectado
+        vendor = request.user.vendor
+    except Exception:
+        return JsonResponse({"error": "No cuentas con un perfil de vendedor activo."}, status=403)
+
+    rango = request.GET.get("range", "7days")
+    start, end = get_datetime_range(rango)
+
+    # 1. Histórico Diario de Ingresos
+    items = OrderItem.objects.filter(
+        vendor=vendor,
+        order__status__iexact="paid",
+        order__created_at__gte=start,
+        order__created_at__lte=end
+    )
+
+    # Reconstrucción de fechas del rango
+    dates = [start.date() + timedelta(days=i) for i in range((end.date() - start.date()).days + 1)]
+    
+    dict_diario = {d: {"ventas": 0, "arriendos": 0} for d in dates}
+    for item in items:
+        day = item.order.created_at.astimezone().date()
+        if day in dict_diario:
+            subtotal = item.price * item.quantity
+            if item.product.status == 'ARRIENDO':
+                dict_diario[day]["arriendos"] += float(subtotal)
+            else:
+                dict_diario[day]["ventas"] += float(subtotal)
+
+    reporte_diario = [
+        {"day": d.strftime("%Y-%m-%d"), "ventas": metrics["ventas"], "arriendos": metrics["arriendos"]}
+        for d, metrics in dict_diario.items()
+    ]
+
+    # 2. Desglose Geográfico de Clientes de este Vendedor
+    all_items_vendor = OrderItem.objects.filter(vendor=vendor, order__status__iexact="paid")
+    comunas_dict = {}
+    
+    for item in all_items_vendor:
+        comuna_nombre = "Sin Especificar"
+        comprador_profile = Profile.objects.filter(user__email=item.order.email).select_related('comuna').first()
+        if comprador_profile and comprador_profile.comuna:
+            comuna_nombre = comprador_profile.comuna.nombre.strip().title()
+
+        if comuna_nombre not in comunas_dict:
+            comunas_dict[comuna_nombre] = {"comuna": comuna_nombre, "cantidad": 0}
+        
+        comunas_dict[comuna_nombre]["cantidad"] += item.quantity
+
+    reporte_comunas = list(comunas_dict.values())
+    reporte_comunas.sort(key=lambda x: x["cantidad"], reverse=True)
+
+    return JsonResponse({
+        "diario": reporte_diario,
+        "comunas": reporte_comunas[:5] # Top 5 comunas donde más le compran a él
+    }, safe=False)
