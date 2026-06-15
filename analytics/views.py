@@ -459,10 +459,6 @@ def vendor_top_products(request):
 
 @staff_member_required
 def admin_sales_data(request):
-    """
-    API REFACTORIZADA: Mantiene compatibilidad con el gráfico de barras diario original
-    pero inyecta los desgloses monetarios de 'ventas' y 'arriendos' por separado.
-    """
     rango = request.GET.get("range", "7days")
     start, end = get_datetime_range(rango)
 
@@ -506,7 +502,6 @@ def admin_sales_data(request):
 
 @staff_member_required
 def admin_top_products(request):
-    """Conserva el gráfico de barras horizontales de popularidad original intacto."""
     range_value = request.GET.get("range", "7days")
 
     today = timezone.localtime()
@@ -539,27 +534,25 @@ def admin_top_products(request):
 
 
 # ============================================================================
-# 🏙️ NUEVO ENDPOINT: DESGLOSE DE MOVIMIENTOS GEOGRÁFICOS POR COMUNA (CHILE)
+# 🏙️ NUEVOS ENDPOINTS Y ARREGLOS DE HOY
 # ============================================================================
 
 @staff_member_required
 def admin_top_comunas(request):
-    # Traemos los ítems pagados optimizando las relaciones con select_related
+    # CORRECCIÓN: Usamos solo 'order' y 'product', que son ForeignKeys seguros.
     items = OrderItem.objects.filter(
         order__status__iexact="paid"
-    ).select_related('order', 'product', 'order__vendors')
+    ).select_related('order', 'product')
 
     comunas_dict = {}
     
     for item in items:
-        # Buscamos el perfil del comprador usando el email registrado en la orden
         comuna_nombre = "Sin Especificar"
         comprador_profile = Profile.objects.filter(user__email=item.order.email).select_related('comuna').first()
         
         if comprador_profile and comprador_profile.comuna:
             comuna_nombre = comprador_profile.comuna.nombre.strip().title()
         elif item.order.place:
-            # Fallback en caso de que sea un comprador anónimo pero haya escrito algo en el checkout
             comuna_nombre = item.order.place.strip().title()
 
         if comuna_nombre not in comunas_dict:
@@ -571,19 +564,17 @@ def admin_top_comunas(request):
             comunas_dict[comuna_nombre]["ventas"] += item.quantity
 
     lista_final = list(comunas_dict.values())
-    # Ordenamos de mayor a menor movimiento total
     lista_final.sort(key=lambda x: x["ventas"] + x["arriendos"], reverse=True)
 
     return JsonResponse(lista_final[:10], safe=False)
 
-#Gráfico de ventas y arriendos por vendedor
+
 @staff_member_required 
 def admin_vendedores_ranking(request):
     vendedores = Vendor.objects.all()
     ranking_data = []
 
     for v in vendedores:
-        # Calculamos ítems vendidos por este vendor específico
         items_vendor = OrderItem.objects.filter(vendor=v, order__status__iexact="paid")
         
         total_ventas = 0
@@ -604,26 +595,20 @@ def admin_vendedores_ranking(request):
             "total_general": total_ventas + total_arriendos
         })
 
-    # Ordenamos el ranking poniendo arriba al que ha recaudado más dinero total
     ranking_data.sort(key=lambda x: x["total_general"], reverse=True)
 
     return JsonResponse(ranking_data, safe=False)
 
-    # --- Agrega esto al final de tu analytics/views.py ---
 
 @login_required
 def vendor_private_metrics(request):
-    from datetime import timedelta
-    from analytics.utils import get_datetime_range
-    
     try:
-        # Obtenemos el perfil de vendedor del usuario conectado
         vendor = request.user.vendor
     except Exception:
         return JsonResponse({"error": "No cuentas con un perfil de vendedor activo."}, status=403)
 
     rango = request.GET.get("range", "7days")
-    start, end = get_datetime_range(rango)
+    start, end = get_datetime_range(rango) # Llamada a la función que ya existe en este mismo archivo
 
     # 1. Histórico Diario de Ingresos
     items = OrderItem.objects.filter(
@@ -633,7 +618,6 @@ def vendor_private_metrics(request):
         order__created_at__lte=end
     )
 
-    # Reconstrucción de fechas del rango
     dates = [start.date() + timedelta(days=i) for i in range((end.date() - start.date()).days + 1)]
     
     dict_diario = {d: {"ventas": 0, "arriendos": 0} for d in dates}
@@ -671,5 +655,5 @@ def vendor_private_metrics(request):
 
     return JsonResponse({
         "diario": reporte_diario,
-        "comunas": reporte_comunas[:5] # Top 5 comunas donde más le compran a él
+        "comunas": reporte_comunas[:5] 
     }, safe=False)
