@@ -121,6 +121,9 @@
         {% endif %}
     </div>
 
+    <!-- ========================================== -->
+    <!-- 📊 MÉTRICAS DE RENDIMIENTO DEL CREADOR     -->
+    <!-- ========================================== -->
     <div class="box" style="border-radius: 12px; border: 1px solid #e1e4e8; padding: 2rem;">
         <h2 class="title is-4 mb-4" style="color: #1a1c29; font-weight: 700; text-align: center;">📊 Métricas de Rendimiento</h2>
 
@@ -131,17 +134,19 @@
         </div>
 
         <div class="columns is-multiline">
+            <!-- GRÁFICO 1: Ingresos Reales en Dinero -->
             <div class="column is-6">
-                <div class="box" style="border: 1px solid #e1e4e8; border-radius: 8px; box-shadow: none;">
-                    <h3 class="title is-6 mb-3" style="color: #4a4a4a;">📅 Volumen de solicitudes por período</h3>
-                    <canvas id="salesChart" style="max-height: 240px;"></canvas>
+                <div class="box" style="border: 1px solid #e1e4e8; border-radius: 8px; box-shadow: none; height: 100%;">
+                    <h3 class="title is-6 mb-3" style="color: #4a4a4a;">💰 Recaudación por período (CLP)</h3>
+                    <canvas id="vendorSalesChart" style="max-height: 260px;"></canvas>
                 </div>
             </div>
 
+            <!-- GRÁFICO 2: Elementos (Unidades) -->
             <div class="column is-6">
-                <div class="box" id="top-products-box" style="border: 1px solid #e1e4e8; border-radius: 8px; box-shadow: none;">
-                    <h3 class="title is-6 mb-3" style="color: #4a4a4a;">🚀 Elementos más solicitados</h3>
-                    <canvas id="topProductsChart" style="max-height: 240px;"></canvas>
+                <div class="box" id="top-products-box" style="border: 1px solid #e1e4e8; border-radius: 8px; box-shadow: none; height: 100%;">
+                    <h3 class="title is-6 mb-3" style="color: #4a4a4a;">🚀 Elementos más solicitados (Unidades)</h3>
+                    <canvas id="topProductsChart" style="max-height: 260px;"></canvas>
                 </div>
             </div>
         </div>
@@ -152,13 +157,23 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-let salesChartInstance = null;
+let vendorSalesChartInstance = null;
 let topProductsChartInstance = null;
+
+// Formateador de Pesos Chilenos
+function formatCLP(n){
+    return new Intl.NumberFormat('es-CL', {
+        style:'currency',
+        currency:'CLP',
+        maximumFractionDigits:0
+    }).format(n || 0);
+}
 
 function loadDashboard(range) {
     loadSalesData(range);
     loadTopProducts(range);
     
+    // Cambia el color del botón activo
     const buttons = document.querySelectorAll('.style-range-btn');
     buttons.forEach(btn => {
         if(btn.textContent.toLowerCase().includes(range === 'today' ? 'hoy' : range === '7days' ? '7' : '30')) {
@@ -173,37 +188,62 @@ function loadDashboard(range) {
     });
 }
 
-function loadSalesData(range) {
-    fetch(`/analytics/vendor/sales-data/?range=${range}`)
-        .then(r => r.json())
-        .then(data => renderSalesChart(data));
+// 1. CARGA EL DINERO REAL DESDE LA NUEVA API PRIVADA
+async function loadSalesData(range) {
+    try {
+        const res = await fetch(`/analytics/vendor/my-metrics/?range=${range}`);
+        if (!res.ok) throw new Error("Error en la red");
+        const data = await res.json();
+        
+        // La API devuelve un objeto con "diario" y "comunas". Usamos "diario".
+        renderVendorSalesChart(data.diario);
+    } catch (error) {
+        console.error("Error cargando ingresos:", error);
+    }
 }
 
-function renderSalesChart(data) {
-    const ctx = document.getElementById("salesChart").getContext("2d");
-    if (salesChartInstance) salesChartInstance.destroy();
+function renderVendorSalesChart(dataDiario) {
+    const ctx = document.getElementById("vendorSalesChart").getContext("2d");
+    if (vendorSalesChartInstance) vendorSalesChartInstance.destroy();
 
-    salesChartInstance = new Chart(ctx, {
+    vendorSalesChartInstance = new Chart(ctx, {
         type: "bar",
         data: {
-            labels: data.map(d => d.day),
-            datasets: [{
-                label: "Monto total (CLP)",
-                data: data.map(d => d.total),
-                backgroundColor: "rgba(99, 68, 255, 0.6)",
-                borderColor: "rgba(99, 68, 255, 1)",
-                borderWidth: 2,
-                borderRadius: 6
-            }]
+            labels: dataDiario.map(d => d.day),
+            datasets: [
+                {
+                    label: "Ventas ($)",
+                    data: dataDiario.map(d => d.ventas),
+                    backgroundColor: "#10b981", // Verde
+                    borderRadius: 4
+                },
+                {
+                    label: "Arriendos ($)",
+                    data: dataDiario.map(d => d.arriendos),
+                    backgroundColor: "#6344ff", // Morado
+                    borderRadius: 4
+                }
+            ]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } },
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) { 
+                            return context.dataset.label + ": " + formatCLP(context.raw); 
+                        }
+                    }
+                },
+                legend: { position: 'bottom' }
+            },
             scales: { y: { beginAtZero: true } }
         }
     });
 }
 
+// 2. CARGA LAS UNIDADES DESDE EL ENDPOINT DE PRODUCTOS
 function loadTopProducts(range) {
     fetch(`/analytics/vendor/top-products/?range=${range}`)
         .then(r => r.json())
@@ -217,7 +257,7 @@ function renderTopProductsChart(data) {
 
     const canvas = document.createElement("canvas");
     canvas.id = "topProductsChart";
-    canvas.style.maxHeight = "240px";
+    canvas.style.maxHeight = "260px";
     box.appendChild(canvas);
 
     const ctx = canvas.getContext("2d");
@@ -237,9 +277,15 @@ function renderTopProductsChart(data) {
         },
         options: {
             responsive: true,
-            indexAxis: "y",
+            maintainAspectRatio: false,
+            indexAxis: "y", // Barras horizontales
             plugins: { legend: { display: false } },
-            scales: { x: { beginAtZero: true } }
+            scales: { 
+                x: { 
+                    beginAtZero: true,
+                    ticks: { precision: 0 } // Fuerzo a que no muestre 0.5, 1.5, etc.
+                } 
+            }
         }
     });
 }

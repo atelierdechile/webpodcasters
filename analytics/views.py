@@ -544,27 +544,67 @@ def admin_top_products(request):
 
 @staff_member_required
 def admin_top_comunas(request):
-    """
-    Agrupa los ítems pagados según el valor ingresado en 'place' (comuna)
-    entregando el recuento total acumulado de ventas y arriendos.
-    """
-    items = OrderItem.objects.filter(order__status__iexact="paid")
+    # Traemos los ítems pagados optimizando las relaciones con select_related
+    items = OrderItem.objects.filter(
+        order__status__iexact="paid"
+    ).select_related('order', 'product', 'order__vendors')
 
     comunas_dict = {}
+    
     for item in items:
-        # Aseguramos un formateo limpio para evitar duplicados por tildes o mayúsculas
-        comuna = (item.order.place or "Sin especificar").strip().title()
+        # Buscamos el perfil del comprador usando el email registrado en la orden
+        comuna_nombre = "Sin Especificar"
+        comprador_profile = Profile.objects.filter(user__email=item.order.email).select_related('comuna').first()
         
-        if comuna not in comunas_dict:
-            comunas_dict[comuna] = {"comuna": comuna, "ventas": 0, "arriendos": 0}
-            
+        if comprador_profile and comprador_profile.comuna:
+            comuna_nombre = comprador_profile.comuna.nombre.strip().title()
+        elif item.order.place:
+            # Fallback en caso de que sea un comprador anónimo pero haya escrito algo en el checkout
+            comuna_nombre = item.order.place.strip().title()
+
+        if comuna_nombre not in comunas_dict:
+            comunas_dict[comuna_nombre] = {"comuna": comuna_nombre, "ventas": 0, "arriendos": 0}
+
         if item.product.status == 'ARRIENDO':
-            comunas_dict[comuna]["arriendos"] += item.quantity
+            comunas_dict[comuna_nombre]["arriendos"] += item.quantity
         else:
-            comunas_dict[comuna]["ventas"] += item.quantity
+            comunas_dict[comuna_nombre]["ventas"] += item.quantity
 
     lista_final = list(comunas_dict.values())
-    # Ordenar por volumen total de movimientos
+    # Ordenamos de mayor a menor movimiento total
     lista_final.sort(key=lambda x: x["ventas"] + x["arriendos"], reverse=True)
 
     return JsonResponse(lista_final[:10], safe=False)
+
+#Gráfico de ventas y arriendos por vendedor
+@staff_member_required 
+def admin_vendedores_ranking(request):
+    vendedores = Vendor.objects.all()
+    ranking_data = []
+
+    for v in vendedores:
+        # Calculamos ítems vendidos por este vendor específico
+        items_vendor = OrderItem.objects.filter(vendor=v, order__status__iexact="paid")
+        
+        total_ventas = 0
+        total_arriendos = 0
+
+        for item in items_vendor:
+            subtotal = item.price * item.quantity
+            if item.product.status == 'ARRIENDO':
+                total_arriendos += subtotal
+            else:
+                total_ventas += subtotal
+
+        ranking_data.append({
+            "vendedor_id": v.id,
+            "vendedor_name": v.name,
+            "total_ventas": total_ventas,
+            "total_arriendos": total_arriendos,
+            "total_general": total_ventas + total_arriendos
+        })
+
+    # Ordenamos el ranking poniendo arriba al que ha recaudado más dinero total
+    ranking_data.sort(key=lambda x: x["total_general"], reverse=True)
+
+    return JsonResponse(ranking_data, safe=False)

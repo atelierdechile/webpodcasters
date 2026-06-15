@@ -55,6 +55,35 @@
     </div>
   </div>
 
+  <!-- 🏆 SECCIÓN AGREGADA: RANKING GLOBAL DE VENDEDORES -->
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <div style="text-align: left;">
+        <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🏆 Desempeño Comercial por Vendedor</h2>
+        <p class="help has-text-grey" style="margin-top: 5px;">Monto total acumulado y desglose de ingresos generados por cada creador/proveedor en la plataforma.</p>
+      </div>
+      <span class="tag is-success is-light" style="font-weight:600;">Control de Canales</span>
+    </div>
+
+    <div style="overflow-x: auto; margin-top: 1.5rem;">
+      <table class="table is-hoverable is-fullwidth" style="background: transparent; width: 100%;">
+        <thead>
+          <tr style="background-color: #f9fafb;">
+            <th style="text-align: left; padding: 12px;">Vendedor / Canal</th>
+            <th style="text-align: right; padding: 12px;">Ventas Directas</th>
+            <th style="text-align: right; padding: 12px;">Arriendos Temporales</th>
+            <th style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">Total General</th>
+          </tr>
+        </thead>
+        <tbody id="vendedoresRankingBody">
+          <tr>
+            <td colspan="4" class="has-text-centered has-text-grey py-4">Cargando datos del ranking...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h2 style="color:#6344ff; font-weight:600; font-size: 1.3rem;">Servicios o productos más populares (global)</h2>
@@ -141,7 +170,6 @@
       <canvas id="chartTopPreferencias"></canvas>
     </div>
   </div>
-
 </main>
 {% endblock %}
 
@@ -338,6 +366,42 @@
       comunasChart.update();
     }
 
+    // 🔥 NUEVA FUNCIÓN ASÍNCRONA PARA EL RANKING DE VENDEDORES
+    async function loadVendedoresRanking() {
+      const tbody = document.getElementById("vendedoresRankingBody");
+      try {
+        const res = await fetch("/analytics/admin/vendedores-ranking/");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        
+        const data = await res.json();
+        
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="has-text-centered has-text-grey py-4">No se registran transacciones aprobadas aún.</td></tr>`;
+          return;
+        }
+
+        let htmlRows = "";
+        data.forEach(v => {
+          htmlRows += `
+            <tr style="border-bottom: 1px solid #edf2f7;">
+              <td style="text-align: left; padding: 12px; font-weight: 600; color: #2d3748;">
+                ${v.vendedor_name} <span class="has-text-grey-light" style="font-size: 0.8rem;">(ID: ${v.vendedor_id})</span>
+              </td>
+              <td style="text-align: right; padding: 12px; color: #4a5568;">${formatCLP(v.total_ventas)}</td>
+              <td style="text-align: right; padding: 12px; color: #4a5568;">${formatCLP(v.total_arriendos)}</td>
+              <td style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">${formatCLP(v.total_general)}</td>
+            </tr>
+          `;
+        });
+        
+        tbody.innerHTML = htmlRows;
+
+      } catch (err) {
+        console.error("❌ Error cargando ranking de vendedores:", err);
+        tbody.innerHTML = `<tr><td colspan="4" class="has-text-centered has-text-danger py-4">Error al conectar con el servidor de métricas.</td></tr>`;
+      }
+    }
+
     async function loadProductos() {
       const rango = document.getElementById("productosRango").value;
       const res = await fetch(`/analytics/admin/top-products/?range=${rango}`);
@@ -385,7 +449,6 @@
       usuariosChart.data.datasets[0].data = dataDias.usuarios.map(e => e.total);
       usuariosChart.update();
 
-      hoursChart = horasChart;
       horasChart.data.labels = dataHoras.labels;
       horasChart.data.datasets[0].data = dataHoras.values;
       horasChart.update();
@@ -430,8 +493,9 @@
       loadVendorsMap();
       setInterval(loadVendorsMap, 5000);
 
-      loadVentas();    // Ejecuta la recarga de transacciones por día
-      loadComunas();   // 🔥 Ejecuta la recarga de la lista de comunas
+      loadVentas();    
+      loadComunas();   
+      loadVendedoresRanking(); // 🔥 Corre la tabla posicional al cargar
       loadProductos();
 
       actualizarDatos();
