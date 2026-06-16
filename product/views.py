@@ -47,12 +47,12 @@ def product(request, category_slug, product_slug):
             return redirect("product:category", category_slug=category_slug)
 
     # DISPONIBILIDAD POR COMUNA (COBERTURA)
-    comuna_activa = get_active_comuna(request)
-    vendor_comuna = getattr(product.vendor.created_by.profile.comuna, "nombre", None)
+    #comuna_activa = get_active_comuna(request)
+    #vendor_comuna = getattr(product.vendor.created_by.profile.comuna, "nombre", None)
 
-    if comuna_activa and vendor_comuna and comuna_activa.lower() != vendor_comuna.lower():
-        messages.warning(request, f"🚫 Este elemento no está disponible para tu comuna actual ({comuna_activa}).")
-        return redirect("product:category", category_slug=category_slug)
+    #if comuna_activa and vendor_comuna and comuna_activa.lower() != vendor_comuna.lower():
+    #    messages.warning(request, f"🚫 Este elemento no está disponible para tu comuna actual ({comuna_activa}).")
+    #    return redirect("product:category", category_slug=category_slug)
 
     # ============================
     # ELEMENTOS SIMILARES
@@ -62,10 +62,10 @@ def product(request, category_slug, product_slug):
     if request.user.is_authenticated and hasattr(request.user, "profile") and request.user.profile.country:
         similar_qs = similar_qs.filter(vendor__country=request.user.profile.country)
 
-    if comuna_activa:
-        similar_qs = similar_qs.filter(
-            vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
-        )
+    #if comuna_activa:
+    #    similar_qs = similar_qs.filter(
+    #        vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
+    #    )
 
     similar = list(similar_qs)
     if len(similar) > 4:
@@ -135,7 +135,7 @@ def product(request, category_slug, product_slug):
         "form": form,
         "currency_symbol": product.vendor.country.currency_symbol,
         "currency_code": product.vendor.country.currency,
-        "comuna": comuna_activa,
+    #    "comuna": comuna_activa,
     })
 
 
@@ -162,11 +162,11 @@ def category(request, category_slug):
             products = Product.objects.none()
 
     # COMUNA
-    comuna_activa = get_active_comuna(request)
-    if comuna_activa:
-        products = products.filter(
-            vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
-        )
+    #comuna_activa = get_active_comuna(request)
+    #if comuna_activa:
+    #    products = products.filter(
+    #        vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
+    #    )
 
     # PREFERENCIAS E INTERESES
     solo_pref = request.GET.get("solo_pref") == "1"
@@ -190,7 +190,7 @@ def category(request, category_slug):
     return render(request, "product/category.html", {
         "category": categoria,
         "products": products,
-        "comuna": comuna_activa,
+    #    "comuna": comuna_activa,
         "solo_pref": solo_pref,
     })
 
@@ -213,11 +213,11 @@ def search(request):
         products = products.filter(vendor__country=request.user.profile.country)
 
     # COMUNA
-    comuna_activa = get_active_comuna(request)
-    if comuna_activa:
-        products = products.filter(
-            vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
-        )
+    #comuna_activa = get_active_comuna(request)
+    #if comuna_activa:
+    #    products = products.filter(
+    #        vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
+    #    )
 
     # PREFERENCIAS
     solo_pref = request.GET.get("solo_pref") == "1"
@@ -242,6 +242,6 @@ def search(request):
     return render(request, "product/search.html", {
         "products": products,
         "query": query,
-        "comuna": comuna_activa,
+    #    "comuna": comuna_activa,
         "solo_pref": solo_pref,
     })

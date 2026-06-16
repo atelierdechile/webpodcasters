@@ -51,11 +51,11 @@ def frontpage(request):
             selected_country = user_country.id
             request.session['selected_country'] = user_country.id
 
-    comuna_activa = get_active_comuna(request)
-    if comuna_activa:
-        newest_products = newest_products.filter(
-            vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
-        )
+    #comuna_activa = get_active_comuna(request)
+    #if comuna_activa:
+    #    newest_products = newest_products.filter(
+    #        vendor__created_by__profile__comuna__nombre__iexact=comuna_activa
+    #    )
 
     # ⭐ Aquí agregas la línea que faltaba
     solo_pref = request.GET.get("solo_pref") == "1"
@@ -65,7 +65,7 @@ def frontpage(request):
         "countries": countries,
         "selected_country": selected_country,
         "newest_products": newest_products[:12],
-        "comuna": comuna_activa,
+    #    "comuna": comuna_activa,
         "solo_pref": solo_pref,
     })
 
@@ -171,72 +171,10 @@ def set_location_auto(request):
     request.session["temp_region"] = None
     request.session["temp_provincia"] = None
 
-    # Limpiar carrito según nueva comuna
-    mensaje = limpiar_carrito_por_comuna(request, comuna)
+    # REEMPLAZO: Ya no limpiamos el carrito, solo asignamos un mensaje de éxito
+    mensaje = f"Ubicación cambiada a {comuna}."
 
     return JsonResponse({
         "status": "ok",
         "message": mensaje,
     })
-
-
-
-# Limpiar productos incompatibles del carrito
-
-def limpiar_carrito_por_comuna(request, nueva_comuna):
-    cart = Cart(request)
-    productos_eliminados = 0
-
-    # congelar lista antes de modificar
-    for item in list(cart):
-        product_obj = None
-        product_id = None
-
-        #  detectar cómo viene el item del carrito
-        if isinstance(item, dict):
-            if "product" in item:
-                product_obj = item["product"]
-            elif "product_id" in item:
-                product_id = item["product_id"]
-            elif "id" in item:
-                product_id = item["id"]
-        else:
-            
-            continue
-
-        if product_obj is None and product_id is not None:
-            try:
-                product_obj = Product.objects.get(id=product_id)
-            except Product.DoesNotExist:
-                continue
-
-        if product_obj is None:
-            continue
-
-        vendor_comuna = getattr(
-            getattr(
-                getattr(product_obj.vendor.created_by, "profile", None),
-                "comuna",
-                None
-            ),
-            "nombre",
-            None
-        )
-
-        if not vendor_comuna:
-            continue
-
-        if vendor_comuna.lower() != nueva_comuna.lower():
-            cart.remove(product_obj.id)
-            productos_eliminados += 1
-
-    if productos_eliminados > 0:
-        mensaje = f"Se eliminaron {productos_eliminados} productos del carrito por no estar disponibles en {nueva_comuna}."
-    else:
-        mensaje = f"Ubicación cambiada a {nueva_comuna}."
-
-    messages.warning(request, mensaje)
-    return mensaje
-
-
-
