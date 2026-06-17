@@ -101,7 +101,8 @@
     </div>
   </div>
 
-<div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
+  <!-- 🏆 SECCIÓN AGREGADA: RANKING GLOBAL DE VENDEDORES -->
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
       <div style="text-align: left;">
         <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🏆 Desempeño Comercial por Vendedor</h2>
@@ -115,16 +116,14 @@
         <thead>
           <tr style="background-color: #f9fafb;">
             <th style="text-align: left; padding: 12px;">Vendedor</th>
-            <th style="text-align: right; padding: 12px;">Total Ventas Monto</th>
-            <th style="text-align: right; padding: 12px;">Total Ventas Cantidad</th>
-            <th style="text-align: right; padding: 12px;">Total Arriendos Monto</th>
-            <th style="text-align: right; padding: 12px;">Total Arriendos Cant</th>
+            <th style="text-align: right; padding: 12px;">Total Ventas</th>
+            <th style="text-align: right; padding: 12px;">Total Arriendo</th>
             <th style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">Total Montos</th>
           </tr>
         </thead>
         <tbody id="vendedoresRankingBody">
           <tr>
-            <td colspan="6" class="has-text-centered has-text-grey py-4">Cargando datos del ranking...</td>
+            <td colspan="4" class="has-text-centered has-text-grey py-4">Cargando datos del ranking...</td>
           </tr>
         </tbody>
       </table>
@@ -456,35 +455,57 @@
         }
     }
 
-<div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <div style="text-align: left;">
-        <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🏆 Desempeño Comercial por Vendedor</h2>
-        <p class="help has-text-grey" style="margin-top: 5px;">Monto total acumulado y desglose de ingresos generados por cada vendedor en la plataforma.</p>
-      </div>
-      <span class="tag is-success is-light" style="font-weight:600;">Control de Canales</span>
-    </div>
+    // 🔥 ACTUALIZADO: CARGA DE RANKING DE VENDEDORES CON CANTIDADES
+    async function loadVendedoresRanking() {
+      const tbody = document.getElementById("vendedoresRankingBody");
+      try {
+        const res = await fetch("/analytics/admin/vendedores-ranking/");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        
+        const data = await res.json();
+        
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="has-text-centered has-text-grey py-4">No se registran transacciones aprobadas aún.</td></tr>`;
+          return;
+        }
 
-    <div style="overflow-x: auto; margin-top: 1.5rem;">
-      <table class="table is-hoverable is-fullwidth" style="background: transparent; width: 100%;">
-        <thead>
-          <tr style="background-color: #f9fafb;">
-            <th style="text-align: left; padding: 12px;">Vendedor</th>
-            <th style="text-align: right; padding: 12px;">Total Ventas Monto</th>
-            <th style="text-align: right; padding: 12px;">Total Ventas Cantidad</th>
-            <th style="text-align: right; padding: 12px;">Total Arriendos Monto</th>
-            <th style="text-align: right; padding: 12px;">Total Arriendos Cantidad</th>
-            <th style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">Total Montos</th>
-          </tr>
-        </thead>
-        <tbody id="vendedoresRankingBody">
-          <tr>
-            <td colspan="6" class="has-text-centered has-text-grey py-4">Cargando datos del ranking...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+        let htmlRows = "";
+        data.forEach(v => {
+          // Extraemos la información asumiendo que el backend nos envía cant_ventas y cant_arriendos (o 0 por defecto)
+          const cantVentas = v.cant_ventas || 0;
+          const cantArriendos = v.cant_arriendos || 0;
+
+          htmlRows += `
+            <tr style="border-bottom: 1px solid #edf2f7;">
+              <td style="text-align: left; padding: 12px; font-weight: 600; color: #2d3748; vertical-align: middle;">
+                ${v.vendedor_name} <span class="has-text-grey-light" style="font-size: 0.8rem;">(ID: ${v.vendedor_id})</span>
+              </td>
+              <td style="text-align: right; padding: 12px; color: #4a5568; vertical-align: middle;">
+                <span style="font-size: 0.8rem; font-weight: 600; background: #e6ffed; color: #10b981; padding: 3px 8px; border-radius: 12px; margin-right: 8px;">
+                  ${cantVentas} un.
+                </span>
+                ${formatCLP(v.total_ventas)}
+              </td>
+              <td style="text-align: right; padding: 12px; color: #4a5568; vertical-align: middle;">
+                <span style="font-size: 0.8rem; font-weight: 600; background: #f0ebff; color: #6344ff; padding: 3px 8px; border-radius: 12px; margin-right: 8px;">
+                  ${cantArriendos} un.
+                </span>
+                ${formatCLP(v.total_arriendos)}
+              </td>
+              <td style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff; vertical-align: middle;">
+                ${formatCLP(v.total_general)}
+              </td>
+            </tr>
+          `;
+        });
+        
+        tbody.innerHTML = htmlRows;
+
+      } catch (err) {
+        console.error("❌ Error cargando ranking de vendedores:", err);
+        tbody.innerHTML = `<tr><td colspan="4" class="has-text-centered has-text-danger py-4">Error al conectar con el servidor de métricas.</td></tr>`;
+      }
+    }
 
     async function loadProductos() {
       const rango = document.getElementById("productosRango").value;
