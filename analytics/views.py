@@ -579,24 +579,29 @@ def admin_vendedores_ranking(request):
         
         total_ventas = 0
         total_arriendos = 0
+        cant_ventas = 0
+        cant_arriendos = 0
 
         for item in items_vendor:
             subtotal = item.price * item.quantity
             if item.product.status == 'ARRIENDO':
                 total_arriendos += subtotal
+                cant_arriendos += item.quantity
             else:
                 total_ventas += subtotal
+                cant_ventas += item.quantity
 
         ranking_data.append({
             "vendedor_id": v.id,
             "vendedor_name": v.name,
             "total_ventas": total_ventas,
             "total_arriendos": total_arriendos,
+            "cant_ventas": cant_ventas,         # <-- NUEVO
+            "cant_arriendos": cant_arriendos,   # <-- NUEVO
             "total_general": total_ventas + total_arriendos
         })
 
     ranking_data.sort(key=lambda x: x["total_general"], reverse=True)
-
     return JsonResponse(ranking_data, safe=False)
 
 
@@ -657,3 +662,29 @@ def vendor_private_metrics(request):
         "diario": reporte_diario,
         "comunas": reporte_comunas[:5] 
     }, safe=False)
+
+#Devuelve la distribución global entre Ventas y Arriendos para el pie chart
+@staff_member_required
+def admin_sales_rentals_pie(request):
+    items = OrderItem.objects.filter(order__status__iexact="paid")
+    
+    ventas = 0
+    arriendos = 0
+    
+    for item in items:
+        if item.product.status == 'ARRIENDO':
+            arriendos += item.quantity
+        else:
+            ventas += item.quantity
+            
+    total = ventas + arriendos
+    porcentaje_ventas = round((ventas / total * 100), 1) if total > 0 else 0
+    porcentaje_arriendos = round((arriendos / total * 100), 1) if total > 0 else 0
+
+    return JsonResponse({
+        "ventas": ventas,
+        "arriendos": arriendos,
+        "porcentaje_ventas": porcentaje_ventas,
+        "porcentaje_arriendos": porcentaje_arriendos,
+        "total": total
+    })

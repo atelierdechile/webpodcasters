@@ -18,6 +18,7 @@ urlpatterns = [
     path("admin/top-products/", views.admin_top_products, name="admin_top_products"),
     path("admin/top-comunas/", views.admin_top_comunas, name="admin_top_comunas"), # 👈 Arreglada en views.py
     path("admin/vendedores-ranking/", views.admin_vendedores_ranking, name="admin_vendedores_ranking"), # 👈 NUEVA: Ranking global
+    path("admin-pie-chart/", views.admin_sales_rentals_pie, name="admin_sales_rentals_pie"),
 
     # --- PANEL VENDEDOR (MÉTRICAS PRIVADAS) ---
     path("vendor/sales-data/", views.vendor_sales_data, name="vendor_sales_data"),

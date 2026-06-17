@@ -43,6 +43,52 @@
     </div>
   </div>
 
+    <!-- 🥧 NUEVA SECCIÓN: DISTRIBUCIÓN GLOBAL (PIE CHART) -->
+  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+      <div style="text-align: left;">
+        <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🥧 Distribución Global de Movimientos</h2>
+        <p class="help has-text-grey" style="margin-top: 5px;">Proporción total de unidades vendidas vs. equipos arrendados a nivel plataforma.</p>
+      </div>
+      <span class="tag is-primary is-light" style="font-weight:600;">Proporción Total</span>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
+      <!-- Gráfico de Torta -->
+      <div style="flex: 1 1 40%; min-width: 250px; max-width: 320px; text-align: center;">
+          <canvas id="salesPieChart"></canvas>
+      </div>
+      
+      <!-- Caja de Resumen Lateral -->
+      <div style="flex: 1 1 40%; min-width: 280px; text-align: left; background-color: #fafbfc; border: 1px solid #e1e4e8; border-radius: 12px; padding: 1.5rem; box-shadow: inset 0 0 5px rgba(0,0,0,0.02);">
+          <h3 style="color: #6344ff; font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Resumen de Distribución</h3>
+          
+          <div style="margin-bottom: 0.8rem; display: flex; align-items: center;">
+              <span style="color: #10b981; font-size: 1.2rem; margin-right: 8px;">📦</span>
+              <strong style="color: #4a5568;">Unidades Vendidas:</strong> 
+              <span id="pie-total-ventas" style="font-size: 1.25rem; font-weight: bold; margin-left: auto; color: #10b981;">0</span>
+          </div>
+          
+          <div style="margin-bottom: 1.2rem; display: flex; align-items: center;">
+              <span style="color: #6344ff; font-size: 1.2rem; margin-right: 8px;">🤝</span>
+              <strong style="color: #4a5568;">Equipos Arrendados:</strong> 
+              <span id="pie-total-arriendos" style="font-size: 1.25rem; font-weight: bold; margin-left: auto; color: #6344ff;">0</span>
+          </div>
+
+          <hr style="background-color: #e1e4e8; height: 1px; border: none; margin: 1rem 0;">
+
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="color: #718096;">Porcentaje de ventas:</span>
+            <strong id="pie-pct-ventas" style="color: #10b981;">0%</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #718096;">Porcentaje de arriendos:</span>
+            <strong id="pie-pct-arriendos" style="color: #6344ff;">0%</strong>
+          </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #485fc7;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🏙️ Volumen de Órdenes por Comuna de Usuario</h2>
@@ -55,12 +101,11 @@
     </div>
   </div>
 
-  <!-- 🏆 SECCIÓN AGREGADA: RANKING GLOBAL DE VENDEDORES -->
-  <div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
+<div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
       <div style="text-align: left;">
         <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🏆 Desempeño Comercial por Vendedor</h2>
-        <p class="help has-text-grey" style="margin-top: 5px;">Monto total acumulado y desglose de ingresos generados por cada creador/proveedor en la plataforma.</p>
+        <p class="help has-text-grey" style="margin-top: 5px;">Monto total acumulado y desglose de ingresos generados por cada vendedor en la plataforma.</p>
       </div>
       <span class="tag is-success is-light" style="font-weight:600;">Control de Canales</span>
     </div>
@@ -69,15 +114,17 @@
       <table class="table is-hoverable is-fullwidth" style="background: transparent; width: 100%;">
         <thead>
           <tr style="background-color: #f9fafb;">
-            <th style="text-align: left; padding: 12px;">Vendedor / Canal</th>
-            <th style="text-align: right; padding: 12px;">Ventas Directas</th>
-            <th style="text-align: right; padding: 12px;">Arriendos Temporales</th>
-            <th style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">Total General</th>
+            <th style="text-align: left; padding: 12px;">Vendedor</th>
+            <th style="text-align: right; padding: 12px;">Total Ventas Monto</th>
+            <th style="text-align: right; padding: 12px;">Total Ventas Cantidad</th>
+            <th style="text-align: right; padding: 12px;">Total Arriendos Monto</th>
+            <th style="text-align: right; padding: 12px;">Total Arriendos Cant</th>
+            <th style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">Total Montos</th>
           </tr>
         </thead>
         <tbody id="vendedoresRankingBody">
           <tr>
-            <td colspan="4" class="has-text-centered has-text-grey py-4">Cargando datos del ranking...</td>
+            <td colspan="6" class="has-text-centered has-text-grey py-4">Cargando datos del ranking...</td>
           </tr>
         </tbody>
       </table>
@@ -355,7 +402,6 @@
       ventasArriendosDiariosChart.update();
     }
 
-    // 🔥 NUEVA FUNCIÓN ASÍNCRONA PARA EL PANEL DE COMUNAS
     async function loadComunas() {
       const res = await fetch("/analytics/admin/top-comunas/");
       const data = await res.json();
@@ -366,41 +412,79 @@
       comunasChart.update();
     }
 
-    // 🔥 NUEVA FUNCIÓN ASÍNCRONA PARA EL RANKING DE VENDEDORES
-    async function loadVendedoresRanking() {
-      const tbody = document.getElementById("vendedoresRankingBody");
-      try {
-        const res = await fetch("/analytics/admin/vendedores-ranking/");
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        
-        const data = await res.json();
-        
-        if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="has-text-centered has-text-grey py-4">No se registran transacciones aprobadas aún.</td></tr>`;
-          return;
+    // 🔥 NUEVA FUNCIÓN: CARGA DEL PIE CHART
+    let salesPieChartInstance = null;
+    async function loadSalesPieChart() {
+        try {
+            const res = await fetch('/analytics/admin-pie-chart/');
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            const data = await res.json();
+
+            // Actualizar la caja de resumen
+            document.getElementById('pie-total-ventas').textContent = data.ventas;
+            document.getElementById('pie-total-arriendos').textContent = data.arriendos;
+            document.getElementById('pie-pct-ventas').textContent = data.porcentaje_ventas + '%';
+            document.getElementById('pie-pct-arriendos').textContent = data.porcentaje_arriendos + '%';
+
+            // Dibujar el gráfico
+            const ctx = document.getElementById('salesPieChart').getContext('2d');
+            if (salesPieChartInstance) salesPieChartInstance.destroy();
+
+            salesPieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Ventas', 'Arriendos'],
+                    datasets: [{
+                        data: [data.ventas, data.arriendos],
+                        backgroundColor: ['#10b981', '#6344ff'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, font: { size: 13 } }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("❌ Error cargando gráfico de torta:", err);
         }
-
-        let htmlRows = "";
-        data.forEach(v => {
-          htmlRows += `
-            <tr style="border-bottom: 1px solid #edf2f7;">
-              <td style="text-align: left; padding: 12px; font-weight: 600; color: #2d3748;">
-                ${v.vendedor_name} <span class="has-text-grey-light" style="font-size: 0.8rem;">(ID: ${v.vendedor_id})</span>
-              </td>
-              <td style="text-align: right; padding: 12px; color: #4a5568;">${formatCLP(v.total_ventas)}</td>
-              <td style="text-align: right; padding: 12px; color: #4a5568;">${formatCLP(v.total_arriendos)}</td>
-              <td style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">${formatCLP(v.total_general)}</td>
-            </tr>
-          `;
-        });
-        
-        tbody.innerHTML = htmlRows;
-
-      } catch (err) {
-        console.error("❌ Error cargando ranking de vendedores:", err);
-        tbody.innerHTML = `<tr><td colspan="4" class="has-text-centered has-text-danger py-4">Error al conectar con el servidor de métricas.</td></tr>`;
-      }
     }
+
+<div class="card mb-5" style="background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; border-left: 5px solid #10b981;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <div style="text-align: left;">
+        <h2 style="color:#1a1c29; font-weight:700; font-size: 1.3rem;">🏆 Desempeño Comercial por Vendedor</h2>
+        <p class="help has-text-grey" style="margin-top: 5px;">Monto total acumulado y desglose de ingresos generados por cada vendedor en la plataforma.</p>
+      </div>
+      <span class="tag is-success is-light" style="font-weight:600;">Control de Canales</span>
+    </div>
+
+    <div style="overflow-x: auto; margin-top: 1.5rem;">
+      <table class="table is-hoverable is-fullwidth" style="background: transparent; width: 100%;">
+        <thead>
+          <tr style="background-color: #f9fafb;">
+            <th style="text-align: left; padding: 12px;">Vendedor</th>
+            <th style="text-align: right; padding: 12px;">Total Ventas Monto</th>
+            <th style="text-align: right; padding: 12px;">Total Ventas Cantidad</th>
+            <th style="text-align: right; padding: 12px;">Total Arriendos Monto</th>
+            <th style="text-align: right; padding: 12px;">Total Arriendos Cantidad</th>
+            <th style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff;">Total Montos</th>
+          </tr>
+        </thead>
+        <tbody id="vendedoresRankingBody">
+          <tr>
+            <td colspan="6" class="has-text-centered has-text-grey py-4">Cargando datos del ranking...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
     async function loadProductos() {
       const rango = document.getElementById("productosRango").value;
@@ -495,7 +579,8 @@
 
       loadVentas();    
       loadComunas();   
-      loadVendedoresRanking(); // 🔥 Corre la tabla posicional al cargar
+      loadSalesPieChart(); // 🔥 Carga el nuevo Pie Chart de Ventas/Arriendos
+      loadVendedoresRanking(); 
       loadProductos();
 
       actualizarDatos();
