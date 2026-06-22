@@ -332,28 +332,67 @@ document.getElementById("use-my-location").addEventListener("click", () => {
 {% block scripts %}{% endblock %}
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    /* MANEJO DE DROPDOWNS DINÁMICOS (SOPORTE ESCRITORIO Y MÓVIL) */
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. MANEJO DEL MENÚ HAMBURGUESA PRINCIPAL (Mobile)
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+    
+    if ($navbarBurgers.length > 0) {
+        $navbarBurgers.forEach( el => {
+            el.addEventListener('click', () => {
+                // Busca el contenedor que tiene el ID correspondiente (navbarBasicExample)
+                const target = el.dataset.target;
+                const $target = document.getElementById(target);
+
+                // Alterna la clase "is-active" en ambos elementos para abrir/cerrar
+                el.classList.toggle('is-active');
+                $target.classList.toggle('is-active');
+            });
+        });
+    }
+
+    // 2. MANEJO DE LOS SUB-MENÚS (Dropdowns de Perfil / Creador)
     const dropdowns = document.querySelectorAll('.navbar-item.has-dropdown');
     
     dropdowns.forEach(dropdown => {
-        // 1. Comportamiento en PC (Pasar el mouse)
-        dropdown.addEventListener('mouseenter', () => {
-            dropdown.classList.add('is-active');
-        });
-        dropdown.addEventListener('mouseleave', () => {
-            dropdown.classList.remove('is-active');
-        });
+        // Detectamos si la pantalla es de escritorio (Bulma rompe el menú mobile a los 1023px)
+        const isDesktop = window.innerWidth >= 1024;
 
-        // 2. Comportamiento en Celulares (Tocar la pantalla)
+        if (isDesktop) {
+            // Comportamiento limpio para PC (Hover nativo)
+            dropdown.addEventListener('mouseenter', () => {
+                dropdown.classList.add('is-active');
+            });
+            dropdown.addEventListener('mouseleave', () => {
+                dropdown.classList.remove('is-active');
+            });
+        }
+
+        // Comportamiento exclusivo para Celulares y Tablets (Click/Tap)
         const link = dropdown.querySelector('.navbar-link');
-        if(link) {
+        if (link) {
             link.addEventListener('click', (e) => {
-                e.preventDefault(); // Evita que la página salte hacia arriba
-                dropdown.classList.toggle('is-active');
+                // Si estamos en mobile, evitamos el comportamiento por defecto y controlamos el toggle manualmente
+                if (window.innerWidth < 1024) {
+                    e.preventDefault(); 
+                    e.stopPropagation(); // Evita que el evento "flote" e interfiera con otros elementos
+                    dropdown.classList.toggle('is-active');
+                }
             });
         }
     });
+
+    // Cerrar sub-menús si el usuario hace clic fuera de ellos en mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth < 1024) {
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.classList.remove('is-active');
+                }
+            });
+        }
+    });
+
 });
 </script>
 
