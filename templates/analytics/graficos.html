@@ -469,11 +469,11 @@
           return;
         }
 
-        let htmlRows = "";
+let htmlRows = "";
         data.forEach(v => {
-          // Extraemos la información asumiendo que el backend nos envía cant_ventas y cant_arriendos (o 0 por defecto)
           const cantVentas = v.cant_ventas || 0;
           const cantArriendos = v.cant_arriendos || 0;
+          const totalUnidades = cantVentas + cantArriendos; // 👈 NUEVO: Suma total
 
           htmlRows += `
             <tr style="border-bottom: 1px solid #edf2f7;">
@@ -493,6 +493,9 @@
                 ${formatCLP(v.total_arriendos)}
               </td>
               <td style="text-align: right; padding: 12px; font-weight: 700; color: #6344ff; vertical-align: middle;">
+                <span style="font-size: 0.8rem; font-weight: 600; background: #f3f4f6; color: #4a5568; padding: 3px 8px; border-radius: 12px; margin-right: 8px;">
+                  ${totalUnidades} un.
+                </span>
                 ${formatCLP(v.total_general)}
               </td>
             </tr>

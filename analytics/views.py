@@ -559,7 +559,7 @@ def admin_top_comunas(request):
             comunas_dict[comuna_nombre] = {"comuna": comuna_nombre, "ventas": 0, "arriendos": 0}
 
         if item.product.status == 'ARRIENDO':
-            comunas_dict[comuna_nombre]["arriendos"] += item.quantity
+            comunas_dict[comuna_nombre]["arriendos"] += 1  # 👈 CORREGIDO: Cuenta como 1 transacción
         else:
             comunas_dict[comuna_nombre]["ventas"] += item.quantity
 
@@ -586,7 +586,7 @@ def admin_vendedores_ranking(request):
             subtotal = item.price * item.quantity
             if item.product.status == 'ARRIENDO':
                 total_arriendos += subtotal
-                cant_arriendos += item.quantity
+                cant_arriendos += 1  # 👈 CORREGIDO: Cuenta como 1 transacción
             else:
                 total_ventas += subtotal
                 cant_ventas += item.quantity
@@ -596,8 +596,8 @@ def admin_vendedores_ranking(request):
             "vendedor_name": v.name,
             "total_ventas": total_ventas,
             "total_arriendos": total_arriendos,
-            "cant_ventas": cant_ventas,         # <-- NUEVO
-            "cant_arriendos": cant_arriendos,   # <-- NUEVO
+            "cant_ventas": cant_ventas,
+            "cant_arriendos": cant_arriendos,
             "total_general": total_ventas + total_arriendos
         })
 
@@ -673,7 +673,7 @@ def admin_sales_rentals_pie(request):
     
     for item in items:
         if item.product.status == 'ARRIENDO':
-            arriendos += item.quantity
+            arriendos += 1  # 👈 CORREGIDO: Cuenta como 1 transacción
         else:
             ventas += item.quantity
             

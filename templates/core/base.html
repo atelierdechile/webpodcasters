@@ -333,15 +333,26 @@ document.getElementById("use-my-location").addEventListener("click", () => {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    /* MANEJO DE DROPDOWNS DINÁMICOS */
+    /* MANEJO DE DROPDOWNS DINÁMICOS (SOPORTE ESCRITORIO Y MÓVIL) */
     const dropdowns = document.querySelectorAll('.navbar-item.has-dropdown');
+    
     dropdowns.forEach(dropdown => {
+        // 1. Comportamiento en PC (Pasar el mouse)
         dropdown.addEventListener('mouseenter', () => {
             dropdown.classList.add('is-active');
         });
         dropdown.addEventListener('mouseleave', () => {
             dropdown.classList.remove('is-active');
         });
+
+        // 2. Comportamiento en Celulares (Tocar la pantalla)
+        const link = dropdown.querySelector('.navbar-link');
+        if(link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // Evita que la página salte hacia arriba
+                dropdown.classList.toggle('is-active');
+            });
+        }
     });
 });
 </script>
