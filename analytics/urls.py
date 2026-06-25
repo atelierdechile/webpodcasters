@@ -28,4 +28,5 @@ urlpatterns = [
     # --- MAPAS ---
     path("api/map/vendors-sales-today/", views.map_vendors_sales_today, name="map_vendors_sales_today"),
     path("api/map/vendors-sales-total/", views.map_vendors_sales_total, name="map_vendors_sales_total"),
+    path("api/buscar-vendedores-google/", views.api_buscar_vendedores_google, name="api_buscar_vendedores_google"),
 ]

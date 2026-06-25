@@ -9,12 +9,97 @@ from django.utils.timezone import now, localtime
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-
-# Importación de modelos de las otras apps
 from .models import UserActionLog
 from .utils import classify_section
 from vendor.models import Profile, UserPreference, Preference, Vendor
 from order.models import Order, OrderItem
+import requests
+from django.conf import settings
+
+# ============================================================================
+# 🧭 SISTEMA DE RUTAS POR COMUNAS (GOOGLE MAPS PLATFORM)
+# ============================================================================
+
+@login_required
+def api_buscar_vendedores_google(request):
+    # 1. Obtener el perfil y la comuna del comprador logueado
+    perfil_comprador = getattr(request.user, "profile", None)
+    
+    if not perfil_comprador or not perfil_comprador.comuna:
+        return JsonResponse(
+            {"error": "Necesitas tener configurada una comuna en tu perfil para usar esta función."}, 
+            status=400
+        )
+    
+    # Extraemos el nombre de la comuna (ej: "San Bernardo") y le aseguramos el país
+    origen = f"{perfil_comprador.comuna.nombre.strip()}, Chile"
+
+    # 2. Recopilar todos los vendedores activos que tengan comuna registrada
+    vendedores = Vendor.objects.select_related("created_by__profile__comuna")
+    destinos_lista = []
+    vendedores_validos = []
+
+    for v in vendedores:
+        perfil_vendedor = getattr(v.created_by, "profile", None)
+        if perfil_vendedor and perfil_vendedor.comuna:
+            # Evitamos que el comprador se compare consigo mismo si coincide el ID del vendedor
+            if v.created_by == request.user:
+                continue
+                
+            comuna_vendedor = f"{perfil_vendedor.comuna.nombre.strip()}, Chile"
+            destinos_lista.append(comuna_vendedor)
+            vendedores_validos.append(v)
+
+    if not destinos_lista:
+        return JsonResponse({"error": "No existen creadores con comunas registradas para comparar."}, status=400)
+
+    # 3. Construir la consulta para Google Distance Matrix
+    destinos_pipe = "|".join(destinos_lista)
+    api_key = getattr(settings, "GOOGLE_MAPS_API_KEY", None)
+
+    if not api_key:
+        return JsonResponse({"error": "La credencial GOOGLE_MAPS_API_KEY no está configurada en settings.py."}, status=500)
+
+    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    params = {
+        "origins": origen,
+        "destinations": destinos_pipe,
+        "key": api_key,
+        "mode": "driving",
+        "language": "es"
+    }
+
+    vendedores_cercanos = []
+
+    try:
+        response = requests.get(url, params=params, timeout=6).json()
+
+        if response.get("status") == "OK":
+            elementos = response["rows"][0]["elements"]
+
+            for idx, elemento in enumerate(elementos):
+                if elemento.get("status") == "OK":
+                    distancia_metros = elemento["distance"]["value"] # Distancia en metros reales por calle
+                    distancia_texto = elemento["distance"]["text"]   # Ej: "4.2 km"
+                    duracion_texto = elemento["duration"]["text"]     # Ej: "9 min"
+
+                    # 🎚️ Filtro límite del requerimiento: 5000 metros (5 KM)
+                    if distancia_metros <= 5000:
+                        vendedor_match = vendedores_validos[idx]
+                        vendedores_cercanos.append({
+                            "id": vendedor_match.id,
+                            "name": vendedor_match.name,
+                            "comuna": vendedor_match.created_by.profile.comuna.nombre.strip().title(),
+                            "distancia": distancia_texto,
+                            "tiempo": duracion_texto
+                        })
+        else:
+            return JsonResponse({"error": f"Google Maps API retornó un error: {response.get('status')}"}, status=500)
+
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": f"Fallo de conexión en la solicitud de rutas: {str(e)}"}, status=500)
+
+    return JsonResponse(vendedores_cercanos, safe=False)
 
 # ============================================================================
 # 🗺️ MAPAS Y GEOLOCALIZACIÓN HISTÓRICA
