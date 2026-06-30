@@ -96,13 +96,23 @@ def api_buscar_vendedores_google(request):
                     # Filtro de rango de 5 Kilómetros, EDITAR para cambiar el rango de búsqueda
                     if distancia_metros <= 5000:
                         vendedor_match = vendedores_validos[idx]
+                        
+                        # Extraemos la dirección geográfica limpia del vendedor
+                        p_vend = vendedor_match.created_by.profile
+                        c_name = p_vend.comuna.nombre.strip()
+                        if p_vend.address:
+                            direccion_geografica = f"{p_vend.address.strip()}, {c_name}, Chile"
+                        else:
+                            direccion_geografica = f"{c_name}, Chile"
+
                         vendedores_cercanos.append({
                             "id": vendedor_match.id,
                             "name": vendedor_match.name,
-                            "comuna": vendedor_match.created_by.profile.comuna.nombre.strip().title(),
+                            "comuna": c_name.title(),
                             "distancia": distancia_texto,
                             "tiempo": duracion_texto,
-                            "modo": modo_transporte
+                            "modo": modo_transporte,
+                            "direccion_real": direccion_geografica # 👈 Enviado limpio al front para el mapa
                         })
         else:
             return JsonResponse({"error": f"Google Maps API retornó un error: {response.get('status')}"}, status=500)
