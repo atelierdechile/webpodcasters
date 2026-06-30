@@ -16,25 +16,30 @@ from order.models import Order, OrderItem
 import requests
 from django.conf import settings
 
-# ============================================================================
-# 🧭 SISTEMA DE RUTAS POR COMUNAS (GOOGLE MAPS PLATFORM)
-# ============================================================================
-
 @login_required
 def api_buscar_vendedores_google(request):
-    # 1. Obtener el perfil y la comuna del comprador logueado
+    # 1. Obtener el perfil del comprador logueado
     perfil_comprador = getattr(request.user, "profile", None)
     
     if not perfil_comprador or not perfil_comprador.comuna:
         return JsonResponse(
-            {"error": "Necesitas tener configurada una comuna en tu perfil para usar esta función."}, 
+            {"error": "Necesitas tener configurada una ubicación en tu perfil para usar esta función."}, 
             status=400
         )
     
-    # Extraemos el nombre de la comuna (ej: "San Bernardo") y le aseguramos el país
-    origen = f"{perfil_comprador.comuna.nombre.strip()}, Chile"
+    # Capturar el modo de transporte dinámico (?modo=walking, bicycling, etc.)
+    modo_transporte = request.GET.get("modo", "driving").strip().lower()
+    if modo_transporte not in ["driving", "walking", "bicycling", "transit"]:
+        modo_transporte = "driving"
 
-    # 2. Recopilar todos los vendedores activos que tengan comuna registrada
+    # Construir origen usando la calle exacta que ya captura tu modelo
+    comuna_comp = perfil_comprador.comuna.nombre.strip()
+    if perfil_comprador.address:
+        origen = f"{perfil_comprador.address.strip()}, {comuna_comp}, Chile"
+    else:
+        origen = f"{comuna_comp}, Chile"
+
+    # 2. Recopilar todos los vendedores activos
     vendedores = Vendor.objects.select_related("created_by__profile__comuna")
     destinos_lista = []
     vendedores_validos = []
@@ -42,30 +47,35 @@ def api_buscar_vendedores_google(request):
     for v in vendedores:
         perfil_vendedor = getattr(v.created_by, "profile", None)
         if perfil_vendedor and perfil_vendedor.comuna:
-            # Evitamos que el comprador se compare consigo mismo si coincide el ID del vendedor
             if v.created_by == request.user:
                 continue
                 
-            comuna_vendedor = f"{perfil_vendedor.comuna.nombre.strip()}, Chile"
-            destinos_lista.append(comuna_vendedor)
+            comuna_vend = perfil_vendedor.comuna.nombre.strip()
+            # Si el vendedor tiene dirección exacta, la usamos
+            if perfil_vendedor.address:
+                dir_vendedor = f"{perfil_vendedor.address.strip()}, {comuna_vend}, Chile"
+            else:
+                dir_vendedor = f"{comuna_vend}, Chile"
+                
+            destinos_lista.append(dir_vendedor)
             vendedores_validos.append(v)
 
     if not destinos_lista:
-        return JsonResponse({"error": "No existen creadores con comunas registradas para comparar."}, status=400)
+        return JsonResponse({"error": "No existen creadores con direcciones registradas."}, status=400)
 
-    # 3. Construir la consulta para Google Distance Matrix
+    # 3. Llamada a Google Distance Matrix
     destinos_pipe = "|".join(destinos_lista)
     api_key = getattr(settings, "GOOGLE_MAPS_API_KEY", None)
 
     if not api_key:
-        return JsonResponse({"error": "La credencial GOOGLE_MAPS_API_KEY no está configurada en settings.py."}, status=500)
+        return JsonResponse({"error": "La credencial GOOGLE_MAPS_API_KEY no está configurada."}, status=500)
 
     url = "https://maps.googleapis.com/maps/api/distancematrix/json"
     params = {
         "origins": origen,
         "destinations": destinos_pipe,
         "key": api_key,
-        "mode": "driving",
+        "mode": modo_transporte,
         "language": "es"
     }
 
@@ -79,11 +89,11 @@ def api_buscar_vendedores_google(request):
 
             for idx, elemento in enumerate(elementos):
                 if elemento.get("status") == "OK":
-                    distancia_metros = elemento["distance"]["value"] # Distancia en metros reales por calle
-                    distancia_texto = elemento["distance"]["text"]   # Ej: "4.2 km"
-                    duracion_texto = elemento["duration"]["text"]     # Ej: "9 min"
+                    distancia_metros = elemento["distance"]["value"] 
+                    distancia_texto = elemento["distance"]["text"]   
+                    duracion_texto = elemento["duration"]["text"]    
 
-                    # 🎚️ Filtro límite del requerimiento: 5000 metros (5 KM)
+                    # Filtro de rango de 5 Kilómetros
                     if distancia_metros <= 5000:
                         vendedor_match = vendedores_validos[idx]
                         vendedores_cercanos.append({
@@ -91,13 +101,14 @@ def api_buscar_vendedores_google(request):
                             "name": vendedor_match.name,
                             "comuna": vendedor_match.created_by.profile.comuna.nombre.strip().title(),
                             "distancia": distancia_texto,
-                            "tiempo": duracion_texto
+                            "tiempo": duracion_texto,
+                            "modo": modo_transporte
                         })
         else:
             return JsonResponse({"error": f"Google Maps API retornó un error: {response.get('status')}"}, status=500)
 
     except requests.exceptions.RequestException as e:
-        return JsonResponse({"error": f"Fallo de conexión en la solicitud de rutas: {str(e)}"}, status=500)
+        return JsonResponse({"error": f"Fallo de conexión: {str(e)}"}, status=500)
 
     return JsonResponse(vendedores_cercanos, safe=False)
 

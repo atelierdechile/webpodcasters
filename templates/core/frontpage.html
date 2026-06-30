@@ -53,22 +53,7 @@
       <hr class="is-centered" style="width: 80px; border: 2px solid #6344ff;">
     </div>
 
-    {% if user.is_authenticated and user.profile.preferences.count > 0 %}
-    <div class="has-text-centered mb-5">
-      {% if solo_pref %}
-        <a href="?" class="button is-light is-rounded">
-          👀 Ver todo el catálogo
-        </a>
-        <p class="has-text-grey mt-2">Mostrando contenido según tus preferencias de audio 🎧</p>
-      {% else %}
-        <a href="?solo_pref=1" class="button is-link is-light is-rounded">
-          🎵 Ver solo mis intereses
-        </a>
-      {% endif %}
-    </div>
-    {% endif %}
-
-    {% if user.is_authenticated %}
+{% if user.is_authenticated %}
     <div class="has-text-centered mb-5">
         <button id="btn-buscar-google" class="button is-link is-medium is-rounded" style="background-color: #6344ff; font-weight: 600;">
             🔍 BUSCAR VENDEDORES A MENOS DE 5 KM
@@ -78,9 +63,19 @@
     <div class="modal" id="modalGoogleCercanos">
       <div class="modal-background" onclick="cerrarModalGoogle()"></div>
       <div class="modal-card" style="border-radius: 12px; overflow: hidden; max-width: 500px;">
-        <header class="modal-card-head" style="background: #ffffff; border-bottom: 1px solid #edf2f7;">
-          <p class="modal-card-title has-text-weight-bold" style="color: #1a1c29; font-size: 1.2rem;">🎙️ Creadores a menos de 5 km (Calles reales)</p>
-          <button class="delete" aria-label="close" onclick="cerrarModalGoogle()"></button>
+        <header class="modal-card-head" style="background: #ffffff; border-bottom: 1px solid #edf2f7; flex-direction: column; align-items: stretch;">
+          <div class="is-flex is-justify-content-space-between is-align-items-center mb-3">
+            <p class="modal-card-title has-text-weight-bold mb-0" style="color: #1a1c29; font-size: 1.2rem;">🎙️ Creadores en tu rango (5 km)</p>
+            <button class="delete" aria-label="close" onclick="cerrarModalGoogle()"></button>
+          </div>
+          
+          <div class="tabs is-toggle is-fullwidth is-small mb-0">
+            <ul>
+              <li id="tab-driving" class="is-active"><a onclick="cambiarModoTransporte('driving')">🚗 Auto</a></li>
+              <li id="tab-walking">   <a onclick="cambiarModoTransporte('walking')">🚶 Caminando</a></li>
+              <li id="tab-bicycling"> <a onclick="cambiarModoTransporte('bicycling')">🚴 Bici</a></li>
+            </ul>
+          </div>
         </header>
         <section class="modal-card-body" style="background: #fafbfc; padding: 1.5rem;">
           <div id="lista-google-container" class="columns is-multiline">
@@ -89,6 +84,7 @@
       </div>
     </div>
     {% endif %}
+
     {% if newest_products %}
       <div class="columns is-multiline">
         {% for product in newest_products %}
@@ -397,6 +393,9 @@ document.getElementById("chat-input").addEventListener("keypress", function(e) {
 </script>
 
 <script>
+// Variable global para recordar qué transporte está mirando el usuario
+let modoActual = 'driving';
+
 function abrirModalGoogle() { 
     document.getElementById("modalGoogleCercanos").classList.add("is-active"); 
 }
@@ -404,58 +403,76 @@ function cerrarModalGoogle() {
     document.getElementById("modalGoogleCercanos").classList.remove("is-active"); 
 }
 
+// Cambia la pestaña activa y vuelve a consultar la API
+function cambiarModoTransporte(nuevoModo) {
+    modoActual = nuevoModo;
+    // Manejo de clases visuales en las pestañas
+    document.querySelectorAll('.tabs li').forEach(li => li.classList.remove('is-active'));
+    document.getElementById(`tab-${nuevoModo}`).classList.add('is-active');
+    
+    // Ejecuta la consulta de inmediato con el nuevo modo
+    ejecutarBusquedaGoogle(true);
+}
+
 const btnBuscarGoogle = document.getElementById("btn-buscar-google");
 if (btnBuscarGoogle) {
-    btnBuscarGoogle.addEventListener("click", function() {
-        const btn = this;
-        btn.classList.add("is-loading");
+    btnBuscarGoogle.addEventListener("click", () => ejecutarBusquedaGoogle(false));
+}
 
-        fetch("/analytics/api/buscar-vendedores-google/")
-            .then(response => response.json())
-            .then(vendedores => {
-                btn.classList.remove("is-loading");
-                const container = document.getElementById("lista-google-container");
-                container.innerHTML = "";
+function ejecutarBusquedaGoogle(isTabChange = false) {
+    const btn = document.getElementById("btn-buscar-google");
+    if (!isTabChange) btn.classList.add("is-loading");
 
-                if (vendedores.error) {
-                    alert(vendedores.error);
-                    return;
-                }
+    const container = document.getElementById("lista-google-container");
+    container.innerHTML = `<div class="column is-12 has-text-centered py-5"><p class="has-text-grey">Calculando rutas en tiempo real... 🕒</p></div>`;
 
-                if (vendedores.length === 0) {
-                    container.innerHTML = `
-                        <div class="column is-12 has-text-centered py-5">
-                            <p class="has-text-grey">No se encontraron canales o creadores de audio disponibles a menos de 5 km reales por ruta desde tu comuna actual. 🎧</p>
-                        </div>`;
-                    abrirModalGoogle();
-                    return;
-                }
+    if (!isTabChange) abrirModalGoogle();
 
-                vendedores.forEach(v => {
-                    container.innerHTML += `
-                        <div class="column is-12">
-                            <div class="box" style="border: 1px solid #e1e4e8; box-shadow: none; border-radius: 8px; background: #ffffff; text-align: left;">
-                                <div class="is-flex is-justify-content-space-between is-align-items-center">
-                                    <div>
-                                        <h4 class="title is-5 mb-1" style="color: #1a1c29; margin-bottom: 4px !important;">⭐ ${v.name}</h4>
-                                        <p class="subtitle is-6 has-text-grey mb-0" style="margin-bottom: 0px !important;">Comuna: ${v.comuna}</p>
-                                        <p class="help has-text-grey-dark mt-1">🚗 Tiempo estimado de ruta: ${v.tiempo}</p>
-                                    </div>
-                                    <div class="has-text-right">
-                                        <span class="tag is-link is-light" style="font-weight: 600; color: #6344ff;">📍 a ${v.distancia}</span>
-                                    </div>
+    // Hacemos el fetch dinámico mandando el modo seleccionado por el usuario
+    fetch(`/analytics/api/buscar-vendedores-google/?modo=${modoActual}`)
+        .then(response => response.json())
+        .then(vendedores => {
+            btn.classList.remove("is-loading");
+            container.innerHTML = "";
+
+            if (vendedores.error) {
+                container.innerHTML = `<div class="column is-12"><div class="notification is-danger is-light">${vendedores.error}</div></div>`;
+                return;
+            }
+
+            if (vendedores.length === 0) {
+                let icono = modoActual === 'driving' ? '🚗' : (modoActual === 'walking' ? '🚶' : '🚴');
+                container.innerHTML = `
+                    <div class="column is-12 has-text-centered py-5">
+                        <p class="has-text-grey">No se encontraron canales a menos de 5 km utilizando este medio de transporte (${icono}).</p>
+                    </div>`;
+                return;
+            }
+
+            vendedores.forEach(v => {
+                let iconoModo = v.modo === 'driving' ? '🚗' : (v.modo === 'walking' ? '🚶' : '🚴');
+                container.innerHTML += `
+                    <div class="column is-12">
+                        <div class="box" style="border: 1px solid #e1e4e8; box-shadow: none; border-radius: 8px; background: #ffffff; text-align: left;">
+                            <div class="is-flex is-justify-content-space-between is-align-items-center">
+                                <div>
+                                    <h4 class="title is-5 mb-1" style="color: #1a1c29; margin-bottom: 4px !important;">⭐ ${v.name}</h4>
+                                    <p class="subtitle is-6 has-text-grey mb-0" style="margin-bottom: 0px !important;">Comuna: ${v.comuna}</p>
+                                    <p class="help has-text-grey-dark mt-1">${iconoModo} Tiempo de viaje estimado: ${v.tiempo}</p>
+                                </div>
+                                <div class="has-text-right">
+                                    <span class="tag is-link is-light" style="font-weight: 600; color: #6344ff;">📍 a ${v.distancia}</span>
                                 </div>
                             </div>
-                        </div>`;
-                });
-                abrirModalGoogle();
-            })
-            .catch(err => {
-                btn.classList.remove("is-loading");
-                console.error("Error en la petición:", err);
-                alert("Ocurrió un error de red o de servidor al procesar la búsqueda por comunas.");
+                        </div>
+                    </div>`;
             });
-    });
+        })
+        .catch(err => {
+            btn.classList.remove("is-loading");
+            console.error("Error en la petición:", err);
+            container.innerHTML = `<div class="column is-12 has-text-centered"><p class="has-text-danger">Error de comunicación con el servidor.</p></div>`;
+        });
 }
 </script>
 {% endif %}
