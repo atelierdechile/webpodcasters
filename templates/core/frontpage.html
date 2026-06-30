@@ -451,21 +451,30 @@ function ejecutarBusquedaGoogle(isTabChange = false) {
 
             vendedores.forEach(v => {
     let iconoModo = v.modo === 'driving' ? '🚗' : (v.modo === 'walking' ? '🚶' : '🚴');
+    let destinoUrl = encodeURIComponent(`${v.name}, ${v.comuna}, Chile`);
+    let urlMapaDirecciones = `https://www.google.com/maps/dir/?api=1&destination=${destinoUrl}&travelmode=${v.modo === 'bicycling' ? 'bicycling' : (v.modo === 'walking' ? 'walking' : 'driving')}`;
+
     container.innerHTML += `
         <div class="column is-12">
             <div class="box" style="border: 1px solid #e1e4e8; box-shadow: none; border-radius: 8px; background: #ffffff; text-align: left; padding: 1.25rem;">
                 <div class="is-flex is-justify-content-space-between is-align-items-center">
                     
                     <div style="display: block; line-height: 1.4;">
-                        <h4 style="font-size: 1.15rem; font-weight: 700; color: #1a1c29; margin: 0 0 4px 0;">
-                            ⭐ ${v.name}
+                        <h4 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 4px 0;">
+                            ⭐ <a href="/vendor/${v.id}/" target="_blank" style="color: #6344ff; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                ${v.name}
+                            </a>
                         </h4>
                         <p style="font-size: 0.95rem; color: #718096; margin: 0 0 4px 0;">
                             Comuna: ${v.comuna}
                         </p>
-                        <p style="font-size: 0.85rem; color: #4a5568; margin: 0; font-weight: 500;">
+                        <p style="font-size: 0.85rem; color: #4a5568; margin: 0 0 8px 0; font-weight: 500;">
                             ${iconoModo} Tiempo de viaje estimado: ${v.tiempo}
                         </p>
+                        
+                        <a href="${urlMapaDirecciones}" target="_blank" class="button is-small is-light is-rounded" style="font-size: 0.75rem; padding: 0 10px; height: 26px; border: 1px solid #d1d5db; font-weight: 600;">
+                            🗺️ Ver ruta en Google Maps
+                        </a>
                     </div>
                     
                     <div style="margin-left: 10px; flex-shrink: 0;">
@@ -477,7 +486,7 @@ function ejecutarBusquedaGoogle(isTabChange = false) {
                 </div>
             </div>
         </div>`;
-            });
+        });
         })
         .catch(err => {
             btn.classList.remove("is-loading");

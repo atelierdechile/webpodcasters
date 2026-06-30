@@ -93,7 +93,7 @@ def api_buscar_vendedores_google(request):
                     distancia_texto = elemento["distance"]["text"]   
                     duracion_texto = elemento["duration"]["text"]    
 
-                    # Filtro de rango de 5 Kilómetros
+                    # Filtro de rango de 5 Kilómetros, EDITAR para cambiar el rango de búsqueda
                     if distancia_metros <= 5000:
                         vendedor_match = vendedores_validos[idx]
                         vendedores_cercanos.append({
