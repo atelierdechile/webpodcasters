@@ -6,11 +6,44 @@
 <div class="container mb-6" style="padding: 0 1.5rem;">
     <div class="columns is-multiline">
         
+        <!-- 🔍 ENCABEZADO PÚBLICO DEL CREADOR -->
         <div class="column is-12 has-text-centered mt-6 mb-5">
             <h1 class="title is-2 is-capitalized" style="color: #1a1c29; font-weight: 700;">{{ vendor.name }}</h1>
             <p class="subtitle is-6 has-text-grey mt-2">Explora el catálogo completo y los elementos indexados por este perfil</p>
             
-            <div class="is-flex is-justify-content-center is-align-items-center is-flex-wrap-wrap mt-4" style="gap: 1rem;">
+            <!-- 📇 FICHA DE DATOS E INFORMACIÓN DE CONTACTO -->
+            <div class="is-flex is-justify-content-center is-align-items-center is-flex-wrap-wrap mt-3 mb-4" style="gap: 1.25rem; font-size: 0.9rem; color: #4a5568;">
+                
+                <!-- Correo electrónico comercial del User -->
+                {% if vendor.created_by.email %}
+                    <span class="has-text-weight-medium">
+                        ✉️ <strong>Email:</strong> 
+                        <a href="mailto:{{ vendor.created_by.email }}" style="color: #6344ff;">{{ vendor.created_by.email }}</a>
+                    </span>
+                {% endif %}
+
+                <!-- Teléfono principal del Profile -->
+                {% if vendor.created_by.profile.phone %}
+                    <span class="has-text-weight-medium">
+                        📞 <strong>Teléfono:</strong> {{ vendor.created_by.profile.phone }}
+                    </span>
+                {% endif %}
+
+                <!-- Ubicación: Dirección física, Comuna y País -->
+                <span class="has-text-weight-medium">
+                    📍 <strong>Ubicación:</strong> 
+                    {% if vendor.created_by.profile.address %}
+                        {{ vendor.created_by.profile.address }},
+                    {% endif %}
+                    {% if vendor.created_by.profile.comuna %}
+                        {{ vendor.created_by.profile.comuna.nombre|title }},
+                    {% endif %}
+                    {{ vendor.country.name|default:"Chile" }}
+                </span>
+            </div>
+
+            <!-- 🆕 CANALES DE ATENCIÓN DIRECTA (WhatsApp y Horarios) -->
+            <div class="is-flex is-justify-content-center is-align-items-center is-flex-wrap-wrap mt-2" style="gap: 1rem;">
                 
                 {% if vendor.created_by.profile.whatsapp %}
                     <a href="https://wa.me/{{ vendor.created_by.profile.whatsapp|cut:' ' }}" 
@@ -39,6 +72,7 @@
             <hr style="width: 60px; height: 4px; background: #6344ff; margin: 1.5rem auto 0; border-radius: 2px;">
         </div>
 
+        <!-- LISTADO DE ELEMENTOS ASOCIADOS -->
         {% for product in vendor.products.all %}
             {% include 'product/parts/list_item.html' %}
         {% empty %}
