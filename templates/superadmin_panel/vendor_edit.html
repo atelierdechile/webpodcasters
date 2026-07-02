@@ -92,6 +92,44 @@
           {% endif %}
         </div>
 
+        <hr style="background-color: #e1e4e8; margin: 2rem 0;">
+        <h3 class="subtitle is-5 mb-4" style="color: #1a1c29; font-weight: 700;">📞 Información de Contacto y Atención</h3>
+
+        <!-- Teléfono Comercial Principal -->
+        <div class="field mb-3">
+          <label class="label">Teléfono de Contacto</label>
+          <div class="control">
+            {{ form.phone|add_class:"input" }}
+          </div>
+          {% if form.phone.errors %}
+            <p class="help is-danger">{{ form.phone.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- WhatsApp Integrado para Enlaces de Redirección -->
+        <div class="field mb-3">
+          <label class="label">WhatsApp Comercial</label>
+          <div class="control">
+            {{ form.whatsapp|add_class:"input" }}
+          </div>
+          <p class="help has-text-grey-light">Formato numérico internacional para pruebas dinámicas (Ej: +56900000000).</p>
+          {% if form.whatsapp.errors %}
+            <p class="help is-danger">{{ form.whatsapp.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Horarios Comerciales Informativos -->
+        <div class="field mb-4">
+          <label class="label">Horario de Atención comercial</label>
+          <div class="control">
+            {{ form.horario|add_class:"input" }}
+          </div>
+          <p class="help has-text-grey-light">Texto plano de visualización directa para los compradores.</p>
+          {% if form.horario.errors %}
+            <p class="help is-danger">{{ form.horario.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
         <div class="field is-grouped is-justify-content-space-between mt-5">
           <div class="control">
             <a href="{% url 'superadmin_panel:vendor_list' %}" class="button is-light" style="font-weight: 600; border-radius: 8px;">

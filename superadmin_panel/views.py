@@ -200,9 +200,10 @@ def vendor_edit(request, vendor_id):
 
     if request.method == "POST":
         form = VendorEditForm(request.POST, instance=vendor)
+        
         if form.is_valid():
             form.save()
-            messages.success(request, "Vendedor actualizado correctamente.")
+            messages.success(request, "✅ Perfil de creador y datos de contacto actualizados correctamente.")
             return redirect("superadmin_panel:vendor_list")
     else:
         form = VendorEditForm(instance=vendor)

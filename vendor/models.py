@@ -71,13 +71,18 @@ class Profile(models.Model):
     lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     phone = PhoneNumberField(region="CL", blank=True)
+    
+    whatsapp = PhoneNumberField(region="CL", blank=True, null=True, help_text="Ej: +56912345678")
+    
+    # Campo de texto libre para estructurar los horarios comerciales
+    horario = models.CharField(max_length=255, blank=True, default="Lunes a Viernes de 09:00 a 18:00")
+
     address = models.CharField(max_length=255, blank=True, default="")
     zipcode = models.CharField(max_length=255, blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Solo mantenemos las preferencias/intereses de contenido
     preferences = models.ManyToManyField(Preference, blank=True)
 
     def __str__(self):

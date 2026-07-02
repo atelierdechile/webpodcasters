@@ -11,6 +11,7 @@ User = get_user_model()
 
 # --- GESTIÓN DE OFERTAS ---
 class OfferForm(forms.ModelForm):
+    # (Se mantiene exactamente igual que tu código original)
     class Meta:
         model = Offer
         fields = [
@@ -25,7 +26,6 @@ class OfferForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Ordenar productos/servicios por creador y nombre
         self.fields["product"].queryset = Product.objects.select_related("vendor").order_by(
             "vendor__name", "title"
         )
@@ -45,6 +45,11 @@ class VendorEditForm(forms.ModelForm):
     comuna = forms.ModelChoiceField(queryset=None, required=False, label="Comuna")
 
     phone = forms.CharField(label="Teléfono", required=False)
+    
+    # 🆕 NUEVOS CAMPOS EXPLICITADOS EN EL PANEL DE SUPERADMINISTRADOR
+    whatsapp = forms.CharField(label="WhatsApp Comercial", required=False, help_text="Ej: +56912345678")
+    horario = forms.CharField(label="Horario de Atención", required=False, help_text="Ej: Lun a Vie 09:00 a 18:00")
+
     address = forms.CharField(label="Dirección", required=False)
     zipcode = forms.CharField(label="Código postal", required=False)
 
@@ -85,6 +90,11 @@ class VendorEditForm(forms.ModelForm):
         self.fields["comuna"].initial = profile.comuna_id
 
         self.fields["phone"].initial = str(profile.phone) if getattr(profile, "phone", None) else ""
+        
+        # 🧪 CARGAR VALORES INICIALES DESDE EL PERFIL EXISTENTE
+        self.fields["whatsapp"].initial = str(profile.whatsapp) if getattr(profile, "whatsapp", None) else ""
+        self.fields["horario"].initial = profile.horario or ""
+
         self.fields["address"].initial = profile.address or ""
         self.fields["zipcode"].initial = profile.zipcode or ""
 
@@ -95,7 +105,7 @@ class VendorEditForm(forms.ModelForm):
         user.username = self.cleaned_data["username"]
         user.email = (self.cleaned_data.get("email") or "").strip()
 
-        new_password = self.cleaned_data.get("new_password1")
+        new_password = self.cleaned_data["new_password1"]
         if new_password:
             user.set_password(new_password)
 
@@ -107,6 +117,11 @@ class VendorEditForm(forms.ModelForm):
         profile.comuna = self.cleaned_data.get("comuna")
 
         profile.phone = self.cleaned_data.get("phone") or ""
+        
+        # 💾 SALVAGUARDAR CAMPOS NUEVOS EN EL PERFIL
+        profile.whatsapp = self.cleaned_data.get("whatsapp") or ""
+        profile.horario = self.cleaned_data.get("horario") or ""
+
         profile.address = self.cleaned_data.get("address") or ""
         profile.zipcode = self.cleaned_data.get("zipcode") or ""
 
@@ -141,6 +156,7 @@ class VendorEditForm(forms.ModelForm):
 
 # --- MESSAGING REGIONAL ---
 class VendorMessagingForm(forms.Form):
+    # (Se mantiene exactamente igual que tu código original)
     target_type = forms.ChoiceField(
         choices=[
             ("all", "A todos"),
@@ -208,6 +224,7 @@ class VendorMessagingForm(forms.Form):
 
 # --- EDICIÓN DE CLIENTE ---
 class CustomerEditForm(forms.ModelForm):
+    # (Se mantiene exactamente igual que tu código original)
     username = forms.CharField(label="Usuario", max_length=150)
     email = forms.EmailField(label="Correo electrónico", required=False)
 
@@ -248,7 +265,7 @@ class CustomerEditForm(forms.ModelForm):
         user.username = self.cleaned_data["username"]
         user.email = (self.cleaned_data.get("email") or "").strip()
 
-        new_password = self.cleaned_data.get("new_password1")
+        new_password = self.cleaned_data["new_password1"]
         if new_password:
             user.set_password(new_password)
 
