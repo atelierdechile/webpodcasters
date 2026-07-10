@@ -73,4 +73,15 @@ urlpatterns = [
     path("add-product/", views.add_product, name="add-product"),
     path("delete-product/<int:pk>/", views.delete_product, name="delete-product"),
     path("product/<int:product_id>/offer/", views.edit_offer, name="edit-offer"),
+
+    # =========================
+    # 📊 VALORACIONES / HISTORIAL
+    # =========================
+    path("mi-historial/", views.customer_orders_history, name="customer-history"),
+    path("calificar-item/<int:item_id>/", views.add_review, name="add-review"),
+
+    # ========================
+    # Historial de ventas
+    # ========================
+    path("historial-ventas/", views.vendor_sales_history, name="vendor-sales-history"),
 ]

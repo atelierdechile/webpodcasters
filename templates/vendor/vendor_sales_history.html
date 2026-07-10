@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Historial de Ventas{% endblock title %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        
+        <div class="mb-5">
+            <h1 class="title is-3" style="color: #1a1c29; font-weight: 700;">Historial de Transacciones</h1>
+            <p class="subtitle is-6 has-text-grey">Listado cronológico de todas las ventas y arriendos indexados en tu vitrina comercial.</p>
+        </div>
+
+        <!--  TABLA CON CONTENEDOR SCROLL -->
+        <div class="table-container" style="max-height: 520px; overflow-y: auto; border: 1px solid #e1e4e8; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+            <table class="table is-striped is-hoverable is-fullwidth" style="margin-bottom: 0;">
+                <thead>
+                    <tr style="position: sticky; top: 0; background-color: #f8fafc; z-index: 5; border-bottom: 2px solid #e2e8f0;">
+                        <th style="padding: 1rem; color: #475569; font-weight: 600;">Fecha y Hora</th>
+                        <th style="padding: 1rem; color: #475569; font-weight: 600;">Producto / Servicio</th>
+                        <th style="padding: 1rem; color: #475569; font-weight: 600; text-align: center;">Tipo</th>
+                        <th style="padding: 1rem; color: #475569; font-weight: 600;">Monto Cobrado</th>
+                        <th style="padding: 1rem; color: #475569; font-weight: 600;">Cliente</th>
+                        <th style="padding: 1rem; color: #475569; font-weight: 600; text-align: center;">ID Orden</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sales %}
+                        <tr style="transition: background 0.2s;">
+                            <!-- Fecha de Transacción -->
+                            <td style="padding: 1rem; vertical-align: middle;">
+                                <span class="has-text-weight-semibold" style="color: #1a1c29;">{{ item.order.created_at|date:"d/m/Y" }}</span>
+                                <br>
+                                <span class="is-size-7 has-text-grey-light">🕒 {{ item.order.created_at|time:"H:i" }} hrs</span>
+                            </td>
+                            
+                            <!-- Producto -->
+                            <td style="padding: 1rem; vertical-align: middle; font-weight: 500; color: #2d3748;">
+                                🎙️ {{ item.product.title }}
+                                {% if item.quantity > 1 %}
+                                    <span class="tag is-small is-light ml-1">x{{ item.quantity }}</span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Tipo de transacción (VENTA / ARRIENDO) -->
+                            <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                                {% if "arriendo" in item.product.status|lower or "renta" in item.product.status|lower %}
+                                    <span class="tag is-warning is-light has-text-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">ARRIENDO</span>
+                                {% else %}
+                                    <span class="tag is-success is-light has-text-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">VENTA</span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Monto -->
+                            <td style="padding: 1rem; vertical-align: middle; font-weight: 700; color: #1a1c29;">
+                                ${{ item.get_total_price }}
+                            </td>
+                            
+                            <!-- Cliente (Nombre) -->
+                            <td style="padding: 1rem; vertical-align: middle; color: #4a5568;">
+                                {{ item.order.first_name }} {{ item.order.last_name }}
+                            </td>
+                            
+                            <!-- Cliente ID (O ID de la Orden para tracking fácil) -->
+                            <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                                <span class="tag is-dark is-light" style="font-family: monospace; font-size: 0.8rem; border-radius: 6px;">
+                                    #{{ item.order.id }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="has-text-centered py-6 has-text-grey">
+                                <p class="is-size-5 mb-1">📭 Historial vacío</p>
+                                <p class="is-size-6 has-text-grey-light">Aún no registras transacciones procesadas como vendedor en la plataforma.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    /* Efecto sutil para mantener fija la cabecera en navegadores antiguos */
+    .table-container th {
+        background-color: #f8fafc !important;
+    }
+</style>
+{% endblock content %}

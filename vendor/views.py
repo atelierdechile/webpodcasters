@@ -6,6 +6,9 @@ from .models import Vendor, Profile, Preference
 from product.models import Product
 from django.contrib import messages
 from order.models import Order
+from order.models import Order, OrderItem
+from .forms import ReviewForm
+from .models import Review
 
 # --- REGISTRO DE CLIENTE ---
 def register_customer_view(request):
@@ -309,3 +312,54 @@ def edit_offer(request, product_id):
         "form": form,
         "offer": offer,
     })
+
+@login_required
+def customer_orders_history(request):
+    #Lista el historial de compras del usuario logueado basándose en su correo.
+    orders = Order.objects.filter(
+        email=request.user.email,
+        status__iexact="paid"
+    ).prefetch_related('items__product', 'items__review').order_by('-created_at')
+
+    return render(request, "vendor/customer_orders_history.html", {"orders": orders})
+
+@login_required
+def add_review(request, item_id):
+    #Procesa el formulario para que el cliente asigne una nota (1 a 7) a un OrderItem
+    item = get_object_or_404(OrderItem, id=item_id, order__email=request.user.email)
+    
+    # Seguridad: Si el producto ya fue calificado, redirige para evitar duplicados
+    if hasattr(item, 'review'):
+        return redirect('vendor:customer-history')
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.order_item = item
+            review.customer = request.user
+            review.vendor = item.vendor  # Vinculamos al creador correspondiente
+            review.save()
+            messages.success(request, "¡Tu valoración ha sido guardada con éxito! 🎉")
+            return redirect('vendor:customer-history')
+    else:
+        form = ReviewForm()
+
+    return render(request, "vendor/add_review.html", {
+        "form": form,
+        "item": item
+    })
+
+    # --- HISTORIAL DE VENTAS Y ARRIENDOS (PARA EL VENDEDOR) ---
+@login_required
+def vendor_sales_history(request):
+    if not hasattr(request.user, 'vendor'):
+        return redirect('core:home')
+        
+    vendor = request.user.vendor
+    
+    # Buscamos todas las líneas de pedidos (OrderItem) que le pertenezcan a este vendedor
+    # Usamos select_related para traer los datos de la orden y el producto de un solo viaje a la BD
+    sales = OrderItem.objects.filter(vendor=vendor).select_related('order', 'product').order_by('-order__created_at')
+    
+    return render(request, "vendor/vendor_sales_history.html", {"sales": sales})

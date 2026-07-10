@@ -8,6 +8,7 @@ from .models import Profile
 from product.models import Product 
 from location.models import Region, Provincia, Comuna
 from .geocoding import geocode_address
+from .models import Review
 
 
 class ProductForm(forms.ModelForm):
@@ -210,3 +211,24 @@ class SignUpForm(UserCreationForm):
                 lng=lng,
             )
         return user
+    
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.Select(attrs={
+                'class': 'select',
+                'style': 'width: 100%; border-radius: 6px;'
+            }),
+            'comment': forms.Textarea(attrs={
+                'class': 'textarea',
+                'placeholder': 'Cuéntanos qué tal fue tu experiencia con el servicio o producto...',
+                'rows': 4,
+                'style': 'border-radius: 6px;'
+            }),
+        }
+        labels = {
+            'rating': 'Calificación (Nota de 1 a 7)',
+            'comment': 'Tu Comentario (Opcional)',
+        }

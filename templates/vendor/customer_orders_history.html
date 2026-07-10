@@ -1,0 +1,158 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Mi Historial de Compras{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width: 900px;">
+        <h1 class="title is-3" style="color: #1a1c29; font-weight: 700; margin-bottom: 2rem;">Mi Historial de Compras</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="notification is-success" style="border-radius: 6px;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% for order in orders %}
+            <div class="box mb-5" style="border-radius: 12px; border: 1px solid #e1e4e8; box-shadow: none;">
+                <div class="columns is-mobile is-vcentered">
+                    <div class="column">
+                        <p class="title is-5" style="margin-bottom: 0.25rem;">Orden #{{ order.id }}</p>
+                        <p class="subtitle is-6 has-text-grey">{{ order.created_at|date:"d M Y, H:i" }}</p>
+                    </div>
+                    <div class="column has-text-right">
+                        <span class="tag is-success is-light" style="font-weight: 600; text-transform: uppercase;">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <hr style="background-color: #e1e4e8; height: 1px; margin: 1rem 0;">
+
+                {% for item in order.items.all %}
+                    <div class="columns is-vcentered {% if not forloop.last %}mb-3{% endif %}" style="padding: 0.5rem 0;">
+                        <div class="column is-6">
+                            <p style="font-weight: 600; color: #1a1c29;">{{ item.product.title }}</p>
+                            <p class="is-size-7 has-text-grey">Vendido por: {{ item.vendor.name }}</p>
+                        </div>
+                        <div class="column is-3 has-text-centered">
+                            <p class="has-text-grey-dark">{{ item.quantity }} x ${{ item.price }}</p>
+                        </div>
+                        <div class="column is-3 has-text-right">
+                            {% if item.review %}
+                                <span class="tag is-info is-light" style="font-weight: 600;">
+                                    ⭐ Nota {{ item.review.rating }}
+                                </span>
+                            {% else %}
+                                <button 
+                                    class="button is-small is-link is-light btn-valorar" 
+                                    style="font-weight: 600; border-radius: 6px;"
+                                    data-item-id="{{ item.id }}"
+                                    data-product-title="{{ item.product.title }}"
+                                    data-vendor-name="{{ item.vendor.name }}">
+                                    Calificar Servicio
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% empty %}
+            <div class="has-text-centered py-6">
+                <p class="subtitle is-5 has-text-grey">Aún no registras compras pagadas en la plataforma.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<div class="modal" id="modal-review">
+    <div class="modal-background" id="modal-review-bg"></div>
+    <div class="modal-content" style="max-width: 500px; padding: 1rem;">
+        <div class="box" style="border-radius: 12px; padding: 2rem;">
+            <h3 class="title is-4" style="color: #1a1c29; font-weight: 700; margin-bottom: 0.5rem;">⭐ Dejar Valoración</h3>
+            <p class="subtitle is-6 has-text-grey mb-4">
+                Calificando a <span id="modal-vendor-name" style="font-weight: 600;"></span> por el producto <strong id="modal-product-title" style="color: #6344ff;"></strong>.
+            </p>
+
+            <form method="post" id="form-review-modal" action="">
+                {% csrf_token %}
+                
+                <div class="field mb-4">
+                    <label class="label has-text-grey-dark" style="font-weight: 600;">Calificación (Nota de 1 a 7)</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="rating" id="id_rating" class="select" required>
+                                {% for i in "1234567" %}
+                                    <option value="{{ i }}">Nota {{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field mb-5">
+                    <label class="label has-text-grey-dark" style="font-weight: 600;">Tu Comentario (Opcional)</label>
+                    <div class="control">
+                        <textarea name="comment" id="id_comment" class="textarea" rows="3" placeholder="Cuéntanos cómo estuvo el servicio..." style="border-radius: 6px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="field is-grouped is-grouped-right">
+                    <div class="control">
+                        <button type="button" class="button is-light btn-close-modal" style="font-weight: 600; border-radius: 6px;">
+                            Cancelar
+                        </button>
+                    </div>
+                    <div class="control">
+                        <button type="submit" class="button is-link" style="font-weight: 600; background-color: #6344ff; border-radius: 6px;">
+                            Guardar Nota
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <button class="modal-close is-large btn-close-modal" aria-label="close"></button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('modal-review');
+        const form = document.getElementById('form-review-modal');
+        const modalVendor = document.getElementById('modal-vendor-name');
+        const modalProduct = document.getElementById('modal-product-title');
+        
+        // Capturar clics en los botones "Calificar Servicio"
+        document.querySelectorAll('.btn-valorar').forEach(button => {
+            button.addEventListener('click', () => {
+                const itemId = button.getAttribute('data-item-id');
+                const productTitle = button.getAttribute('data-product-title');
+                const vendorName = button.getAttribute('data-vendor-name');
+
+                // 1. Modificar los textos del Pop-up de manera dinámica
+                modalVendor.textContent = vendorName;
+                modalProduct.textContent = productTitle;
+
+                // 2. Inyectar la URL correcta en el atributo action del formulario usando la ruta que creamos
+                form.action = `/vendor/calificar-item/${itemId}/`;
+
+                // 3. Mostrar el Modal agregando la clase activa de Bulma
+                modal.classList.add('is-active');
+            });
+        });
+
+        // Función para cerrar el modal
+        const closeModal = () => {
+            modal.classList.remove('is-active');
+            form.reset(); // Limpia los inputs al cerrar
+        };
+
+        // Eventos de cierre (Fondo, botón cancelar, equis superior)
+        document.querySelectorAll('.btn-close-modal, #modal-review-bg').forEach(element => {
+            element.addEventListener('click', closeModal);
+        });
+    });
+</script>
+{% endblock %}

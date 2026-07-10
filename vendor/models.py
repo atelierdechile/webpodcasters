@@ -1,11 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-
 from core.models import Country
 from location.models import Region, Provincia, Comuna
 from django.utils.text import slugify
-
 from vendor.geocoding import geocode_address
 
 
@@ -74,7 +72,6 @@ class Profile(models.Model):
     
     whatsapp = PhoneNumberField(region="CL", blank=True, null=True, help_text="Ej: +56912345678")
     
-    # Campo de texto libre para estructurar los horarios comerciales
     horario = models.CharField(max_length=255, blank=True, default="Lunes a Viernes de 09:00 a 18:00")
 
     address = models.CharField(max_length=255, blank=True, default="")
@@ -160,3 +157,31 @@ class UserPreference(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.preference.name} - {self.action}"
+
+
+# ============================================================================
+# 📊 SISTEMA DE VALORACIONES Y RESEÑAS (NOTA 1 A 7)
+# ============================================================================
+class Review(models.Model):
+    # 🌟 SOLUCIÓN: Usamos el string "order.OrderItem" en lugar del objeto directo
+    order_item = models.OneToOneField("order.OrderItem", related_name="review", on_delete=models.CASCADE)
+    
+    # Registramos el comprador (User de Django) y el Vendor calificado
+    customer = models.ForeignKey(User, related_name="reviews", on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor, related_name="reviews", on_delete=models.CASCADE)
+    
+    # Escala de notas tradicionales de Chile (1 al 7)
+    NOTAS_CHOICES = [(i, f"Nota {i}") for i in range(1, 8)]
+    rating = models.IntegerField(choices=NOTAS_CHOICES, help_text="Calificación del 1 al 7")
+    
+    # Comentario en texto libre
+    comment = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Reseña"
+        verbose_name_plural = "Reseñas"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Nota {self.rating} para {self.vendor.name} por @{self.customer.username}"
