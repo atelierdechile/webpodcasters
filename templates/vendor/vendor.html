@@ -1,12 +1,12 @@
 {% extends 'core/base.html' %}
 
-{% block title %}{{ vendor.name }} - Catálogo de Creador{% endblock title %}
+{% block title %}{{ vendor.name }} - Catálogo de Vendedor{% endblock title %}
 
 {% block content %}
 <div class="container mb-6" style="padding: 0 1.5rem;">
     <div class="columns is-multiline">
         
-        <!-- 🔍 ENCABEZADO PÚBLICO DEL CREADOR -->
+        <!-- 🔍 ENCABEZADO PÚBLICO DEL VENDEDOR -->
         <div class="column is-12 has-text-centered mt-6 mb-5">
             <h1 class="title is-2 is-capitalized" style="color: #1a1c29; font-weight: 700;">{{ vendor.name }}</h1>
             <p class="subtitle is-6 has-text-grey mt-2">Explora el catálogo completo y los elementos indexados por este perfil</p>
@@ -42,9 +42,27 @@
                 </span>
             </div>
 
-            <!-- 🆕 CANALES DE ATENCIÓN DIRECTA (WhatsApp y Horarios) -->
+            <!-- 🆕 CANALES DE ATENCIÓN DIRECTA (WhatsApp, Horarios y Chat Nativo) -->
             <div class="is-flex is-justify-content-center is-align-items-center is-flex-wrap-wrap mt-2" style="gap: 1rem;">
                 
+                <!-- BOTÓN CHAT NATIVO -->
+                {% if user.is_authenticated %}
+                    {% if user != vendor.created_by %}
+                        <button class="button is-small is-link" 
+                                style="border-radius: 8px; font-weight: 600; background-color: #6344ff;"
+                                onclick="abrirChat({{ vendor.created_by.id }}, '{{ vendor.name|escapejs }}')">
+                            <span class="icon is-small">
+                                <i class="far fa-comments"></i>
+                            </span>
+                            <span>Chatear en la plataforma</span>
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'core:login' %}" class="button is-small is-light" style="border-radius: 8px;">
+                        <span>Inicia sesión para chatear</span>
+                    </a>
+                {% endif %}
+
                 {% if vendor.created_by.profile.whatsapp %}
                     <a href="https://wa.me/{{ vendor.created_by.profile.whatsapp|cut:' ' }}" 
                        target="_blank" 
@@ -80,7 +98,7 @@
                 <div style="background: white; border-radius: 12px; border: 1px solid #e1e4e8; padding: 3rem; max-width: 500px; margin: 0 auto;">
                     <p class="has-text-grey is-size-5 mb-2">📭 Vitrina vacía</p>
                     <p class="has-text-grey-light is-size-6">
-                        Este creador aún no dispone de elementos públicos indexados en su catálogo actual.
+                        Este vendedor aún no dispone de elementos públicos indexados en su catálogo actual.
                     </p>
                 </div>
             </div>
@@ -88,4 +106,135 @@
 
     </div>
 </div>
+
+<!-- 💬 VENTANA FLOTANTE DEL CHAT (COMPONENT) -->
+<div id="chat-modal" style="display: none; position: fixed; bottom: 20px; right: 20px; width: 340px; height: 440px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0px 10px 25px rgba(0,0,0,0.15); z-index: 1000; flex-direction: column; overflow: hidden;">
+  
+  <!-- Encabezado del Chat -->
+  <div style="background: #6344ff; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <strong id="chat-vendedor-nombre" style="color: white; font-size: 0.95rem;">Chat</strong>
+        <p style="font-size: 0.75rem; opacity: 0.8; margin: 0;">Responde en la plataforma</p>
+    </div>
+    <button onclick="cerrarChat()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">✕</button>
+  </div>
+
+  <!-- Área de Mensajes -->
+  <div id="chat-mensajes" style="flex: 1; padding: 12px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 8px;">
+    <!-- Se llena con JS -->
+  </div>
+
+  <!-- Formulario de Entrada -->
+  <form id="chat-form" onsubmit="enviarMensaje(event)" style="display: flex; padding: 10px; background: white; border-top: 1px solid #f1f5f9;">
+    <input type="text" id="chat-input" placeholder="Escribe un mensaje..." required style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 0.875rem;">
+    <button type="submit" style="margin-left: 6px; padding: 8px 14px; background: #6344ff; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.875rem;">Enviar</button>
+  </form>
+
+</div>
+
+<!-- 📜 SCRIPT DE INTERACCIÓN -->
+<script>
+let conversacionActualId = null;
+let intervaloChat = null;
+
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
+function abrirChat(vendedorId, nombreVendedor) {
+    document.getElementById('chat-vendedor-nombre').innerText = 'Chat con ' + nombreVendedor;
+    
+    fetch(`/chat/iniciar/${vendedorId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.conversacion_id) {
+                conversacionActualId = data.conversacion_id;
+                document.getElementById('chat-modal').style.display = 'flex';
+                cargarMensajes();
+                if (!intervaloChat) {
+                    intervaloChat = setInterval(cargarMensajes, 3000);
+                }
+            } else if (data.error) {
+                alert(data.error);
+            }
+        });
+}
+
+function cerrarChat() {
+    document.getElementById('chat-modal').style.display = 'none';
+    if (intervaloChat) {
+        clearInterval(intervaloChat);
+        intervaloChat = null;
+    }
+}
+
+function cargarMensajes() {
+    if (!conversacionActualId) return;
+
+    fetch(`/chat/mensajes/${conversacionActualId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const contenedor = document.getElementById('chat-mensajes');
+            contenedor.innerHTML = '';
+
+            if (data.mensajes.length === 0) {
+                contenedor.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 20px;">Envía un mensaje para iniciar la conversación.</div>';
+                return;
+            }
+
+            data.mensajes.forEach(msg => {
+                const div = document.createElement('div');
+                div.style.padding = '8px 12px';
+                div.style.borderRadius = '10px';
+                div.style.maxWidth = '85%';
+                div.style.fontSize = '0.85rem';
+
+                if (msg.es_mío) {
+                    div.style.background = '#6344ff';
+                    div.style.color = 'white';
+                    div.style.alignSelf = 'flex-end';
+                    div.style.borderBottomRightRadius = '2px';
+                } else {
+                    div.style.background = '#e2e8f0';
+                    div.style.color = '#1e293b';
+                    div.style.alignSelf = 'flex-start';
+                    div.style.borderBottomLeftRadius = '2px';
+                }
+
+                div.innerHTML = `<div>${msg.texto}</div><div style="font-size: 0.65rem; text-align: right; opacity: 0.75; margin-top: 2px;">${msg.hora}</div>`;
+                contenedor.appendChild(div);
+            });
+
+            contenedor.scrollTop = contenedor.scrollHeight;
+        });
+}
+
+function enviarMensaje(event) {
+    event.preventDefault();
+    const input = document.getElementById('chat-input');
+    const texto = input.value.trim();
+
+    if (!texto || !conversacionActualId) return;
+
+    const formData = new FormData();
+    formData.append('texto', texto);
+
+    fetch(`/chat/enviar/${conversacionActualId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            input.value = '';
+            cargarMensajes();
+        }
+    });
+}
+</script>
 {% endblock content %}

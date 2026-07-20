@@ -395,6 +395,214 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+{% if user.is_authenticated %}
+<!-- 💬 BOTÓN FLOTANTE GLOBAL DE CHATS -->
+<button id="btn-global-chat" onclick="toggleBandejaChats()" 
+        style="position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #6344ff; color: white; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; z-index: 9999; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+  💬
+</button>
+
+<!-- 🗂️ PANEL / MODAL DE BANDEJA DE CHATS -->
+<div id="modal-bandeja-chats" 
+     style="display: none; position: fixed; bottom: 85px; right: 20px; width: 340px; height: 460px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 10000; flex-direction: column; overflow: hidden;">
+  
+  <!-- Encabezado del Panel -->
+  <div style="background: #6344ff; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <strong id="titulo-panel-chat" style="color: white; font-size: 0.95rem;">Mis Mensajes</strong>
+    </div>
+    <div>
+      <button id="btn-volver-lista" onclick="mostrarListaChats()" style="display: none; background: none; border: none; color: white; font-size: 14px; cursor: pointer; margin-right: 8px;">⬅ Volver</button>
+      <button onclick="toggleBandejaChats()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">✕</button>
+    </div>
+  </div>
+
+  <!-- Vista 1: Lista de Conversaciones Activas -->
+  <div id="vista-lista-chats" style="flex: 1; overflow-y: auto; background: #f8fafc; padding: 8px;">
+    <!-- Se llena dinámicamente con JS -->
+  </div>
+
+  <!-- Vista 2: Conversación Abierta -->
+  <div id="vista-chat-mensajes" style="display: none; flex: 1; flex-direction: column; height: 100%;">
+    <div id="contenedor-mensajes-chat" style="flex: 1; padding: 12px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 8px;">
+    </div>
+
+    <form onsubmit="enviarMensajeGlobal(event)" style="display: flex; padding: 10px; background: white; border-top: 1px solid #f1f5f9;">
+      <input type="text" id="input-mensaje-global" placeholder="Escribe un mensaje..." required style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 0.875rem;">
+      <button type="submit" style="margin-left: 6px; padding: 8px 14px; background: #6344ff; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.875rem;">Enviar</button>
+    </form>
+  </div>
+
+</div>
+
+<!-- 📜 SCRIPT GLOBAL DEL CHAT -->
+<script>
+let conversacionActivaId = null;
+let timerPollingChat = null;
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleBandejaChats() {
+    const modal = document.getElementById('modal-bandeja-chats');
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        modal.style.display = 'flex';
+        mostrarListaChats();
+    } else {
+        modal.style.display = 'none';
+        if (timerPollingChat) {
+            clearInterval(timerPollingChat);
+            timerPollingChat = null;
+        }
+    }
+}
+
+function mostrarListaChats() {
+    conversacionActivaId = null;
+    if (timerPollingChat) clearInterval(timerPollingChat);
+
+    document.getElementById('titulo-panel-chat').innerText = 'Mis Mensajes';
+    document.getElementById('btn-volver-lista').style.display = 'none';
+    document.getElementById('vista-lista-chats').style.display = 'block';
+    document.getElementById('vista-chat-mensajes').style.display = 'none';
+
+    fetch('/chat/mis-chats/')
+        .then(res => res.json())
+        .then(data => {
+            const lista = document.getElementById('vista-lista-chats');
+            lista.innerHTML = '';
+
+            if (data.conversaciones.length === 0) {
+                lista.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 20px; font-size: 0.85rem;">No tienes conversaciones activas aún.</div>';
+                return;
+            }
+
+            data.conversaciones.forEach(c => {
+                const item = document.createElement('div');
+                item.onclick = () => abrirConversacionEspecifica(c.id, c.otro_usuario_nombre);
+                item.style.cssText = 'padding: 10px 12px; background: white; border-radius: 8px; margin-bottom: 6px; cursor: pointer; border: 1px solid #e2e8f0; transition: background 0.2s;';
+                item.onmouseover = () => item.style.background = '#f1f5f9';
+                item.onmouseout = () => item.style.background = 'white';
+
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: #1e293b;">
+                        <span>👤 ${c.otro_usuario_nombre}</span>
+                        <span style="font-size: 0.7rem; color: #94a3b8; font-weight: normal;">${c.hora}</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                        ${c.ultimo_mensaje}
+                    </div>
+                `;
+                lista.appendChild(item);
+            });
+        });
+}
+
+function abrirConversacionEspecifica(chatId, nombreUsuario) {
+    conversacionActivaId = chatId;
+    document.getElementById('titulo-panel-chat').innerText = 'Chat con ' + nombreUsuario;
+    document.getElementById('btn-volver-lista').style.display = 'inline-block';
+    
+    // Ocultar lista y mostrar la vista del chat
+    document.getElementById('vista-lista-chats').style.display = 'none';
+    
+    const vistaChat = document.getElementById('vista-chat-mensajes');
+    vistaChat.style.display = 'flex';
+    vistaChat.style.flexDirection = 'column';
+    vistaChat.style.flex = '1';
+
+    cargarMensajesChat();
+    
+    if (timerPollingChat) clearInterval(timerPollingChat);
+    timerPollingChat = setInterval(cargarMensajesChat, 3000);
+}
+
+function cargarMensajesChat() {
+    if (!conversacionActivaId) return;
+
+    fetch(`/chat/mensajes/${conversacionActivaId}/`)
+        .then(res => {
+            if (!res.ok) throw new Error("Error al cargar mensajes");
+            return res.json();
+        })
+        .then(data => {
+            const contenedor = document.getElementById('contenedor-mensajes-chat');
+            contenedor.innerHTML = '';
+
+            if (data.mensajes.length === 0) {
+                contenedor.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 20px;">Sin mensajes aún. ¡Escribe el primero!</div>';
+                return;
+            }
+
+            data.mensajes.forEach(msg => {
+                const div = document.createElement('div');
+                div.style.padding = '8px 12px';
+                div.style.borderRadius = '10px';
+                div.style.maxWidth = '85%';
+                div.style.fontSize = '0.85rem';
+                div.style.wordBreak = 'break-word';
+
+                if (msg.es_mío) {
+                    div.style.background = '#6344ff';
+                    div.style.color = 'white';
+                    div.style.alignSelf = 'flex-end';
+                    div.style.borderBottomRightRadius = '2px';
+                } else {
+                    div.style.background = '#e2e8f0';
+                    div.style.color = '#1e293b';
+                    div.style.alignSelf = 'flex-start';
+                    div.style.borderBottomLeftRadius = '2px';
+                }
+
+                div.innerHTML = `<div>${msg.texto}</div><div style="font-size: 0.65rem; text-align: right; opacity: 0.75; margin-top: 2px;">${msg.hora}</div>`;
+                contenedor.appendChild(div);
+            });
+
+            // Scroll automático hacia abajo
+            contenedor.scrollTop = contenedor.scrollHeight;
+        })
+        .catch(err => console.error("Error trayendo chat:", err));
+}
+
+function enviarMensajeGlobal(event) {
+    event.preventDefault();
+    const input = document.getElementById('input-mensaje-global');
+    const texto = input.value.trim();
+
+    if (!texto || !conversacionActivaId) return;
+
+    const formData = new FormData();
+    formData.append('texto', texto);
+
+    fetch(`/chat/enviar/${conversacionActivaId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            input.value = '';
+            cargarMensajesChat();
+        }
+    });
+}
+</script>
+{% endif %}
 
 </body>
 </html>

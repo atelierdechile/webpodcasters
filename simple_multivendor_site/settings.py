@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "vendorpos",
     'rest_framework',
     "superadmin_panel",
+    'chat',
 ]
 NOMINATIM_EMAIL = os.getenv('NOMINATIM_EMAIL', '')
 
