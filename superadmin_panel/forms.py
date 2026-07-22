@@ -11,7 +11,6 @@ User = get_user_model()
 
 # --- GESTIÓN DE OFERTAS ---
 class OfferForm(forms.ModelForm):
-    # (Se mantiene exactamente igual que tu código original)
     class Meta:
         model = Offer
         fields = [
@@ -118,7 +117,6 @@ class VendorEditForm(forms.ModelForm):
 
         profile.phone = self.cleaned_data.get("phone") or ""
         
-        # 💾 SALVAGUARDAR CAMPOS NUEVOS EN EL PERFIL
         profile.whatsapp = self.cleaned_data.get("whatsapp") or ""
         profile.horario = self.cleaned_data.get("horario") or ""
 
@@ -224,7 +222,6 @@ class VendorMessagingForm(forms.Form):
 
 # --- EDICIÓN DE CLIENTE ---
 class CustomerEditForm(forms.ModelForm):
-    # (Se mantiene exactamente igual que tu código original)
     username = forms.CharField(label="Usuario", max_length=150)
     email = forms.EmailField(label="Correo electrónico", required=False)
 
